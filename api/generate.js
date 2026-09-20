@@ -228,11 +228,24 @@ function mapQuality(quality) {
   return ['low', 'medium', 'high', 'auto'].includes(quality) ? quality : 'medium';
 }
 
-async function callOpenAIImages({ model, quality, concepts, brief }) {
+// OpenAI's gpt-image-1 family only supports these three fixed sizes (plus "auto").
+// Map the app's marketing aspect ratios onto the closest supported size.
+const ASPECT_TO_SIZE = {
+  '1:1': '1024x1024',
+  '4:5': '1024x1536',
+  '9:16': '1024x1536',
+  '16:9': '1536x1024'
+};
+function mapAspectToSize(aspectRatio) {
+  return ASPECT_TO_SIZE[aspectRatio] || '1024x1024';
+}
+
+async function callOpenAIImages({ model, quality, aspectRatio, concepts, brief }) {
   const key = process.env.OPENAI_API_KEY;
   if (!key) return { error: 'OpenAI API key is not configured. Using ₹0 built-in result.' };
   const list = (Array.isArray(concepts) ? concepts : []).slice(0, 4);
   if (!list.length) return { error: 'No creative concepts supplied to generate images from.' };
+  const size = mapAspectToSize(aspectRatio);
   try {
     const results = await Promise.all(
       list.map(async (concept) => {
@@ -242,7 +255,7 @@ async function callOpenAIImages({ model, quality, concepts, brief }) {
           body: JSON.stringify({
             model,
             prompt: buildImagePrompt(concept, brief),
-            size: '1024x1024',
+            size,
             quality: mapQuality(quality),
             n: 1
           })
@@ -275,7 +288,8 @@ export default async function handler(req, res) {
       if (provider !== 'openai') return res.status(400).json({ error: 'Image generation currently supports OpenAI only.' });
       const model = body.model || DEFAULT_OPENAI_IMAGE_MODEL;
       const quality = body.quality || 'medium';
-      const result = await callOpenAIImages({ model, quality, concepts: body.creativeConcepts, brief });
+      const aspectRatio = body.aspectRatio || '1:1';
+      const result = await callOpenAIImages({ model, quality, aspectRatio, concepts: body.creativeConcepts, brief });
       if (result.error) return res.status(503).json({ error: result.error });
       return res.status(200).json(result);
     }
