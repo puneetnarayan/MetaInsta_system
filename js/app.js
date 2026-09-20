@@ -1,7 +1,9 @@
 const ids=['brandName','productName','productDescription','objective','location','targetCustomer','ageRange','offer','budget','problem','outcome','tone','landingPage'];const $=id=>document.getElementById(id);
-function defaultAiConfig(){return {master:false,stages:{strategy:false,copy:false,creative:false,images:false,reels:false},textProvider:'openai',textModel:AI_MODELS.openai.text[0],imageProvider:'openai',imageModel:AI_MODELS.openai.image[0],imageQuality:'medium'};}
+function defaultAiConfig(){return {master:false,stages:{strategy:false,copy:false,creative:false,images:false,reels:false},textProvider:'openai',textModel:AI_MODELS.openai.text[0],imageProvider:'openai',imageModel:AI_MODELS.openai.image[0],imageQuality:'medium',imageAspectRatio:'1:1'};}
 function emptyAiUsage(){return {strategy:null,copy:null,creative:null,images:null,reels:null};}
-let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null};
+function defaultAudience(){return {primaryCustomer:'',location:'',age:'',gender:'Any',occupation:'',income:'Mid-market',problem:'',outcome:'',awareness:'Problem Aware',intent:'Warm',strategies:['Broad'],plan:null,matrix:[]};}
+function defaultOffer(){return {product:'',price:'',discount:'',duration:'',scarcity:'',cta:'',bonuses:'',guarantee:'',proof:'',analysis:null,variants:null};}
+let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer()};
 
 const REFERENCE_ADS=[{"name":"Ad Version 1 · Problem-led","hook":"Still knowing what you want to say — but hesitating when it's your turn to speak?","primaryText":"You know the answer.\n\nYou have an idea.\n\nBut when the meeting turns to you, you suddenly start searching for words, translating in your head or wondering whether you are saying it correctly.\n\nIf this sounds familiar, you are not alone.\n\nThe Speak in Meetings Workshop is designed for working professionals who want to express their ideas more clearly and participate with greater confidence in workplace conversations.\n\n4-day live workshop · ₹997\n\nExplore the workshop and see if it is right for you.","headline":"Speak with more confidence in meetings","description":"4-day live workshop for working professionals.","cta":"Learn More"},{"name":"Ad Version 2 · Outcome-led","hook":"Imagine expressing your idea clearly when the meeting turns to you.","primaryText":"You don't necessarily need more words.\n\nYou need to feel more comfortable using the words you already know.\n\nThe Speak in Meetings Workshop helps working professionals practise how to express ideas, respond naturally and participate more confidently in workplace conversations.\n\nIf your goal is to speak more clearly without constantly worrying about finding the perfect words, this workshop may be a useful next step.\n\n4-day live workshop · ₹997","headline":"Express your ideas with confidence","description":"Practical workplace communication training.","cta":"Learn More"},{"name":"Ad Version 3 · Conversational","hook":"Quick question: do you stay quiet in meetings even when you have something useful to say?","primaryText":"Maybe you know exactly what you want to say.\n\nThen the moment comes.\n\nYou hesitate.\n\nYou search for the right words.\n\nSomeone else speaks.\n\nAnd the opportunity passes.\n\nThe Speak in Meetings Workshop is created for working professionals who want to become more comfortable expressing themselves in meetings and workplace conversations.\n\nLearn, practise and build confidence through a focused 4-day live workshop.\n\n₹997","headline":"Have something to say? Say it clearly.","description":"Build practical speaking confidence at work.","cta":"Learn More"}];
 const REFERENCE_REELS=[{"title":"Reel 1 · Problem to Solution","hook":"Ever had the perfect answer five minutes after the meeting ended?","scenes":["0–3s — Hook: “Ever had the perfect answer five minutes after the meeting ended?”","3–7s — Show a professional listening in a meeting but not speaking. Voiceover: “You knew exactly what you wanted to say...”","7–12s — Show hesitation. Voiceover: “...but you started searching for words and the conversation moved on.”","12–18s — Show a confident interaction. Voiceover: “With practice, you can learn to express your ideas more naturally.”","18–24s — Introduce the workshop. Voiceover: “That's what we practise in the Speak in Meetings Workshop.”","24–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More to see the details.”"]},{"title":"Reel 2 · Outcome-led","hook":"Imagine your next meeting feeling easier.","scenes":["0–3s — Show the desired outcome immediately.","3–8s — Voiceover: “You have the knowledge. You have the ideas.”","8–15s — Show the person speaking clearly. Voiceover: “The next step is expressing those ideas clearly when the moment comes.”","15–24s — Show workshop practice. Voiceover: “The Speak in Meetings Workshop gives you a focused environment to practise workplace communication.”","24–30s — End frame: “4-day live workshop · ₹997” and “Learn More.”"]},{"title":"Reel 3 · Question Format","hook":"Do you stay quiet in meetings even when you have something useful to say?","scenes":["0–3s — Put the question on screen and pause for recognition.","3–9s — Show a meeting situation. Voiceover: “Maybe you're searching for the right words.”","9–17s — Show a simple speaking exercise. Voiceover: “Maybe you're worried about making a mistake.”","17–25s — Introduce the workshop. Voiceover: “The Speak in Meetings Workshop helps you practise expressing your ideas more clearly and confidently.”","25–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More.”"]}];
@@ -49,7 +51,7 @@ function fillBrief(b){
 }
 function resetState(){
  const keepAiConfig=state.aiConfig||defaultAiConfig();
- state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:keepAiConfig,aiUsage:emptyAiUsage(),aiImages:null};
+ state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:keepAiConfig,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer()};
 }
 function showTab(name){
  document.querySelectorAll('nav button').forEach(b=>{const active=b.dataset.tab===name;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});
@@ -61,6 +63,20 @@ function showTab(name){
      generateDemo();
    }
  }
+ if(name==='audience'&&!state.audience.primaryCustomer&&!state.audience.problem){
+   const currentBrief=brief();
+   fillAudienceInputs(Object.assign({},state.audience,{primaryCustomer:currentBrief.targetCustomer||'',location:currentBrief.location||'',age:currentBrief.ageRange||'',problem:currentBrief.problem||'',outcome:currentBrief.outcome||''}));
+ }else if(name==='audience'){
+   fillAudienceInputs(state.audience);
+ }
+ if(name==='offer'&&!state.offer.product&&!state.offer.price){
+   const currentBrief=brief();
+   fillOfferInputs(Object.assign({},state.offer,{product:currentBrief.productName||'',price:currentBrief.offer||''}));
+ }else if(name==='offer'){
+   fillOfferInputs(state.offer);
+ }
+ if(name==='audience')renderAudiencePlan(),renderAudienceMatrix();
+ if(name==='offer')renderOfferAnalysis();
  if(name==='copy')renderCopy();
  if(name==='reels')renderReels();
  if(name==='saved')renderSaved();
@@ -84,6 +100,7 @@ function readAiConfigFromUI(){
  state.aiConfig.imageProvider=$('imageProviderSelect').value;
  state.aiConfig.imageModel=$('imageModelSelect').value;
  state.aiConfig.imageQuality=$('imageQualitySelect').value;
+ state.aiConfig.imageAspectRatio=$('imageAspectSelect').value;
 }
 function applyAiConfigToUI(){
  const cfg=state.aiConfig=state.aiConfig||defaultAiConfig();
@@ -95,6 +112,7 @@ function applyAiConfigToUI(){
  $('textModelSelect').value=cfg.textModel||AI_MODELS[state.aiConfig.textProvider].text[0];
  $('imageModelSelect').value=cfg.imageModel||AI_MODELS[state.aiConfig.imageProvider].image[0];
  $('imageQualitySelect').value=cfg.imageQuality||'medium';
+ $('imageAspectSelect').value=cfg.imageAspectRatio||'1:1';
  readAiConfigFromUI();
  renderAiControlSummary();
 }
@@ -106,7 +124,7 @@ function renderAiUsageSummary(){
    const u=state.aiUsage[stage];
    const label=capitalize(stage);
    if(!u)return label+': ₹0.00 '+(stageIsAi(stage)?'(AI on — not yet generated)':'BUILT-IN');
-   if(stage==='images')return label+': '+formatInr(u.costUsd||0)+' ESTIMATE ('+(u.imageCount||0)+' images, '+providerLabel(u.provider)+')';
+   if(stage==='images')return label+': '+formatInr(u.costUsd||0)+' ESTIMATE ('+(u.imageCount||0)+' images, '+(u.aspectRatio||'1:1')+', '+providerLabel(u.provider)+')';
    return label+': '+formatInr(u.costUsd||0)+' ('+providerLabel(u.provider)+', in:'+(u.inputTokens||0)+' out:'+(u.outputTokens||0)+' tokens)';
  });
  const totalUsd=['strategy','copy','creative','reels'].reduce((s,st)=>s+((state.aiUsage[st]&&state.aiUsage[st].costUsd)||0),0)+((state.aiUsage.images&&state.aiUsage.images.costUsd)||0);
@@ -315,6 +333,159 @@ async function regenerate(type){
  $('status').textContent='New '+type+' ideas generated — ₹0';
  renderAiControlSummary();
 }
+
+// ---- Phase 2: Audience Builder (₹0, local heuristics) ----
+const AWARENESS_GUIDANCE={
+ 'Unaware':'They do not yet recognise the problem. Lead with a relatable scenario or question before naming a solution.',
+ 'Problem Aware':'They know the problem but not the solution. Lead with the problem in their own words, then introduce a solution.',
+ 'Solution Aware':'They know solutions like this exist but not yours. Lead with what makes this one different.',
+ 'Product Aware':'They know this product but have not decided. Lead with proof, offer details and objection handling.',
+ 'Most Aware':'They are ready to buy. Lead with the offer and a clear CTA.'
+};
+const AUDIENCE_STRATEGY_NOTES={
+ 'Broad':'Let Meta’s delivery system find responders with minimal targeting restrictions.',
+ 'Interest':'Target based on stated interests and behaviours related to the problem or outcome.',
+ 'Custom':'Target people who already interacted with the brand (site visitors, engagers, customer lists).',
+ 'Lookalike':'Target people who resemble an existing high-value custom audience.',
+ 'Advantage+':'Let Meta’s automated targeting combine signals across audience types.',
+ 'Retargeting':'Re-engage people who showed intent but did not convert.'
+};
+function audienceInputs(){
+ return {
+  primaryCustomer:$('audPrimaryCustomer').value.trim(),
+  location:$('audLocation').value.trim(),
+  age:$('audAge').value.trim(),
+  gender:$('audGender').value,
+  occupation:$('audOccupation').value.trim(),
+  income:$('audIncome').value,
+  problem:$('audProblem').value.trim(),
+  outcome:$('audOutcome').value.trim(),
+  awareness:$('audAwareness').value,
+  intent:$('audIntent').value,
+  strategies:Array.from(document.querySelectorAll('.audStrategyBox:checked')).map(el=>el.value)
+ };
+}
+function fillAudienceInputs(a){
+ if(!a)return;
+ $('audPrimaryCustomer').value=a.primaryCustomer||'';
+ $('audLocation').value=a.location||'';
+ $('audAge').value=a.age||'';
+ $('audGender').value=a.gender||'Any';
+ $('audOccupation').value=a.occupation||'';
+ $('audIncome').value=a.income||'Mid-market';
+ $('audProblem').value=a.problem||'';
+ $('audOutcome').value=a.outcome||'';
+ $('audAwareness').value=a.awareness||'Problem Aware';
+ $('audIntent').value=a.intent||'Warm';
+ const strategies=a.strategies&&a.strategies.length?a.strategies:['Broad'];
+ document.querySelectorAll('.audStrategyBox').forEach(el=>{el.checked=strategies.includes(el.value);});
+}
+function generateAudiencePlan(){
+ state.brief=brief();
+ const a=audienceInputs();
+ state.audience=Object.assign(state.audience||defaultAudience(),a);
+ const clean=s=>String(s).trim().replace(/[.!?]+$/,'');
+ const customer=a.primaryCustomer||state.brief.targetCustomer||'your ideal customer';
+ const problem=a.problem||state.brief.problem||'a frustrating problem';
+ const outcome=a.outcome||state.brief.outcome||'a clear desired outcome';
+ const strategies=a.strategies.length?a.strategies:['Broad'];
+ const plan={
+  primaryAudience:customer+(a.age?' · '+a.age:'')+(a.gender&&a.gender!=='Any'?' · '+a.gender:'')+(a.occupation?' · '+a.occupation:'')+(a.location?' · '+a.location:''),
+  pain:problem,
+  motivation:outcome,
+  awareness:a.awareness+' — '+(AWARENESS_GUIDANCE[a.awareness]||''),
+  message:'For '+clean(customer).toLowerCase()+' dealing with '+clean(problem).toLowerCase()+', position the offer as the practical next step toward '+clean(outcome).toLowerCase()+'.',
+  options:strategies.map(s=>s+': '+(AUDIENCE_STRATEGY_NOTES[s]||''))
+ };
+ state.audience.plan=plan;
+ if(!Array.isArray(state.audience.matrix)||!state.audience.matrix.length){
+   const angles=['Problem-led','Outcome-led','Question-led'];
+   state.audience.matrix=strategies.slice(0,3).map((s,i)=>({audience:s,angle:angles[i%angles.length],creative:'Single Image Ad',purpose:'Test '+s+' audience with a '+angles[i%angles.length].toLowerCase()+' angle'}));
+ }
+ renderAudiencePlan();
+ renderAudienceMatrix();
+ $('status').textContent='Audience plan generated — ₹0';
+}
+function renderAudiencePlan(){
+ const p=state.audience&&state.audience.plan;
+ if(!p){$('audiencePlanResult').innerHTML='<div class="placeholder">Fill in audience details and generate a plan.</div>';return;}
+ $('audiencePlanResult').innerHTML='<div class="result-grid">'+
+  '<div class="result-card"><strong>Primary Audience</strong><p>'+esc(p.primaryAudience)+'</p></div>'+
+  '<div class="result-card"><strong>Pain</strong><p>'+esc(p.pain)+'</p></div>'+
+  '<div class="result-card"><strong>Motivation</strong><p>'+esc(p.motivation)+'</p></div>'+
+  '<div class="result-card"><strong>Awareness</strong><p>'+esc(p.awareness)+'</p></div>'+
+  '<div class="result-card wide-card"><strong>Message</strong><p>'+esc(p.message)+'</p></div>'+
+  '<div class="result-card wide-card"><strong>Audience Options</strong><p>'+p.options.map(o=>esc(o)).join('<br>')+'</p></div>'+
+ '</div><small class="demo-badge">₹0 MODE — built-in audience engine</small>';
+}
+function renderAudienceMatrix(){
+ const rows=(state.audience&&state.audience.matrix)||[];
+ $('audienceMatrix').innerHTML=rows.length?'<table class="matrix-table"><thead><tr><th>Audience</th><th>Angle</th><th>Creative</th><th>Purpose</th><th></th></tr></thead><tbody>'+
+  rows.map((r,i)=>'<tr><td><input class="matrix-field" data-index="'+i+'" data-key="audience" value="'+attr(r.audience)+'"></td><td><input class="matrix-field" data-index="'+i+'" data-key="angle" value="'+attr(r.angle)+'"></td><td><input class="matrix-field" data-index="'+i+'" data-key="creative" value="'+attr(r.creative)+'"></td><td><input class="matrix-field" data-index="'+i+'" data-key="purpose" value="'+attr(r.purpose)+'"></td><td><button class="ghost danger matrixRemove" data-index="'+i+'" type="button">✕</button></td></tr>').join('')+
+ '</tbody></table>':'<div class="placeholder">No testing rows yet. Generate a plan or add a row.</div>';
+ document.querySelectorAll('.matrix-field').forEach(el=>el.oninput=()=>{state.audience.matrix[Number(el.dataset.index)][el.dataset.key]=el.value;});
+ document.querySelectorAll('.matrixRemove').forEach(btn=>btn.onclick=()=>{state.audience.matrix.splice(Number(btn.dataset.index),1);renderAudienceMatrix();});
+}
+
+// ---- Phase 3: Offer Module (₹0, local heuristics) ----
+function offerInputs(){
+ return {
+  product:$('offerProduct').value.trim(),
+  price:$('offerPrice').value.trim(),
+  discount:$('offerDiscount').value.trim(),
+  duration:$('offerDuration').value.trim(),
+  scarcity:$('offerScarcity').value.trim(),
+  cta:$('offerCta').value.trim(),
+  bonuses:$('offerBonuses').value.trim(),
+  guarantee:$('offerGuarantee').value.trim(),
+  proof:$('offerProof').value.trim()
+ };
+}
+function fillOfferInputs(o){
+ if(!o)return;
+ $('offerProduct').value=o.product||'';
+ $('offerPrice').value=o.price||'';
+ $('offerDiscount').value=o.discount||'';
+ $('offerDuration').value=o.duration||'';
+ $('offerScarcity').value=o.scarcity||'';
+ $('offerCta').value=o.cta||'';
+ $('offerBonuses').value=o.bonuses||'';
+ $('offerGuarantee').value=o.guarantee||'';
+ $('offerProof').value=o.proof||'';
+}
+function analyzeOffer(){
+ state.brief=brief();
+ const o=offerInputs();
+ state.offer=Object.assign(state.offer||defaultOffer(),o);
+ const product=o.product||state.brief.productName||'the product/service';
+ const price=o.price||state.brief.offer||'';
+ const checks=[
+  {label:'Offer clarity',ok:!!(product&&price),note:(product&&price)?'Product and price are both specified.':'Suggested improvement: specify both what is being offered and the price.'},
+  {label:'Value proposition',ok:!!o.duration,note:o.duration?'Duration/scope is specified, helping set expectations.':'Potential weakness: no duration or scope specified — add what exactly is included.'},
+  {label:'Risk reversal',ok:!!o.guarantee,note:o.guarantee?'A guarantee is included.':'Potential weakness: no guarantee or risk reversal — consider adding one to reduce hesitation.'},
+  {label:'Proof',ok:!!o.proof,note:o.proof?'Proof/evidence is included.':'Potential weakness: no proof or evidence provided — consider adding testimonials, numbers or case studies.'},
+  {label:'Urgency',ok:!!(o.scarcity||o.discount),note:(o.scarcity||o.discount)?'A scarcity or time-limited element is present.':'Suggested test: add a genuine scarcity or deadline element if one exists.'},
+  {label:'CTA',ok:!!o.cta,note:o.cta?'A clear CTA is specified.':'Suggested improvement: specify a single, clear call to action.'}
+ ];
+ state.offer.analysis=checks;
+ const cleanOffer=s=>String(s).trim().replace(/[.!?]+$/,'');
+ const outcomeText=cleanOffer(state.brief.outcome||'the desired outcome').toLowerCase();
+ state.offer.variants=[
+  {name:'Current Offer',description:product+(price?' · '+price:'')+(o.discount?' · '+o.discount:'')+(o.bonuses?' · Includes: '+o.bonuses:'')+(o.guarantee?' · '+o.guarantee:'')},
+  {name:'Outcome-focused',description:'Get '+outcomeText+' with '+product+(price?' · '+price:'')+'.'+(o.guarantee?' '+o.guarantee:'')},
+  {name:'Bonus-focused',description:product+(price?' · '+price:'')+(o.bonuses?' · Plus: '+o.bonuses:' · (add a bonus to strengthen this angle)')+(o.scarcity?' · '+o.scarcity:'')}
+ ];
+ renderOfferAnalysis();
+ $('status').textContent='Offer analysed — ₹0';
+}
+function renderOfferAnalysis(){
+ const checks=state.offer&&state.offer.analysis;
+ if(!checks){$('offerAnalysisResult').innerHTML='<div class="placeholder">Fill in the offer and click Analyse Offer.</div>';$('offerVariantsResult').innerHTML='';return;}
+ $('offerAnalysisResult').innerHTML='<div class="offer-checklist">'+checks.map(c=>'<div class="offer-check-row '+(c.ok?'ok':'warn')+'"><span class="offer-check-icon">'+(c.ok?'✓':'⚠')+'</span><div><strong>'+esc(c.label)+'</strong><p>'+esc(c.note)+'</p></div></div>').join('')+'</div><small class="demo-badge">₹0 MODE — built-in offer engine; heuristic checks, not a guarantee of results</small>';
+ const variants=state.offer.variants||[];
+ $('offerVariantsResult').innerHTML=variants.length?'<h3 class="variants-head">Offer Variants</h3><div class="result-grid">'+variants.map(v=>'<div class="result-card"><strong>'+esc(v.name)+'</strong><p>'+esc(v.description)+'</p></div>').join('')+'</div>':'';
+}
+
 async function loadReferenceExample(){
   const btn=$('useReference');
   btn.disabled=true;
@@ -375,6 +546,8 @@ async function loadReferenceExample(){
     state.aiMode=false;
     state.aiUsage=emptyAiUsage();
     state.aiImages=null;
+    state.audience=defaultAudience();
+    state.offer=defaultOffer();
     state.strategy=strategyData.strategy||REFERENCE_STRATEGY;
     state.copy=Array.isArray(adData.ads)?adData.ads.slice():REFERENCE_ADS.slice();
     state.creative=Array.isArray(creativeData.creative)?creativeData.creative.slice():REFERENCE_CREATIVE.slice();
@@ -385,6 +558,11 @@ async function loadReferenceExample(){
 
     renderResults();
     renderAiControlSummary();
+    fillAudienceInputs(state.audience);
+    renderAudiencePlan();
+    renderAudienceMatrix();
+    fillOfferInputs(state.offer);
+    renderOfferAnalysis();
     $('status').textContent='Reference loaded — Strategy + 3 Ad Copies + 4 Creative Ideas + 3 Reel Scripts ready';
     showTab('brief');
   }catch(err){
@@ -395,7 +573,10 @@ async function loadReferenceExample(){
 }
 $('useReference').onclick=loadReferenceExample;
 $('generate').onclick=()=>{state.brief=brief();generateAI();};
-$('regenStrategy').onclick=()=>regenerate('strategy');$('regenCopy').onclick=()=>regenerate('copy');$('regenCreative').onclick=()=>regenerate('creative');$('regenReels').onclick=()=>regenerate('reels');$('nextCopy').onclick=()=>showTab('copy');$('nextCreative').onclick=()=>showTab('creative');$('nextReels').onclick=()=>showTab('reels');$('nextSaved').onclick=()=>showTab('saved');
+$('regenStrategy').onclick=()=>regenerate('strategy');$('regenCopy').onclick=()=>regenerate('copy');$('regenCreative').onclick=()=>regenerate('creative');$('regenReels').onclick=()=>regenerate('reels');$('nextAudience').onclick=()=>showTab('audience');$('nextOffer').onclick=()=>showTab('offer');$('nextCopyFromOffer').onclick=()=>showTab('copy');$('nextCreative').onclick=()=>showTab('creative');$('nextReels').onclick=()=>showTab('reels');$('nextSaved').onclick=()=>showTab('saved');
+$('genAudiencePlan').onclick=generateAudiencePlan;
+$('addMatrixRow').onclick=()=>{if(!state.audience)state.audience=defaultAudience();if(!Array.isArray(state.audience.matrix))state.audience.matrix=[];state.audience.matrix.push({audience:'',angle:'',creative:'',purpose:''});renderAudienceMatrix();};
+$('analyzeOffer').onclick=analyzeOffer;
 
 $('aiMasterSwitch').onchange=onAiControlChange;
 document.querySelectorAll('.ai-stage-grid input[type=checkbox]').forEach(el=>el.onchange=onAiControlChange);
@@ -404,6 +585,7 @@ $('textModelSelect').onchange=onAiControlChange;
 $('imageProviderSelect').onchange=onAiControlChange;
 $('imageModelSelect').onchange=onAiControlChange;
 $('imageQualitySelect').onchange=onAiControlChange;
+$('imageAspectSelect').onchange=onAiControlChange;
 $('aiImagesOnlyBtn').onclick=()=>{
  $('aiMasterSwitch').checked=true;
  document.querySelectorAll('.ai-stage-grid input[type=checkbox]').forEach(el=>{el.checked=el.dataset.stage==='images';});
@@ -417,13 +599,14 @@ $('generateImagesBtn').onclick=async()=>{
  btn.disabled=true;const orig=btn.textContent;btn.textContent='Generating images…';
  $('status').textContent='Calling '+providerLabel(state.aiConfig.imageProvider)+' for images…';
  try{
-   const data=await callGenerateStage('images',state.brief,{quality:state.aiConfig.imageQuality,creativeConcepts:state.creative,model:state.aiConfig.imageModel,provider:state.aiConfig.imageProvider});
+   const data=await callGenerateStage('images',state.brief,{quality:state.aiConfig.imageQuality,aspectRatio:state.aiConfig.imageAspectRatio,creativeConcepts:state.creative,model:state.aiConfig.imageModel,provider:state.aiConfig.imageProvider});
    state.aiImages=Array.isArray(data.images)?data.images:[];
    const imageCount=(data.usage&&data.usage.imageCount)||state.aiImages.length;
    state.aiUsage.images={
      provider:state.aiConfig.imageProvider,
      model:state.aiConfig.imageModel,
      quality:state.aiConfig.imageQuality,
+     aspectRatio:state.aiConfig.imageAspectRatio,
      imageCount,
      costUsd:estimateImageCostUsd(state.aiConfig.imageQuality,imageCount)
    };
@@ -437,7 +620,7 @@ $('generateImagesBtn').onclick=async()=>{
 };
 
 $('save').onclick=()=>{const b=brief();if(!b.productName){$('status').textContent='Enter a product/service first.';return;}const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:b,state});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));$('status').textContent='Campaign saved';};
-function startNewCampaign(){ids.forEach(id=>$(id).value='');resetState();$('strategyResult').innerHTML='<div class="placeholder">Complete the brief and generate a strategy.</div>';$('copyResult').innerHTML='<div class="placeholder">Generate a campaign to create ad copy.</div>';$('creativeResult').innerHTML='<article><h3>Image Ad</h3><p>Visual concept and text hierarchy.</p></article><article><h3>Carousel</h3><p>Problem → solution → proof → CTA.</p></article><article><h3>Story</h3><p>Vertical 9:16 concept.</p></article><article><h3>Reel</h3><p>Scene-by-scene creative concept.</p></article>';$('reelsResult').innerHTML='<div class="placeholder">Generate a campaign to create reel scripts.</div>';$('status').textContent='New campaign ready';renderAiControlSummary();showTab('brief');}
+function startNewCampaign(){ids.forEach(id=>$(id).value='');resetState();$('strategyResult').innerHTML='<div class="placeholder">Complete the brief and generate a strategy.</div>';$('copyResult').innerHTML='<div class="placeholder">Generate a campaign to create ad copy.</div>';$('creativeResult').innerHTML='<article><h3>Image Ad</h3><p>Visual concept and text hierarchy.</p></article><article><h3>Carousel</h3><p>Problem → solution → proof → CTA.</p></article><article><h3>Story</h3><p>Vertical 9:16 concept.</p></article><article><h3>Reel</h3><p>Scene-by-scene creative concept.</p></article>';$('reelsResult').innerHTML='<div class="placeholder">Generate a campaign to create reel scripts.</div>';fillAudienceInputs(state.audience);renderAudiencePlan();renderAudienceMatrix();fillOfferInputs(state.offer);renderOfferAnalysis();$('status').textContent='New campaign ready';renderAiControlSummary();showTab('brief');}
 $('newCampaign').onclick=()=>{$('newCampaignConfirm').hidden=false;};
 $('confirmNewCampaign').onclick=()=>{$('newCampaignConfirm').hidden=true;startNewCampaign();};
 $('cancelNewCampaign').onclick=()=>{$('newCampaignConfirm').hidden=true;};
@@ -446,21 +629,28 @@ $('exportJson').onclick=()=>download('ai-ads-campaign.json',JSON.stringify(state
 $('exportText').onclick=()=>{
  const briefText=Object.entries(brief()).map(([k,v])=>k+': '+v).join('\n');
  const cfg=state.aiConfig||defaultAiConfig();
- const aiText='\n\nAI CONFIGURATION\nMaster: '+(cfg.master?'ON':'OFF')+'\nText Provider: '+providerLabel(cfg.textProvider)+' ('+cfg.textModel+')\nImage Provider: '+providerLabel(cfg.imageProvider)+' ('+cfg.imageModel+', '+cfg.imageQuality+')\nStages: '+Object.entries(cfg.stages).map(([k,v])=>k+'='+(v?'ON':'OFF')).join(', ')+'\n\n'+($('aiUsagePre')?$('aiUsagePre').textContent:'');
+ const aiText='\n\nAI CONFIGURATION\nMaster: '+(cfg.master?'ON':'OFF')+'\nText Provider: '+providerLabel(cfg.textProvider)+' ('+cfg.textModel+')\nImage Provider: '+providerLabel(cfg.imageProvider)+' ('+cfg.imageModel+', '+cfg.imageQuality+', '+cfg.imageAspectRatio+')\nStages: '+Object.entries(cfg.stages).map(([k,v])=>k+'='+(v?'ON':'OFF')).join(', ')+'\n\n'+($('aiUsagePre')?$('aiUsagePre').textContent:'');
  download('ai-ads-campaign.txt',briefText+aiText,'text/plain');
 };
 function renderSaved(){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');$('savedList').innerHTML=items.length?items.map(x=>'<div class="saved-card"><div class="saved-meta"><strong>'+esc(x.brief.productName||'Untitled campaign')+'</strong><small>'+esc(x.brief.brandName||'')+' · '+new Date(x.savedAt).toLocaleString()+'</small></div><div class="saved-actions"><button class="secondary loadBtn" data-id="'+x.id+'">Load</button><button class="secondary duplicateBtn" data-id="'+x.id+'">Duplicate</button><button class="secondary danger deleteBtn" data-id="'+x.id+'">Delete</button></div></div>').join(''):'<div class="placeholder">No saved campaigns yet.</div>';document.querySelectorAll('.loadBtn').forEach(btn=>btn.onclick=()=>loadCampaign(Number(btn.dataset.id)));document.querySelectorAll('.duplicateBtn').forEach(btn=>btn.onclick=()=>duplicateCampaign(Number(btn.dataset.id)));document.querySelectorAll('.deleteBtn').forEach(btn=>btn.onclick=()=>deleteCampaign(Number(btn.dataset.id)));}
-function duplicateCampaign(id){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');const item=items.find(x=>x.id===id);if(!item)return;const copyBrief={...item.brief,productName:(item.brief.productName||'Untitled campaign')+' (Copy)'};const copyState=item.state?{...item.state,brief:copyBrief}:{brief:copyBrief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:item.state&&item.state.aiConfig||defaultAiConfig(),aiUsage:emptyAiUsage(),aiImages:null};items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:copyBrief,state:copyState});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));renderSaved();$('status').textContent='Campaign duplicated';}
+function duplicateCampaign(id){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');const item=items.find(x=>x.id===id);if(!item)return;const copyBrief={...item.brief,productName:(item.brief.productName||'Untitled campaign')+' (Copy)'};const copyState=item.state?{...item.state,brief:copyBrief}:{brief:copyBrief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:item.state&&item.state.aiConfig||defaultAiConfig(),aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer()};items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:copyBrief,state:copyState});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));renderSaved();$('status').textContent='Campaign duplicated';}
 function loadCampaign(id){
  const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');
  const item=items.find(x=>x.id===id);
  if(!item)return;
  fillBrief(item.brief);
- state=item.state||{brief:item.brief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null};
+ state=item.state||{brief:item.brief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer()};
  state.aiConfig=state.aiConfig||defaultAiConfig();
  state.aiUsage=state.aiUsage||emptyAiUsage();
  if(state.aiImages===undefined)state.aiImages=null;
+ state.audience=Object.assign(defaultAudience(),state.audience||{});
+ state.offer=Object.assign(defaultOffer(),state.offer||{});
  applyAiConfigToUI();
+ fillAudienceInputs(state.audience);
+ renderAudiencePlan();
+ renderAudienceMatrix();
+ fillOfferInputs(state.offer);
+ renderOfferAnalysis();
  if(!state.copy)generateDemo();else{renderResults();}
  state.brief=item.brief;
  $('status').textContent='Saved campaign loaded';

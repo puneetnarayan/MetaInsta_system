@@ -6,7 +6,9 @@ AI-assisted Facebook + Instagram campaign creator built with plain HTML, CSS and
 
 - Campaign Brief form
 - Demo Mode strategy generation (₹0, local, no API calls)
-- **AI Control panel**: an AI Master Switch plus five independent per-stage switches (Strategy, Ad Copy, Creative Concepts, AI Images, Reel Scripts), a Text Provider (OpenAI or Anthropic) with model selector, and separate Image Provider/Model/Quality controls
+- **AI Control panel**: an AI Master Switch plus five independent per-stage switches (Strategy, Ad Copy, Creative Concepts, AI Images, Reel Scripts), a Text Provider (OpenAI or Anthropic) with model selector, and separate Image Provider/Model/Quality/Aspect Ratio controls
+- **Audience tab**: primary customer, demographics, awareness level and buying intent inputs, a ₹0 local audience plan (primary audience, pain, motivation, awareness guidance, message, audience-strategy options) and an editable Audience/Angle/Creative/Purpose testing matrix
+- **Offer tab**: product/price/bonuses/guarantee/proof/scarcity/CTA inputs, a ₹0 heuristic offer analysis (✓/⚠ per clarity, value proposition, risk reversal, proof, urgency, CTA) and three offer variants (current, outcome-focused, bonus-focused)
 - Ad copy variations with live Meta character-count guidance (primary text / headline / description)
 - Creative concepts, with inline (non-blocking) editing, and optional manually-triggered AI image generation per concept
 - Reel script concepts
