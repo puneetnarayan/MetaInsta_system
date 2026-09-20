@@ -11,5 +11,31 @@
   "problem": "I know what I want to say, but I hesitate, search for words and lose confidence when speaking in meetings.",
   "outcome": "Speak naturally and confidently in meetings, express ideas clearly and participate without fear or hesitation.",
   "tone": "Professional + Friendly",
-  "landingPage": "https://coachsapnanarayan.com/speak-in-meetings"
+  "landingPage": "https://coachsapnanarayan.com/speak-in-meetings",
+  "adCopies": [
+    {
+      "name": "Ad Version 1 · Problem-led",
+      "hook": "Still knowing what you want to say — but hesitating when it's your turn to speak?",
+      "primaryText": "You know the answer.\n\nYou have an idea.\n\nBut when the meeting turns to you, you suddenly start searching for words, translating in your head or wondering whether you are saying it correctly.\n\nIf this sounds familiar, you are not alone.\n\nThe Speak in Meetings Workshop is designed for working professionals who want to express their ideas more clearly and participate with greater confidence in workplace conversations.\n\n4-day live workshop · ₹997\n\nExplore the workshop and see if it is right for you.",
+      "headline": "Speak with more confidence in meetings",
+      "description": "4-day live workshop for working professionals.",
+      "cta": "Learn More"
+    },
+    {
+      "name": "Ad Version 2 · Outcome-led",
+      "hook": "Imagine expressing your idea clearly when the meeting turns to you.",
+      "primaryText": "You don't necessarily need more words.\n\nYou need to feel more comfortable using the words you already know.\n\nThe Speak in Meetings Workshop helps working professionals practise how to express ideas, respond naturally and participate more confidently in workplace conversations.\n\nIf your goal is to speak more clearly without constantly worrying about finding the perfect words, this workshop may be a useful next step.\n\n4-day live workshop · ₹997",
+      "headline": "Express your ideas with confidence",
+      "description": "Practical workplace communication training.",
+      "cta": "Learn More"
+    },
+    {
+      "name": "Ad Version 3 · Conversational",
+      "hook": "Quick question: do you stay quiet in meetings even when you have something useful to say?",
+      "primaryText": "Maybe you know exactly what you want to say.\n\nThen the moment comes.\n\nYou hesitate.\n\nYou search for the right words.\n\nSomeone else speaks.\n\nAnd the opportunity passes.\n\nThe Speak in Meetings Workshop is created for working professionals who want to become more comfortable expressing themselves in meetings and workplace conversations.\n\nLearn, practise and build confidence through a focused 4-day live workshop.\n\n₹997",
+      "headline": "Have something to say? Say it clearly.",
+      "description": "Build practical speaking confidence at work.",
+      "cta": "Learn More"
+    }
+  ]
 }
