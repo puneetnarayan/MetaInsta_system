@@ -13,7 +13,17 @@ function fillBrief(b){
  });
 }
 function resetState(){state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null};}
-function showTab(name){document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===name));if(name==='saved')renderSaved();if(name==='export')renderPreview();}
+function showTab(name){
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+ document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===name));
+ if((name==='copy'||name==='reels')&&(!Array.isArray(state.copy)||!state.copy.length||!Array.isArray(state.reels)||!state.reels.length)&&state.brief&&state.brief.productName){
+   generateDemo();
+ }
+ if(name==='copy')renderCopy();
+ if(name==='reels')renderReels();
+ if(name==='saved')renderSaved();
+ if(name==='export')renderPreview();
+}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 
 async function generateAI(){
@@ -141,7 +151,7 @@ function renderCreative(){
  document.querySelectorAll('.creativeEdit').forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.index);const next=prompt('Edit the creative concept:',state.creative[i].concept);if(next!==null&&next.trim()){state.creative[i].concept=next.trim();renderCreative();}});
  document.querySelectorAll('.creativeUse').forEach(btn=>btn.onclick=()=>{$('status').textContent='Creative idea '+(Number(btn.dataset.index)+1)+' selected';});
 }
-function renderReels(){const reels=Array.isArray(state.reels)?state.reels:[];$('reelsResult').innerHTML='<div class="ad-list">'+reels.map((r,i)=>'<article class="ad-card"><h3>'+esc(r.title)+'</h3><label><span class="field-title">Hook</span><textarea class="editable textarea reel-field" data-index="'+i+'" data-key="hook">'+esc(r.hook)+'</textarea></label><div class="field-title">Scenes</div><ol class="reel-scenes">'+r.scenes.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol><button class="secondary copyReel" data-index="'+i+'">Copy Script</button></article>').join('')+'</div><small class="demo-badge">₹0 MODE — editable; confirm before use</small>';document.querySelectorAll('.reel-field').forEach(el=>el.oninput=()=>state.reels[Number(el.dataset.index)][el.dataset.key]=el.value);document.querySelectorAll('.copyReel').forEach(btn=>btn.onclick=()=>{const r=state.reels[Number(btn.dataset.index)];navigator.clipboard?.writeText(r.title+'\nHook: '+r.hook+'\nScenes:\n- '+r.scenes.join('\n- '));$('status').textContent='Reel script copied';});}
+function renderReels(){const reels=Array.isArray(state.reels)?state.reels:[];$('reelsResult').innerHTML='<div class="ad-list">'+reels.map((r,i)=>'<article class="ad-card"><h3>'+esc(r.title||r.name)+'</h3><label><span class="field-title">Hook</span><textarea class="editable textarea reel-field" data-index="'+i+'" data-key="hook">'+esc(r.hook)+'</textarea></label><div class="field-title">Scenes</div><ol class="reel-scenes">'+r.scenes.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol><button class="secondary copyReel" data-index="'+i+'">Copy Script</button></article>').join('')+'</div><small class="demo-badge">₹0 MODE — editable; confirm before use</small>';document.querySelectorAll('.reel-field').forEach(el=>el.oninput=()=>state.reels[Number(el.dataset.index)][el.dataset.key]=el.value);document.querySelectorAll('.copyReel').forEach(btn=>btn.onclick=()=>{const r=state.reels[Number(btn.dataset.index)];navigator.clipboard?.writeText(r.title+'\nHook: '+r.hook+'\nScenes:\n- '+r.scenes.join('\n- '));$('status').textContent='Reel script copied';});}
 function regenerate(type){
  if(!state.brief.productName){$('status').textContent='Generate a campaign first.';showTab('brief');return;}
  const oldBrief={...state.brief};
