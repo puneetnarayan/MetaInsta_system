@@ -19,6 +19,7 @@ AI-assisted Facebook + Instagram campaign creator built with plain HTML, CSS and
 - **Landing Page** tab: analyses the campaign's destination URL at ₹0 — server-side fetch (avoids browser CORS), heuristic checks (Headline/Subheadline/Offer/CTA/Proof/Benefits/Objections/Trust/Form/Mobile usability) drawn only from signals actually found on the page, a Message Match comparison against the selected Ad Copy, and a manual paste-the-text fallback when a page can't be fetched — see below
 - **Launch Checklist** tab: an editable, ₹0 checklist across four sections (Pre-launch, Campaign, Ads, Final — 31 items total, matching Meta's real pre-flight steps), each with a per-section completion count, saved with the campaign — nothing here is auto-verified, it's a manual sign-off
 - **Performance** tab: import real ad performance data (CSV upload, paste a table, or manual entry) with column mapping, ₹0 dashboard cards and a lightweight spend-by-campaign bar chart, and per-row ratios (CTR/CPC/CPL/Conversion Rate/Frequency/ROAS/Cost per Conversion) clearly tagged Reported, Calculated or Unavailable — nothing is ever invented, see below
+- **Optimisation** tab: Campaign Doctor checks 10 areas of the campaign (Brief, Offer, Audience, Strategy, Copy, Creative, Landing Page, Campaign Structure, Tracking, Performance) as Complete / Needs attention / Missing with no overall score, factual Performance Observations pulled straight from imported data, and editable Optimisation Ideas (Hypothesis / Possible Explanation / Suggested Test, grounded in your actual Creative Matrix angles/formats and Audience strategies) plus a Generate New Creative Set button to close the loop — see below
 - Save, duplicate, load and delete campaigns in browser localStorage (including AI settings and usage)
 - New Campaign / Clear workflow with an inline confirmation (no blocking browser dialogs)
 - JSON and text export (including AI configuration and usage, never secrets)
@@ -103,6 +104,15 @@ Always ₹0, entirely local — nothing is sent anywhere:
 
 All rows stay fully editable inline after import, and every row can be removed individually or all rows cleared at once.
 
+### Campaign Doctor + Optimisation (Optimisation tab)
+
+Always ₹0, entirely local — computed live from the rest of the campaign, nothing is ever fabricated:
+
+1. **Campaign Doctor** — checks 10 areas (Brief, Offer, Audience, Strategy, Copy, Creative, Landing Page, Campaign Structure, Tracking, Performance), each independently marked ✓ **Complete**, ⚠ **Needs attention** or ✕ **Missing** with a factual note (e.g. "3 of 9 planned ads are missing tracking parameters"). There is deliberately no overall score — per the roadmap, each area stands on its own. Click **↻ Refresh** to re-check after making changes elsewhere in the app.
+2. **Performance Observations** — plain factual statements pulled from whatever's in the Performance tab (blended CTR/CPC/CPL/ROAS, highest-spend campaign), each labelled reported or calculated; shows a placeholder rather than an observation when no performance data has been imported yet.
+3. **Optimisation Ideas** — **Generate Optimisation Ideas** produces four editable hypothesis cards (Hook, Creative, Audience, Landing Page), each with a Hypothesis, a Possible Explanation and a Suggested Test, personalised using your actual Creative Matrix angles/formats and Audience strategies rather than generic text. Each can be marked "Tested" and every field is editable — none of this claims a change will definitely improve results, only that it's worth testing.
+4. **Generate New Creative Set** — re-runs the ₹0 Creative Matrix generator (the same one on the Creative Ideas tab) and jumps you there, closing the loop from optimisation back into production.
+
 ## Tests
 
 The template logic used by Demo Mode lives in `js/campaign-generator.js` (a plain, dependency-free module usable from both the browser and Node). Run the test suite with:
@@ -115,10 +125,9 @@ npm test
 
 Following the Meta Ads Campaign Operating System roadmap:
 
-1. Campaign Doctor + Optimisation (Phase 11)
-2. Prompt Library (Phase 12)
-3. 90-Day Plan (Phase 13)
-4. Direct Meta Ads API integration (explicitly out of scope for this roadmap; left as an architectural option for later)
+1. Prompt Library (Phase 12)
+2. 90-Day Plan (Phase 13)
+3. Direct Meta Ads API integration (explicitly out of scope for this roadmap; left as an architectural option for later)
 
 ## Deployment
 
