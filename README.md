@@ -37,3 +37,12 @@ This is a static Vercel application. No build step is required.
 
 Target deployment URL:
 https://meta-insta-system-git-main-puneetnarayan.vercel.app/
+
+
+## Reference Campaign
+
+The complete ChatGPT-generated reference input, example placeholders, strategy, ad copy, creative concepts and reel scripts are maintained separately from the application code:
+
+- [Reference Campaign](reference/reference-campaign.md)
+
+This file is the quality reference for future AI-generated campaigns. The application code should not hard-code these campaign outputs.
