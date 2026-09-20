@@ -19,8 +19,12 @@ function resetState(){state={brief:{},strategy:null,copy:null,creative:null,reel
 function showTab(name){
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===name));
- if((name==='copy'||name==='reels')&&(!Array.isArray(state.copy)||!state.copy.length||!Array.isArray(state.reels)||!state.reels.length)&&state.brief&&state.brief.productName){
-   generateDemo();
+ if(name==='copy'||name==='reels'){
+   const current=brief();
+   if((!Array.isArray(state.copy)||!state.copy.length||!Array.isArray(state.reels)||!state.reels.length) && current.productName){
+     state.brief=current;
+     generateDemo();
+   }
  }
  if(name==='copy')renderCopy();
  if(name==='reels')renderReels();
