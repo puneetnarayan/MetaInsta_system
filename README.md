@@ -50,8 +50,16 @@ https://meta-insta-system-git-main-puneetnarayan.vercel.app/
 
 ## Reference Campaign
 
-The complete ChatGPT-generated reference input, example placeholders, strategy, ad copy, creative concepts and reel scripts are maintained separately from the application code:
+The complete reference input, strategy, ad copy, creative concepts and reel scripts are maintained as data files under `reference/`, separate from the application code:
 
-- [Reference Campaign](reference/reference-campaign.md)
+- [Reference Campaign](reference/reference-campaign.md) — the human-readable write-up of the full campaign (quality bar for future AI generation)
+- `reference/reference-input.json` — the brief fields (also matches every placeholder shown in the Campaign Brief form)
+- `reference/reference-strategy.json` — the reference Strategy tab output
+- `reference/reference-ad-copies.json` — the 3 reference Ad Copy variations
+- `reference/reference-creative.json` — the 4 reference Creative Ideas (one per format)
+- `reference/reference-reel-scripts.json` — the 3 reference Reel Scripts
+- `reference/images/*.svg`, `reference/creative-board.svg` — the sample creative visuals
 
-This file is the quality reference for future AI-generated campaigns. The application code should not hard-code these campaign outputs.
+Clicking **Use Reference Example** on the Campaign Brief tab loads all of the above into every tab (Strategy, Ad Copy, Creative Ideas, Reel Scripts) — this is what a fully generated campaign is expected to look like end to end, at ₹0, with no API calls. If any reference JSON file can't be fetched (e.g. running the HTML file directly instead of through a server), the app falls back to an equivalent copy of the same content built into `js/app.js`.
+
+The application's own generator (`js/campaign-generator.js`) should not hard-code these campaign outputs — they exist only as the reference/example data set.

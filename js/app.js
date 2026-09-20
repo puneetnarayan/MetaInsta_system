@@ -3,6 +3,8 @@ let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCop
 
 const REFERENCE_ADS=[{"name":"Ad Version 1 · Problem-led","hook":"Still knowing what you want to say — but hesitating when it's your turn to speak?","primaryText":"You know the answer.\n\nYou have an idea.\n\nBut when the meeting turns to you, you suddenly start searching for words, translating in your head or wondering whether you are saying it correctly.\n\nIf this sounds familiar, you are not alone.\n\nThe Speak in Meetings Workshop is designed for working professionals who want to express their ideas more clearly and participate with greater confidence in workplace conversations.\n\n4-day live workshop · ₹997\n\nExplore the workshop and see if it is right for you.","headline":"Speak with more confidence in meetings","description":"4-day live workshop for working professionals.","cta":"Learn More"},{"name":"Ad Version 2 · Outcome-led","hook":"Imagine expressing your idea clearly when the meeting turns to you.","primaryText":"You don't necessarily need more words.\n\nYou need to feel more comfortable using the words you already know.\n\nThe Speak in Meetings Workshop helps working professionals practise how to express ideas, respond naturally and participate more confidently in workplace conversations.\n\nIf your goal is to speak more clearly without constantly worrying about finding the perfect words, this workshop may be a useful next step.\n\n4-day live workshop · ₹997","headline":"Express your ideas with confidence","description":"Practical workplace communication training.","cta":"Learn More"},{"name":"Ad Version 3 · Conversational","hook":"Quick question: do you stay quiet in meetings even when you have something useful to say?","primaryText":"Maybe you know exactly what you want to say.\n\nThen the moment comes.\n\nYou hesitate.\n\nYou search for the right words.\n\nSomeone else speaks.\n\nAnd the opportunity passes.\n\nThe Speak in Meetings Workshop is created for working professionals who want to become more comfortable expressing themselves in meetings and workplace conversations.\n\nLearn, practise and build confidence through a focused 4-day live workshop.\n\n₹997","headline":"Have something to say? Say it clearly.","description":"Build practical speaking confidence at work.","cta":"Learn More"}];
 const REFERENCE_REELS=[{"title":"Reel 1 · Problem to Solution","hook":"Ever had the perfect answer five minutes after the meeting ended?","scenes":["0–3s — Hook: “Ever had the perfect answer five minutes after the meeting ended?”","3–7s — Show a professional listening in a meeting but not speaking. Voiceover: “You knew exactly what you wanted to say...”","7–12s — Show hesitation. Voiceover: “...but you started searching for words and the conversation moved on.”","12–18s — Show a confident interaction. Voiceover: “With practice, you can learn to express your ideas more naturally.”","18–24s — Introduce the workshop. Voiceover: “That's what we practise in the Speak in Meetings Workshop.”","24–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More to see the details.”"]},{"title":"Reel 2 · Outcome-led","hook":"Imagine your next meeting feeling easier.","scenes":["0–3s — Show the desired outcome immediately.","3–8s — Voiceover: “You have the knowledge. You have the ideas.”","8–15s — Show the person speaking clearly. Voiceover: “The next step is expressing those ideas clearly when the moment comes.”","15–24s — Show workshop practice. Voiceover: “The Speak in Meetings Workshop gives you a focused environment to practise workplace communication.”","24–30s — End frame: “4-day live workshop · ₹997” and “Learn More.”"]},{"title":"Reel 3 · Question Format","hook":"Do you stay quiet in meetings even when you have something useful to say?","scenes":["0–3s — Put the question on screen and pause for recognition.","3–9s — Show a meeting situation. Voiceover: “Maybe you're searching for the right words.”","9–17s — Show a simple speaking exercise. Voiceover: “Maybe you're worried about making a mistake.”","17–25s — Introduce the workshop. Voiceover: “The Speak in Meetings Workshop helps you practise expressing your ideas more clearly and confidently.”","25–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More.”"]}];
+const REFERENCE_STRATEGY={"objective": "Generate qualified leads from working professionals in India who want to communicate more confidently in workplace meetings.", "audience": "Working professionals aged approximately 25–45 who understand English but hesitate when speaking in meetings, presentations or workplace conversations. They may know the answer but hesitate to speak, mentally translate before responding, search for the right words while speaking, avoid participating in meetings and worry about making mistakes. They want to sound clear and professional rather than simply \"speak more English.\"", "corePain": "I know what I want to say, but when the meeting starts I hesitate, search for words and lose confidence.", "desiredOutcome": "Move the customer from hesitation to clear expression, greater confidence and more participation, focused on practical workplace communication rather than presenting fluency as an abstract goal.", "positioning": "Speak in Meetings Workshop is positioned as a practical, focused workshop for working professionals who want to communicate more clearly and confidently during real workplace situations.", "keyMessage": "You may already know what you want to say. The challenge is expressing it clearly and confidently when the moment comes. The workshop provides a structured way to practise the communication skills needed in meetings and workplace conversations.", "funnelAngle": "Problem awareness → Recognition → Practical solution → Workshop → Lead. The first interaction should make the viewer recognise their own situation before the workshop is introduced as a possible next step.", "testing": ["Test 1 — Problem-led: focus on hesitation, searching for words and staying silent in meetings.", "Test 2 — Outcome-led: focus on speaking clearly, expressing ideas and participating confidently.", "Test 3 — Question-led: use questions that make the viewer reflect on their own meeting experience."], "tone": "Professional + Friendly"};
+const REFERENCE_CREATIVE=[{"format": "Single Image Ad", "concept": "Show a professional sitting in a meeting while others are speaking. They have an idea but appear hesitant to raise their hand or enter the conversation. On-image headline: \"I know what I want to say...\" Supporting text: \"...but I hesitate when it's my turn.\" Bottom CTA: \"Speak with more confidence in meetings.\" Visual direction: a clean professional workplace photograph, with the text kept minimal and readable on mobile."}, {"format": "Carousel", "concept": "Card 1 — Problem: \"Do you hesitate before speaking in meetings?\" Card 2 — Recognition: You know the idea, you just struggle to express it quickly. Card 3 — Insight: You don't always need more vocabulary — you need practice expressing your ideas naturally. Card 4 — Solution: Speak in Meetings Workshop, a focused 4-day live workshop for working professionals. Card 5 — CTA: \"Ready to speak with more confidence?\" ₹997 · Learn More."}, {"format": "Instagram Story", "concept": "Frame 1: Meeting starts, someone asks \"What do you think?\" Frame 2: You know the answer, but you start searching for the right words. Frame 3: What if you could express your ideas more naturally? Frame 4: Speak in Meetings Workshop — 4-day live workshop for working professionals. Frame 5: ₹997 — Explore the workshop. Learn More."}, {"format": "Instagram Reel", "concept": "A short 20–30 second video contrasting hesitation with confident participation. Opening text: \"Ever had the perfect answer... after the meeting ended?\" Visual sequence: person in an online meeting → manager asks a question → person hesitates → another participant answers → person later thinks of the answer → transition to the workshop → show practical speaking practice → end with workshop details. End frame: Speak in Meetings Workshop, 4-day live workshop · ₹997 · Learn More."}];
 
 function brief(){return Object.fromEntries(ids.map(id=>[id,$(id).value.trim()]));}
 function fillBrief(b){
@@ -154,19 +156,25 @@ async function loadReferenceExample(){
   $('status').textContent='Loading complete reference campaign…';
   try{
     const base='/reference/';
-    let referenceBrief, adData, reelData;
+    let referenceBrief, adData, reelData, strategyData, creativeData;
     try{
-      const [briefResponse,adResponse,reelResponse]=await Promise.all([
+      const [briefResponse,adResponse,reelResponse,strategyResponse,creativeResponse]=await Promise.all([
         fetch(base+'reference-input.json?v='+Date.now(),{cache:'no-store'}),
         fetch(base+'reference-ad-copies.json?v='+Date.now(),{cache:'no-store'}),
-        fetch(base+'reference-reel-scripts.json?v='+Date.now(),{cache:'no-store'})
+        fetch(base+'reference-reel-scripts.json?v='+Date.now(),{cache:'no-store'}),
+        fetch(base+'reference-strategy.json?v='+Date.now(),{cache:'no-store'}),
+        fetch(base+'reference-creative.json?v='+Date.now(),{cache:'no-store'})
       ]);
       if(!briefResponse.ok)throw new Error('Reference brief '+briefResponse.status);
       if(!adResponse.ok)throw new Error('Reference ads '+adResponse.status);
       if(!reelResponse.ok)throw new Error('Reference reels '+reelResponse.status);
+      if(!strategyResponse.ok)throw new Error('Reference strategy '+strategyResponse.status);
+      if(!creativeResponse.ok)throw new Error('Reference creative '+creativeResponse.status);
       referenceBrief=await briefResponse.json();
       adData=await adResponse.json();
       reelData=await reelResponse.json();
+      strategyData=await strategyResponse.json();
+      creativeData=await creativeResponse.json();
     }catch(fetchError){
       // Offline-safe fallback: the complete reference outputs are built into the app.
       // This keeps the sample campaign working even if a static JSON asset is unavailable.
@@ -187,6 +195,8 @@ async function loadReferenceExample(){
       };
       adData={ads:REFERENCE_ADS};
       reelData={scripts:REFERENCE_REELS};
+      strategyData={strategy:REFERENCE_STRATEGY};
+      creativeData={creative:REFERENCE_CREATIVE};
     }
 
     const missing=ids.filter(id=>referenceBrief[id]===undefined);
@@ -197,16 +207,17 @@ async function loadReferenceExample(){
     }
 
     state.brief=brief();
-    generateDemo();
-
+    state.aiMode=false;
+    state.strategy=strategyData.strategy||REFERENCE_STRATEGY;
     state.copy=Array.isArray(adData.ads)?adData.ads.slice():REFERENCE_ADS.slice();
+    state.creative=Array.isArray(creativeData.creative)?creativeData.creative.slice():REFERENCE_CREATIVE.slice();
     state.reels=Array.isArray(reelData.scripts)?reelData.scripts.slice():REFERENCE_REELS.slice();
     state.selectedCopy=state.copy.length?state.copy[0].name:null;
 
-    if(!state.copy.length||!state.reels.length)throw new Error('Reference outputs are empty');
+    if(!state.strategy||!state.copy.length||!state.creative.length||!state.reels.length)throw new Error('Reference outputs are empty');
 
     renderResults();
-    $('status').textContent='Reference loaded — 3 Ad Copies + 3 Reel Scripts ready';
+    $('status').textContent='Reference loaded — Strategy + 3 Ad Copies + 4 Creative Ideas + 3 Reel Scripts ready';
     showTab('brief');
   }catch(err){
     $('status').textContent='Reference loading error — '+err.message;
