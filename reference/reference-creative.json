@@ -1,0 +1,21 @@
+{
+  "campaign": "Speak in Meetings Workshop",
+  "creative": [
+    {
+      "format": "Single Image Ad",
+      "concept": "Show a professional sitting in a meeting while others are speaking. They have an idea but appear hesitant to raise their hand or enter the conversation. On-image headline: \"I know what I want to say...\" Supporting text: \"...but I hesitate when it's my turn.\" Bottom CTA: \"Speak with more confidence in meetings.\" Visual direction: a clean professional workplace photograph, with the text kept minimal and readable on mobile."
+    },
+    {
+      "format": "Carousel",
+      "concept": "Card 1 — Problem: \"Do you hesitate before speaking in meetings?\" Card 2 — Recognition: You know the idea, you just struggle to express it quickly. Card 3 — Insight: You don't always need more vocabulary — you need practice expressing your ideas naturally. Card 4 — Solution: Speak in Meetings Workshop, a focused 4-day live workshop for working professionals. Card 5 — CTA: \"Ready to speak with more confidence?\" ₹997 · Learn More."
+    },
+    {
+      "format": "Instagram Story",
+      "concept": "Frame 1: Meeting starts, someone asks \"What do you think?\" Frame 2: You know the answer, but you start searching for the right words. Frame 3: What if you could express your ideas more naturally? Frame 4: Speak in Meetings Workshop — 4-day live workshop for working professionals. Frame 5: ₹997 — Explore the workshop. Learn More."
+    },
+    {
+      "format": "Instagram Reel",
+      "concept": "A short 20–30 second video contrasting hesitation with confident participation. Opening text: \"Ever had the perfect answer... after the meeting ended?\" Visual sequence: person in an online meeting → manager asks a question → person hesitates → another participant answers → person later thinks of the answer → transition to the workshop → show practical speaking practice → end with workshop details. End frame: Speak in Meetings Workshop, 4-day live workshop · ₹997 · Learn More."
+    }
+  ]
+}

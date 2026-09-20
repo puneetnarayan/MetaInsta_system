@@ -1,0 +1,18 @@
+{
+  "campaign": "Speak in Meetings Workshop",
+  "strategy": {
+    "objective": "Generate qualified leads from working professionals in India who want to communicate more confidently in workplace meetings.",
+    "audience": "Working professionals aged approximately 25–45 who understand English but hesitate when speaking in meetings, presentations or workplace conversations. They may know the answer but hesitate to speak, mentally translate before responding, search for the right words while speaking, avoid participating in meetings and worry about making mistakes. They want to sound clear and professional rather than simply \"speak more English.\"",
+    "corePain": "I know what I want to say, but when the meeting starts I hesitate, search for words and lose confidence.",
+    "desiredOutcome": "Move the customer from hesitation to clear expression, greater confidence and more participation, focused on practical workplace communication rather than presenting fluency as an abstract goal.",
+    "positioning": "Speak in Meetings Workshop is positioned as a practical, focused workshop for working professionals who want to communicate more clearly and confidently during real workplace situations.",
+    "keyMessage": "You may already know what you want to say. The challenge is expressing it clearly and confidently when the moment comes. The workshop provides a structured way to practise the communication skills needed in meetings and workplace conversations.",
+    "funnelAngle": "Problem awareness → Recognition → Practical solution → Workshop → Lead. The first interaction should make the viewer recognise their own situation before the workshop is introduced as a possible next step.",
+    "testing": [
+      "Test 1 — Problem-led: focus on hesitation, searching for words and staying silent in meetings.",
+      "Test 2 — Outcome-led: focus on speaking clearly, expressing ideas and participating confidently.",
+      "Test 3 — Question-led: use questions that make the viewer reflect on their own meeting experience."
+    ],
+    "tone": "Professional + Friendly"
+  }
+}
