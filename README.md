@@ -18,6 +18,7 @@ AI-assisted Facebook + Instagram campaign creator built with plain HTML, CSS and
 - **Reel Factory** (within Reel Scripts): select one or more reel scripts → generate a ₹0, fully-local, beat-by-beat shot list (Hook / Problem / Turn / Solution / CTA), each beat with editable Time, Visual Direction, Voiceover/Caption, On-Screen Text and Sound/Music fields, plus a Copy Shot List action per reel
 - **Landing Page** tab: analyses the campaign's destination URL at ₹0 — server-side fetch (avoids browser CORS), heuristic checks (Headline/Subheadline/Offer/CTA/Proof/Benefits/Objections/Trust/Form/Mobile usability) drawn only from signals actually found on the page, a Message Match comparison against the selected Ad Copy, and a manual paste-the-text fallback when a page can't be fetched — see below
 - **Launch Checklist** tab: an editable, ₹0 checklist across four sections (Pre-launch, Campaign, Ads, Final — 31 items total, matching Meta's real pre-flight steps), each with a per-section completion count, saved with the campaign — nothing here is auto-verified, it's a manual sign-off
+- **Performance** tab: import real ad performance data (CSV upload, paste a table, or manual entry) with column mapping, ₹0 dashboard cards and a lightweight spend-by-campaign bar chart, and per-row ratios (CTR/CPC/CPL/Conversion Rate/Frequency/ROAS/Cost per Conversion) clearly tagged Reported, Calculated or Unavailable — nothing is ever invented, see below
 - Save, duplicate, load and delete campaigns in browser localStorage (including AI settings and usage)
 - New Campaign / Clear workflow with an inline confirmation (no blocking browser dialogs)
 - JSON and text export (including AI configuration and usage, never secrets)
@@ -90,6 +91,18 @@ Four sections, matching Meta's actual pre-flight steps, each rendered as a plain
 
 Checking an item only records that *you* confirmed it — nothing is verified automatically, and the checklist state is saved and loaded with the rest of the campaign (including in Save/Load/Duplicate and JSON/text export).
 
+### Performance Analyzer (Performance tab)
+
+Always ₹0, entirely local — nothing is sent anywhere:
+
+1. **Import** — three ways in: **Upload CSV**, **paste a table** (tab- or comma-separated, e.g. copied straight from Excel/Sheets/Meta Ads Manager), or **+ Add Row** for fully manual entry. Fields: Campaign, Ad Set, Ad, Spend, Impressions, Reach, Clicks, CTR, CPC, Leads, CPL, Conversions, Revenue.
+2. **Column mapping** — for CSV/paste, each detected column gets a dropdown (auto-guessed from common header names like "Amount Spent" → Spend, "Link Clicks" → Clicks, "Results" → Leads) so you confirm what maps to what before anything is imported; unmatched columns default to Ignore.
+3. **Calculated ratios** — CTR, CPC, CPL, Conversion Rate, Frequency, ROAS and Cost per Conversion are computed per row only from the numbers actually present, and each is tagged **Reported** (you supplied that exact column), **Calculated** (derived from other reported numbers) or **Unavailable** (not enough data) — a ratio is never guessed or defaulted to zero.
+4. **Dashboard cards** — Spend, Impressions, Clicks, CTR, CPC, Leads, CPL, Conversions, ROAS, aggregated across every row that has the underlying numbers; a card shows "—" rather than a fabricated total when no row has that field.
+5. **Spend by Campaign** — a simple, dependency-free CSS bar chart grouping rows by campaign name.
+
+All rows stay fully editable inline after import, and every row can be removed individually or all rows cleared at once.
+
 ## Tests
 
 The template logic used by Demo Mode lives in `js/campaign-generator.js` (a plain, dependency-free module usable from both the browser and Node). Run the test suite with:
@@ -102,11 +115,10 @@ npm test
 
 Following the Meta Ads Campaign Operating System roadmap:
 
-1. Performance Analyzer (Phase 10)
-2. Campaign Doctor + Optimisation (Phase 11)
-3. Prompt Library (Phase 12)
-4. 90-Day Plan (Phase 13)
-6. Direct Meta Ads API integration (explicitly out of scope for this roadmap; left as an architectural option for later)
+1. Campaign Doctor + Optimisation (Phase 11)
+2. Prompt Library (Phase 12)
+3. 90-Day Plan (Phase 13)
+4. Direct Meta Ads API integration (explicitly out of scope for this roadmap; left as an architectural option for later)
 
 ## Deployment
 

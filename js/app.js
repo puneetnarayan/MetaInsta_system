@@ -44,6 +44,85 @@ function normalizeChecklist(existing){
  });
  return out;
 }
+// ---- Phase 10: Performance Analyzer (₹0, local; never invents missing values) ----
+const PERF_FIELDS=[
+ {key:'campaign',label:'Campaign',type:'text'},
+ {key:'adSet',label:'Ad Set',type:'text'},
+ {key:'ad',label:'Ad',type:'text'},
+ {key:'spend',label:'Spend',type:'number'},
+ {key:'impressions',label:'Impressions',type:'number'},
+ {key:'reach',label:'Reach',type:'number'},
+ {key:'clicks',label:'Clicks',type:'number'},
+ {key:'ctr',label:'CTR (%)',type:'number'},
+ {key:'cpc',label:'CPC',type:'number'},
+ {key:'leads',label:'Leads',type:'number'},
+ {key:'cpl',label:'CPL',type:'number'},
+ {key:'conversions',label:'Conversions',type:'number'},
+ {key:'revenue',label:'Revenue',type:'number'}
+];
+const PERF_HEADER_ALIASES={
+ campaign:['campaign','campaign name'],adSet:['ad set','adset','ad set name'],ad:['ad','ad name'],
+ spend:['spend','amount spent','cost'],impressions:['impressions'],reach:['reach'],clicks:['clicks','link clicks'],
+ ctr:['ctr','ctr (%)','click-through rate'],cpc:['cpc','cost per click'],leads:['leads','results'],
+ cpl:['cpl','cost per lead','cost per result'],conversions:['conversions','purchases'],revenue:['revenue','purchase value','conversion value']
+};
+function defaultPerformance(){return {rows:[],source:null};}
+function defaultPerformanceRow(){const r={};PERF_FIELDS.forEach(f=>r[f.key]='');return r;}
+function num(v){if(v===''||v===null||v===undefined)return null;const n=parseFloat(String(v).replace(/[^0-9.\-]/g,''));return isFinite(n)?n:null;}
+function computeDerivedMetrics(row){
+ const spend=num(row.spend),impressions=num(row.impressions),reach=num(row.reach),clicks=num(row.clicks),leads=num(row.leads),conversions=num(row.conversions),revenue=num(row.revenue);
+ const reportedCtr=num(row.ctr),reportedCpc=num(row.cpc),reportedCpl=num(row.cpl);
+ const unavailable={value:null,status:'unavailable'};
+ return {
+  ctr:reportedCtr!=null?{value:reportedCtr,status:'reported'}:(impressions&&clicks!=null&&impressions>0?{value:clicks/impressions*100,status:'calculated'}:unavailable),
+  cpc:reportedCpc!=null?{value:reportedCpc,status:'reported'}:(clicks&&spend!=null&&clicks>0?{value:spend/clicks,status:'calculated'}:unavailable),
+  cpl:reportedCpl!=null?{value:reportedCpl,status:'reported'}:(leads&&spend!=null&&leads>0?{value:spend/leads,status:'calculated'}:unavailable),
+  conversionRate:(clicks&&conversions!=null&&clicks>0)?{value:conversions/clicks*100,status:'calculated'}:unavailable,
+  frequency:(reach&&impressions!=null&&reach>0)?{value:impressions/reach,status:'calculated'}:unavailable,
+  roas:(spend&&revenue!=null&&spend>0)?{value:revenue/spend,status:'calculated'}:unavailable,
+  costPerConversion:(conversions&&spend!=null&&conversions>0)?{value:spend/conversions,status:'calculated'}:unavailable
+ };
+}
+function fmtMetric(m,decimals,suffix){return m.value==null?'—':m.value.toFixed(decimals==null?2:decimals)+(suffix||'');}
+function computePerformanceDashboard(rows){
+ const sum=key=>{const vals=rows.map(r=>num(r[key])).filter(v=>v!=null);return vals.length?vals.reduce((a,b)=>a+b,0):null;};
+ const spend=sum('spend'),impressions=sum('impressions'),clicks=sum('clicks'),leads=sum('leads'),conversions=sum('conversions'),revenue=sum('revenue');
+ return {
+  spend,impressions,clicks,leads,conversions,
+  ctr:(impressions&&clicks!=null&&impressions>0)?clicks/impressions*100:null,
+  cpc:(clicks&&spend!=null&&clicks>0)?spend/clicks:null,
+  cpl:(leads&&spend!=null&&leads>0)?spend/leads:null,
+  roas:(spend&&revenue!=null&&spend>0)?revenue/spend:null
+ };
+}
+function parseDelimitedText(text){
+ const lines=String(text||'').replace(/\r\n/g,'\n').split('\n').filter(l=>l.trim()!=='');
+ if(!lines.length)return {headers:[],rows:[]};
+ const delimiter=lines[0].includes('\t')?'\t':',';
+ const parseLine=line=>{
+  const out=[];let cur='',inQuotes=false;
+  for(let i=0;i<line.length;i++){
+   const ch=line[i];
+   if(ch==='"'){if(inQuotes&&line[i+1]==='"'){cur+='"';i++;}else{inQuotes=!inQuotes;}}
+   else if(ch===delimiter&&!inQuotes){out.push(cur);cur='';}
+   else cur+=ch;
+  }
+  out.push(cur);
+  return out.map(s=>s.trim());
+ };
+ const headers=parseLine(lines[0]);
+ const rows=lines.slice(1).map(parseLine);
+ return {headers,rows};
+}
+function guessColumnMapping(headers){
+ return headers.map(h=>{
+  const norm=String(h||'').trim().toLowerCase();
+  for(const f of PERF_FIELDS){
+   if((PERF_HEADER_ALIASES[f.key]||[]).includes(norm))return f.key;
+  }
+  return 'ignore';
+ });
+}
 const REEL_BEATS=['Hook','Problem','Turn','Solution','CTA'];
 const REEL_SHOT_FIELDS=['time','visual','voiceover','onScreenText','sound'];
 function reelShotFieldLabel(key){return {time:'Time',visual:'Visual Direction',voiceover:'Voiceover / Caption',onScreenText:'On-Screen Text',sound:'Sound / Music'}[key]||key;}
@@ -80,7 +159,7 @@ function normalizeReel(r){
  };
 }
 const CREATIVE_FORMATS=['Single Image Ad','Carousel','Instagram Story','Instagram Reel'];
-let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist()};
+let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist(),performance:defaultPerformance()};
 
 const REFERENCE_ADS=[{"name":"Ad Version 1 · Problem-led","hook":"Still knowing what you want to say — but hesitating when it's your turn to speak?","primaryText":"You know the answer.\n\nYou have an idea.\n\nBut when the meeting turns to you, you suddenly start searching for words, translating in your head or wondering whether you are saying it correctly.\n\nIf this sounds familiar, you are not alone.\n\nThe Speak in Meetings Workshop is designed for working professionals who want to express their ideas more clearly and participate with greater confidence in workplace conversations.\n\n4-day live workshop · ₹997\n\nExplore the workshop and see if it is right for you.","headline":"Speak with more confidence in meetings","description":"4-day live workshop for working professionals.","cta":"Learn More"},{"name":"Ad Version 2 · Outcome-led","hook":"Imagine expressing your idea clearly when the meeting turns to you.","primaryText":"You don't necessarily need more words.\n\nYou need to feel more comfortable using the words you already know.\n\nThe Speak in Meetings Workshop helps working professionals practise how to express ideas, respond naturally and participate more confidently in workplace conversations.\n\nIf your goal is to speak more clearly without constantly worrying about finding the perfect words, this workshop may be a useful next step.\n\n4-day live workshop · ₹997","headline":"Express your ideas with confidence","description":"Practical workplace communication training.","cta":"Learn More"},{"name":"Ad Version 3 · Conversational","hook":"Quick question: do you stay quiet in meetings even when you have something useful to say?","primaryText":"Maybe you know exactly what you want to say.\n\nThen the moment comes.\n\nYou hesitate.\n\nYou search for the right words.\n\nSomeone else speaks.\n\nAnd the opportunity passes.\n\nThe Speak in Meetings Workshop is created for working professionals who want to become more comfortable expressing themselves in meetings and workplace conversations.\n\nLearn, practise and build confidence through a focused 4-day live workshop.\n\n₹997","headline":"Have something to say? Say it clearly.","description":"Build practical speaking confidence at work.","cta":"Learn More"}];
 const REFERENCE_REELS=[{"title": "Reel 1 · Problem to Solution", "hook": "Ever had the perfect answer five minutes after the meeting ended?", "angle": "Problem-led", "duration": "30", "scenes": ["0–3s — Hook: “Ever had the perfect answer five minutes after the meeting ended?”", "3–7s — Show a professional listening in a meeting but not speaking. Voiceover: “You knew exactly what you wanted to say...”", "7–12s — Show hesitation. Voiceover: “...but you started searching for words and the conversation moved on.”", "12–18s — Show a confident interaction. Voiceover: “With practice, you can learn to express your ideas more naturally.”", "18–24s — Introduce the workshop. Voiceover: “That's what we practise in the Speak in Meetings Workshop.”", "24–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More to see the details.”"], "voiceover": "Ever had the perfect answer five minutes after the meeting ended? You knew exactly what you wanted to say, but you started searching for words and the conversation moved on. With practice, you can learn to express your ideas more naturally — that's what we practise in the Speak in Meetings Workshop.", "onScreenText": "Ever had the perfect answer... after the meeting ended?", "cameraDirection": "Handheld, relatable meeting-room framing for the opening scene; cut to a clean end card with workshop details for the CTA.", "bRoll": "A professional in a video call, listening but staying quiet, followed by a confident follow-up conversation.", "cta": "Learn More", "caption": "Ever had the perfect answer... 5 minutes too late? 👀 4-day live workshop · ₹997 · Learn More."}, {"title": "Reel 2 · Outcome-led", "hook": "Imagine your next meeting feeling easier.", "angle": "Outcome-led", "duration": "30", "scenes": ["0–3s — Show the desired outcome immediately.", "3–8s — Voiceover: “You have the knowledge. You have the ideas.”", "8–15s — Show the person speaking clearly. Voiceover: “The next step is expressing those ideas clearly when the moment comes.”", "15–24s — Show workshop practice. Voiceover: “The Speak in Meetings Workshop gives you a focused environment to practise workplace communication.”", "24–30s — End frame: “4-day live workshop · ₹997” and “Learn More.”"], "voiceover": "Imagine your next meeting feeling easier. You have the knowledge, you have the ideas — the next step is expressing them clearly when the moment comes. The Speak in Meetings Workshop gives you a focused environment to practise workplace communication.", "onScreenText": "Imagine your next meeting feeling easier.", "cameraDirection": "Open on a confident, resolved moment for the outcome shot, then cut to workshop-practice footage, ending on a clean end card.", "bRoll": "A professional speaking clearly and confidently in a meeting, contrasted with a brief earlier hesitation.", "cta": "Learn More", "caption": "Imagine your next meeting feeling easier 🙌 4-day live workshop · ₹997 · Learn More."}, {"title": "Reel 3 · Question Format", "hook": "Do you stay quiet in meetings even when you have something useful to say?", "angle": "Question", "duration": "30", "scenes": ["0–3s — Put the question on screen and pause for recognition.", "3–9s — Show a meeting situation. Voiceover: “Maybe you're searching for the right words.”", "9–17s — Show a simple speaking exercise. Voiceover: “Maybe you're worried about making a mistake.”", "17–25s — Introduce the workshop. Voiceover: “The Speak in Meetings Workshop helps you practise expressing your ideas more clearly and confidently.”", "25–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More.”"], "voiceover": "Do you stay quiet in meetings even when you have something useful to say? Maybe you're searching for the right words, or worried about making a mistake. The Speak in Meetings Workshop helps you practise expressing your ideas more clearly and confidently.", "onScreenText": "Do you stay quiet in meetings even when you have something to say?", "cameraDirection": "Direct-to-camera delivery for the opening question, cut to a simple speaking-exercise demonstration, ending on a clean end card.", "bRoll": "A relatable meeting scene where someone visibly hesitates before staying silent.", "cta": "Learn More", "caption": "Quick question 👇 do you stay quiet even when you have something to say? 4-day live workshop · ₹997 · Learn More."}];
@@ -132,7 +211,7 @@ function fillBrief(b){
 }
 function resetState(){
  const keepAiConfig=state.aiConfig||defaultAiConfig();
- state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:keepAiConfig,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist()};
+ state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:keepAiConfig,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist(),performance:defaultPerformance()};
 }
 function showTab(name){
  document.querySelectorAll('nav button').forEach(b=>{const active=b.dataset.tab===name;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});
@@ -177,6 +256,7 @@ function showTab(name){
    renderLandingPageAnalysis();
  }
  if(name==='checklist'){if(!state.checklist)state.checklist=defaultChecklist();renderChecklist();}
+ if(name==='performance')renderPerformance();
  if(name==='saved')renderSaved();
  if(name==='export')renderPreview();
 }
@@ -700,6 +780,142 @@ function renderChecklist(){
   renderChecklist();
  });
 }
+
+// ---- Phase 10: Performance Analyzer (₹0, local; never invents missing values) ----
+let perfPendingParse=null;
+function renderPerformance(){
+ if(!state.performance)state.performance=defaultPerformance();
+ const rows=state.performance.rows;
+ renderPerformanceDashboard(rows);
+ renderPerformanceChart(rows);
+ renderPerformanceTable(rows);
+}
+function renderPerformanceDashboard(rows){
+ const el=$('perfDashboard');
+ if(!el)return;
+ if(!rows.length){el.innerHTML='';return;}
+ const d=computePerformanceDashboard(rows);
+ const cards=[
+  {label:'Spend',value:fmtCurrency(d.spend)},
+  {label:'Impressions',value:d.impressions==null?'—':Math.round(d.impressions).toLocaleString()},
+  {label:'Clicks',value:d.clicks==null?'—':Math.round(d.clicks).toLocaleString()},
+  {label:'CTR',value:d.ctr==null?'—':d.ctr.toFixed(2)+'%'},
+  {label:'CPC',value:d.cpc==null?'—':d.cpc.toFixed(2)},
+  {label:'Leads',value:d.leads==null?'—':Math.round(d.leads).toLocaleString()},
+  {label:'CPL',value:d.cpl==null?'—':d.cpl.toFixed(2)},
+  {label:'Conversions',value:d.conversions==null?'—':Math.round(d.conversions).toLocaleString()},
+  {label:'ROAS',value:d.roas==null?'—':d.roas.toFixed(2)+'x'}
+ ];
+ el.innerHTML='<div class="perf-dashboard">'+cards.map(c=>'<div class="perf-card"><div class="perf-card-label">'+esc(c.label)+'</div><div class="perf-card-value">'+esc(c.value)+'</div></div>').join('')+'</div>';
+}
+function renderPerformanceChart(rows){
+ const el=$('perfChart');
+ if(!el)return;
+ const byCampaign={};
+ rows.forEach(r=>{const spend=num(r.spend);if(spend==null)return;const key=r.campaign||'(No campaign name)';byCampaign[key]=(byCampaign[key]||0)+spend;});
+ const entries=Object.entries(byCampaign).sort((a,b)=>b[1]-a[1]);
+ if(!entries.length){el.innerHTML='';return;}
+ const max=entries[0][1]||1;
+ el.innerHTML='<div class="ai-image-panel"><div class="ai-image-head"><strong>Spend by Campaign</strong></div>'+
+  entries.map(([name,spend])=>'<div class="perf-bar-row"><span class="perf-bar-label" title="'+attr(name)+'">'+esc(name)+'</span><span class="perf-bar-track"><span class="perf-bar-fill" style="width:'+(spend/max*100).toFixed(1)+'%"></span></span><span class="perf-bar-value">'+fmtCurrency(spend)+'</span></div>').join('')+
+ '</div>';
+}
+function fmtCurrency(v){return v==null?'—':'₹'+v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
+function metricCellHtml(m,decimals,suffix){
+ const label={reported:'Reported',calculated:'Calculated',unavailable:'Unavailable'}[m.status];
+ return '<span class="metric-'+m.status+'" title="'+label+'">'+fmtMetric(m,decimals,suffix)+'</span>';
+}
+function renderPerformanceTable(rows){
+ const el=$('perfTableResult');
+ if(!el)return;
+ if(!rows.length){el.innerHTML='<div class="placeholder">No performance data yet. Upload a CSV, paste a table, or add a row manually.</div>';return;}
+ const rawCols=PERF_FIELDS;
+ const derivedCols=[
+  {key:'ctr',label:'CTR',decimals:2,suffix:'%'},{key:'cpc',label:'CPC',decimals:2,suffix:''},{key:'cpl',label:'CPL',decimals:2,suffix:''},
+  {key:'conversionRate',label:'Conv. Rate',decimals:2,suffix:'%'},{key:'frequency',label:'Frequency',decimals:2,suffix:''},
+  {key:'roas',label:'ROAS',decimals:2,suffix:'x'},{key:'costPerConversion',label:'Cost / Conversion',decimals:2,suffix:''}
+ ];
+ const head='<tr>'+rawCols.map(f=>'<th>'+esc(f.label)+'</th>').join('')+derivedCols.map(c=>'<th>'+esc(c.label)+'</th>').join('')+'<th></th></tr>';
+ const body=rows.map((r,i)=>{
+  const derived=computeDerivedMetrics(r);
+  const rawCells=rawCols.map(f=>'<td><input class="perfField" data-index="'+i+'" data-key="'+f.key+'" value="'+attr(r[f.key])+'"></td>').join('');
+  const derivedCells=derivedCols.map(c=>'<td>'+metricCellHtml(derived[c.key],c.decimals,c.suffix)+'</td>').join('');
+  return '<tr>'+rawCells+derivedCells+'<td><button class="ghost danger perfRemoveRow" data-index="'+i+'" type="button">✕</button></td></tr>';
+ }).join('');
+ el.innerHTML='<div class="perf-table-wrap"><table class="matrix-table"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div><small class="demo-badge">₹0 MODE — Reported = you entered this value directly; Calculated = derived from other reported values; Unavailable = not enough data, never invented</small>';
+ document.querySelectorAll('.perfField').forEach(input=>input.oninput=()=>{
+  state.performance.rows[Number(input.dataset.index)][input.dataset.key]=input.value;
+  renderPerformanceDashboard(state.performance.rows);
+  renderPerformanceChart(state.performance.rows);
+ });
+ document.querySelectorAll('.perfRemoveRow').forEach(btn=>btn.onclick=()=>{state.performance.rows.splice(Number(btn.dataset.index),1);renderPerformance();});
+}
+function addPerformanceRow(){
+ if(!state.performance)state.performance=defaultPerformance();
+ state.performance.rows.push(defaultPerformanceRow());
+ state.performance.source=state.performance.source||'manual';
+ renderPerformance();
+ $('status').textContent='Row added — fill in the values you have; leave the rest blank';
+}
+function clearPerformanceRows(){
+ if(!state.performance)state.performance=defaultPerformance();
+ state.performance.rows=[];
+ state.performance.source=null;
+ perfPendingParse=null;
+ $('perfMappingResult').innerHTML='';
+ renderPerformance();
+ $('status').textContent='Performance data cleared';
+}
+function renderMappingUI(){
+ const el=$('perfMappingResult');
+ if(!el||!perfPendingParse)return;
+ const {headers,rows,mapping}=perfPendingParse;
+ el.innerHTML='<div class="ai-image-panel"><div class="ai-image-head"><strong>Map Columns</strong><span class="ai-tab-status">'+rows.length+' row'+(rows.length===1?'':'s')+' detected</span></div>'+
+  '<p class="section-help">Match each column from your data to a field below, or leave it as Ignore.</p>'+
+  '<div class="ai-select-grid">'+headers.map((h,i)=>'<label>'+esc(h||'Column '+(i+1))+'<select class="perfMapField" data-index="'+i+'"><option value="ignore">Ignore</option>'+PERF_FIELDS.map(f=>'<option value="'+f.key+'"'+(mapping[i]===f.key?' selected':'')+'>'+esc(f.label)+'</option>').join('')+'</select></label>').join('')+'</div>'+
+  '<div class="ai-image-controls"><button id="perfImportMapped" class="primary" type="button">Import '+rows.length+' Row'+(rows.length===1?'':'s')+'</button><button id="perfCancelMapping" class="ghost" type="button">Cancel</button></div></div>';
+ document.querySelectorAll('.perfMapField').forEach(sel=>sel.onchange=()=>{perfPendingParse.mapping[Number(sel.dataset.index)]=sel.value;});
+ $('perfImportMapped').onclick=()=>{
+  if(!state.performance)state.performance=defaultPerformance();
+  const {rows:parsedRows,mapping}=perfPendingParse;
+  const imported=parsedRows.map(cols=>{
+   const row=defaultPerformanceRow();
+   mapping.forEach((key,i)=>{if(key!=='ignore'&&cols[i]!==undefined)row[key]=cols[i];});
+   return row;
+  });
+  state.performance.rows=state.performance.rows.concat(imported);
+  state.performance.source=state.performance.source&&state.performance.source!=='manual'?state.performance.source:(perfPendingParse.source||'import');
+  perfPendingParse=null;
+  el.innerHTML='';
+  renderPerformance();
+  $('status').textContent=imported.length+' row'+(imported.length===1?'':'s')+' imported — ₹0';
+ };
+ $('perfCancelMapping').onclick=()=>{perfPendingParse=null;el.innerHTML='';};
+}
+function startPerformanceMapping(headers,rows,source){
+ if(!rows.length){$('status').textContent='No data rows found to import.';return;}
+ perfPendingParse={headers,rows,mapping:guessColumnMapping(headers),source};
+ renderMappingUI();
+}
+function handlePerfParsePaste(){
+ const text=$('perfPasteInput').value;
+ const {headers,rows}=parseDelimitedText(text);
+ if(!headers.length){$('status').textContent='Paste some data first.';return;}
+ startPerformanceMapping(headers,rows,'paste');
+}
+function handlePerfCsvInput(e){
+ const file=e.target.files&&e.target.files[0];
+ if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>{
+  const {headers,rows}=parseDelimitedText(String(reader.result||''));
+  if(!headers.length){$('status').textContent='Could not read that CSV file.';return;}
+  startPerformanceMapping(headers,rows,'csv');
+ };
+ reader.onerror=()=>{$('status').textContent='Could not read that CSV file.';};
+ reader.readAsText(file);
+ e.target.value='';
+}
 async function regenerate(type){
  if(!state.brief.productName){$('status').textContent='Generate a campaign first.';showTab('brief');return;}
  if(stageIsAi(type)){
@@ -1085,6 +1301,7 @@ async function loadReferenceExample(){
     state.selectedCopy=state.copy.length?state.copy[0].name:null;
     state.landingPage=Object.assign(defaultLandingPage(),{url:referenceBrief.landingPage||''});
     state.checklist=defaultChecklist();
+    state.performance=defaultPerformance();
 
     if(!state.strategy||!state.copy.length||!state.creative.length||!state.reels.length)throw new Error('Reference outputs are empty');
 
@@ -1110,6 +1327,7 @@ async function loadReferenceExample(){
     fillLandingPageInputs();
     renderLandingPageAnalysis();
     renderChecklist();
+    renderPerformance();
     $('status').textContent='Reference loaded — Strategy, Audience, Offer, Campaign Structure, 3 Ad Copies, Creative Matrix + 4 Creative Ideas, 3 Reel Scripts ready';
     showTab('brief');
   }catch(err){
@@ -1120,7 +1338,7 @@ async function loadReferenceExample(){
 }
 $('useReference').onclick=loadReferenceExample;
 $('generate').onclick=()=>{state.brief=brief();generateAI();};
-$('regenStrategy').onclick=()=>regenerate('strategy');$('regenCopy').onclick=()=>regenerate('copy');$('regenCreative').onclick=()=>regenerate('creative');$('regenReels').onclick=()=>regenerate('reels');$('nextAudience').onclick=()=>showTab('audience');$('nextOffer').onclick=()=>showTab('offer');$('nextStructure').onclick=()=>showTab('structure');$('nextCopyFromStructure').onclick=()=>showTab('copy');$('nextCreative').onclick=()=>showTab('creative');$('nextReels').onclick=()=>showTab('reels');$('nextLanding').onclick=()=>showTab('landing');$('nextChecklist').onclick=()=>showTab('checklist');$('nextSaved').onclick=()=>showTab('saved');
+$('regenStrategy').onclick=()=>regenerate('strategy');$('regenCopy').onclick=()=>regenerate('copy');$('regenCreative').onclick=()=>regenerate('creative');$('regenReels').onclick=()=>regenerate('reels');$('nextAudience').onclick=()=>showTab('audience');$('nextOffer').onclick=()=>showTab('offer');$('nextStructure').onclick=()=>showTab('structure');$('nextCopyFromStructure').onclick=()=>showTab('copy');$('nextCreative').onclick=()=>showTab('creative');$('nextReels').onclick=()=>showTab('reels');$('nextLanding').onclick=()=>showTab('landing');$('nextChecklist').onclick=()=>showTab('checklist');$('nextPerformance').onclick=()=>showTab('performance');$('nextSaved').onclick=()=>showTab('saved');
 $('genAudiencePlan').onclick=generateAudiencePlan;
 $('addMatrixRow').onclick=()=>{if(!state.audience)state.audience=defaultAudience();if(!Array.isArray(state.audience.matrix))state.audience.matrix=[];state.audience.matrix.push({audience:'',angle:'',creative:'',purpose:''});renderAudienceMatrix();};
 $('analyzeOffer').onclick=analyzeOffer;
@@ -1149,6 +1367,10 @@ $('genImagePrompts').onclick=generateImagePrompts;
 $('genReelShotList').onclick=generateReelShotList;
 $('analyzeLandingPage').onclick=analyzeLandingPage;
 $('analyzeLpManual').onclick=analyzeLandingPageManual;
+$('perfAddRow').onclick=addPerformanceRow;
+$('perfClearAll').onclick=clearPerformanceRows;
+$('perfParsePaste').onclick=handlePerfParsePaste;
+$('perfCsvInput').onchange=handlePerfCsvInput;
 $('generateImagesBtn').onclick=async()=>{
  if(!stageIsAi('images'))return;
  if(!Array.isArray(state.creative)||!state.creative.length){$('status').textContent='Generate creative concepts first.';return;}
@@ -1184,7 +1406,7 @@ $('generateImagesBtn').onclick=async()=>{
 };
 
 $('save').onclick=()=>{const b=brief();if(!b.productName){$('status').textContent='Enter a product/service first.';return;}const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:b,state});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));$('status').textContent='Campaign saved';};
-function startNewCampaign(){ids.forEach(id=>$(id).value='');resetState();$('strategyResult').innerHTML='<div class="placeholder">Complete the brief and generate a strategy.</div>';$('copyResult').innerHTML='<div class="placeholder">Generate a campaign to create ad copy.</div>';$('creativeResult').innerHTML='<article><h3>Image Ad</h3><p>Visual concept and text hierarchy.</p></article><article><h3>Carousel</h3><p>Problem → solution → proof → CTA.</p></article><article><h3>Story</h3><p>Vertical 9:16 concept.</p></article><article><h3>Reel</h3><p>Scene-by-scene creative concept.</p></article>';$('reelsResult').innerHTML='<div class="placeholder">Generate a campaign to create reel scripts.</div>';fillAudienceInputs(state.audience);renderAudiencePlan();renderAudienceMatrix();fillOfferInputs(state.offer);renderOfferAnalysis();$('campaignName').value='';$('campaignObjective').value='';$('campaignBudget').value='';$('campaignLocation').value='';$('campaignDestination').value='';renderCampaignStructure();renderCreativeMatrix();fillImageFactoryGlobalInputs();renderImageConceptSelect();renderImagePrompts();renderReelSelect();renderReelShotList();fillLandingPageInputs();renderLandingPageAnalysis();renderChecklist();$('status').textContent='New campaign ready';renderAiControlSummary();showTab('brief');}
+function startNewCampaign(){ids.forEach(id=>$(id).value='');resetState();$('strategyResult').innerHTML='<div class="placeholder">Complete the brief and generate a strategy.</div>';$('copyResult').innerHTML='<div class="placeholder">Generate a campaign to create ad copy.</div>';$('creativeResult').innerHTML='<article><h3>Image Ad</h3><p>Visual concept and text hierarchy.</p></article><article><h3>Carousel</h3><p>Problem → solution → proof → CTA.</p></article><article><h3>Story</h3><p>Vertical 9:16 concept.</p></article><article><h3>Reel</h3><p>Scene-by-scene creative concept.</p></article>';$('reelsResult').innerHTML='<div class="placeholder">Generate a campaign to create reel scripts.</div>';fillAudienceInputs(state.audience);renderAudiencePlan();renderAudienceMatrix();fillOfferInputs(state.offer);renderOfferAnalysis();$('campaignName').value='';$('campaignObjective').value='';$('campaignBudget').value='';$('campaignLocation').value='';$('campaignDestination').value='';renderCampaignStructure();renderCreativeMatrix();fillImageFactoryGlobalInputs();renderImageConceptSelect();renderImagePrompts();renderReelSelect();renderReelShotList();fillLandingPageInputs();renderLandingPageAnalysis();renderChecklist();renderPerformance();$('status').textContent='New campaign ready';renderAiControlSummary();showTab('brief');}
 $('newCampaign').onclick=()=>{$('newCampaignConfirm').hidden=false;};
 $('confirmNewCampaign').onclick=()=>{$('newCampaignConfirm').hidden=true;startNewCampaign();};
 $('cancelNewCampaign').onclick=()=>{$('newCampaignConfirm').hidden=true;};
@@ -1198,13 +1420,13 @@ $('exportText').onclick=()=>{
  download('ai-ads-campaign.txt',briefText+aiText,'text/plain');
 };
 function renderSaved(){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');$('savedList').innerHTML=items.length?items.map(x=>'<div class="saved-card"><div class="saved-meta"><strong>'+esc(x.brief.productName||'Untitled campaign')+'</strong><small>'+esc(x.brief.brandName||'')+' · '+new Date(x.savedAt).toLocaleString()+'</small></div><div class="saved-actions"><button class="secondary loadBtn" data-id="'+x.id+'">Load</button><button class="secondary duplicateBtn" data-id="'+x.id+'">Duplicate</button><button class="secondary danger deleteBtn" data-id="'+x.id+'">Delete</button></div></div>').join(''):'<div class="placeholder">No saved campaigns yet.</div>';document.querySelectorAll('.loadBtn').forEach(btn=>btn.onclick=()=>loadCampaign(Number(btn.dataset.id)));document.querySelectorAll('.duplicateBtn').forEach(btn=>btn.onclick=()=>duplicateCampaign(Number(btn.dataset.id)));document.querySelectorAll('.deleteBtn').forEach(btn=>btn.onclick=()=>deleteCampaign(Number(btn.dataset.id)));}
-function duplicateCampaign(id){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');const item=items.find(x=>x.id===id);if(!item)return;const copyBrief={...item.brief,productName:(item.brief.productName||'Untitled campaign')+' (Copy)'};const copyState=item.state?{...item.state,brief:copyBrief}:{brief:copyBrief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:item.state&&item.state.aiConfig||defaultAiConfig(),aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist()};items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:copyBrief,state:copyState});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));renderSaved();$('status').textContent='Campaign duplicated';}
+function duplicateCampaign(id){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');const item=items.find(x=>x.id===id);if(!item)return;const copyBrief={...item.brief,productName:(item.brief.productName||'Untitled campaign')+' (Copy)'};const copyState=item.state?{...item.state,brief:copyBrief}:{brief:copyBrief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:item.state&&item.state.aiConfig||defaultAiConfig(),aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist(),performance:defaultPerformance()};items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:copyBrief,state:copyState});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));renderSaved();$('status').textContent='Campaign duplicated';}
 function loadCampaign(id){
  const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');
  const item=items.find(x=>x.id===id);
  if(!item)return;
  fillBrief(item.brief);
- state=item.state||{brief:item.brief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist()};
+ state=item.state||{brief:item.brief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist(),performance:defaultPerformance()};
  state.aiConfig=state.aiConfig||defaultAiConfig();
  state.aiUsage=state.aiUsage||emptyAiUsage();
  if(state.aiImages===undefined)state.aiImages=null;
@@ -1221,6 +1443,8 @@ function loadCampaign(id){
  if(!Array.isArray(state.reelFactory.shots))state.reelFactory.shots=[];
  state.landingPage=Object.assign(defaultLandingPage(),state.landingPage||{});
  state.checklist=normalizeChecklist(state.checklist);
+ state.performance=Object.assign(defaultPerformance(),state.performance||{});
+ if(!Array.isArray(state.performance.rows))state.performance.rows=[];
  applyAiConfigToUI();
  fillAudienceInputs(state.audience);
  renderAudiencePlan();
@@ -1242,6 +1466,7 @@ function loadCampaign(id){
  fillLandingPageInputs();
  renderLandingPageAnalysis();
  renderChecklist();
+ renderPerformance();
  if(!state.copy)generateDemo();else{renderResults();}
  state.brief=item.brief;
  $('status').textContent='Saved campaign loaded';
