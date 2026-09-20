@@ -3,7 +3,8 @@ function defaultAiConfig(){return {master:false,stages:{strategy:false,copy:fals
 function emptyAiUsage(){return {strategy:null,copy:null,creative:null,images:null,reels:null};}
 function defaultAudience(){return {primaryCustomer:'',location:'',age:'',gender:'Any',occupation:'',income:'Mid-market',problem:'',outcome:'',awareness:'Problem Aware',intent:'Warm',strategies:['Broad'],plan:null,matrix:[]};}
 function defaultOffer(){return {product:'',price:'',discount:'',duration:'',scarcity:'',cta:'',bonuses:'',guarantee:'',proof:'',analysis:null,variants:null};}
-let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer()};
+function defaultCampaignStructure(){return {name:'',objective:'',budget:'',location:'',destination:'',adSets:[]};}
+let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure()};
 
 const REFERENCE_ADS=[{"name":"Ad Version 1 · Problem-led","hook":"Still knowing what you want to say — but hesitating when it's your turn to speak?","primaryText":"You know the answer.\n\nYou have an idea.\n\nBut when the meeting turns to you, you suddenly start searching for words, translating in your head or wondering whether you are saying it correctly.\n\nIf this sounds familiar, you are not alone.\n\nThe Speak in Meetings Workshop is designed for working professionals who want to express their ideas more clearly and participate with greater confidence in workplace conversations.\n\n4-day live workshop · ₹997\n\nExplore the workshop and see if it is right for you.","headline":"Speak with more confidence in meetings","description":"4-day live workshop for working professionals.","cta":"Learn More"},{"name":"Ad Version 2 · Outcome-led","hook":"Imagine expressing your idea clearly when the meeting turns to you.","primaryText":"You don't necessarily need more words.\n\nYou need to feel more comfortable using the words you already know.\n\nThe Speak in Meetings Workshop helps working professionals practise how to express ideas, respond naturally and participate more confidently in workplace conversations.\n\nIf your goal is to speak more clearly without constantly worrying about finding the perfect words, this workshop may be a useful next step.\n\n4-day live workshop · ₹997","headline":"Express your ideas with confidence","description":"Practical workplace communication training.","cta":"Learn More"},{"name":"Ad Version 3 · Conversational","hook":"Quick question: do you stay quiet in meetings even when you have something useful to say?","primaryText":"Maybe you know exactly what you want to say.\n\nThen the moment comes.\n\nYou hesitate.\n\nYou search for the right words.\n\nSomeone else speaks.\n\nAnd the opportunity passes.\n\nThe Speak in Meetings Workshop is created for working professionals who want to become more comfortable expressing themselves in meetings and workplace conversations.\n\nLearn, practise and build confidence through a focused 4-day live workshop.\n\n₹997","headline":"Have something to say? Say it clearly.","description":"Build practical speaking confidence at work.","cta":"Learn More"}];
 const REFERENCE_REELS=[{"title":"Reel 1 · Problem to Solution","hook":"Ever had the perfect answer five minutes after the meeting ended?","scenes":["0–3s — Hook: “Ever had the perfect answer five minutes after the meeting ended?”","3–7s — Show a professional listening in a meeting but not speaking. Voiceover: “You knew exactly what you wanted to say...”","7–12s — Show hesitation. Voiceover: “...but you started searching for words and the conversation moved on.”","12–18s — Show a confident interaction. Voiceover: “With practice, you can learn to express your ideas more naturally.”","18–24s — Introduce the workshop. Voiceover: “That's what we practise in the Speak in Meetings Workshop.”","24–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More to see the details.”"]},{"title":"Reel 2 · Outcome-led","hook":"Imagine your next meeting feeling easier.","scenes":["0–3s — Show the desired outcome immediately.","3–8s — Voiceover: “You have the knowledge. You have the ideas.”","8–15s — Show the person speaking clearly. Voiceover: “The next step is expressing those ideas clearly when the moment comes.”","15–24s — Show workshop practice. Voiceover: “The Speak in Meetings Workshop gives you a focused environment to practise workplace communication.”","24–30s — End frame: “4-day live workshop · ₹997” and “Learn More.”"]},{"title":"Reel 3 · Question Format","hook":"Do you stay quiet in meetings even when you have something useful to say?","scenes":["0–3s — Put the question on screen and pause for recognition.","3–9s — Show a meeting situation. Voiceover: “Maybe you're searching for the right words.”","9–17s — Show a simple speaking exercise. Voiceover: “Maybe you're worried about making a mistake.”","17–25s — Introduce the workshop. Voiceover: “The Speak in Meetings Workshop helps you practise expressing your ideas more clearly and confidently.”","25–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More.”"]}];
@@ -51,7 +52,7 @@ function fillBrief(b){
 }
 function resetState(){
  const keepAiConfig=state.aiConfig||defaultAiConfig();
- state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:keepAiConfig,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer()};
+ state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:keepAiConfig,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure()};
 }
 function showTab(name){
  document.querySelectorAll('nav button').forEach(b=>{const active=b.dataset.tab===name;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});
@@ -74,6 +75,15 @@ function showTab(name){
    fillOfferInputs(Object.assign({},state.offer,{product:currentBrief.productName||'',price:currentBrief.offer||''}));
  }else if(name==='offer'){
    fillOfferInputs(state.offer);
+ }
+ if(name==='structure'){
+   const currentBrief=brief();
+   $('campaignObjective').value=currentBrief.objective||'';
+   if(!state.campaign.budget)$('campaignBudget').value=state.campaign.budget=currentBrief.budget||'';else $('campaignBudget').value=state.campaign.budget;
+   if(!state.campaign.location)$('campaignLocation').value=state.campaign.location=state.audience.location||currentBrief.location||'';else $('campaignLocation').value=state.campaign.location;
+   if(!state.campaign.destination)$('campaignDestination').value=state.campaign.destination=currentBrief.landingPage||'';else $('campaignDestination').value=state.campaign.destination;
+   $('campaignName').value=state.campaign.name||'';
+   renderCampaignStructure();
  }
  if(name==='audience')renderAudiencePlan(),renderAudienceMatrix();
  if(name==='offer')renderOfferAnalysis();
@@ -486,6 +496,120 @@ function renderOfferAnalysis(){
  $('offerVariantsResult').innerHTML=variants.length?'<h3 class="variants-head">Offer Variants</h3><div class="result-grid">'+variants.map(v=>'<div class="result-card"><strong>'+esc(v.name)+'</strong><p>'+esc(v.description)+'</p></div>').join('')+'</div>':'';
 }
 
+// ---- Phase 4: Campaign Structure (planning layer only, ₹0, local naming heuristics) ----
+const MONTH_ABBR=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sept','Oct','Nov','Dec'];
+const OBJECTIVE_ABBR={'Lead Generation':'LeadGen','Website Traffic':'Traffic','Sales':'Sales','WhatsApp Leads':'WA_Leads','Workshop / Webinar':'Workshop','Course':'Course','Service':'Service','Product':'Product'};
+const COUNTRY_CODES={'india':'IN','united states':'US','usa':'US','united states of america':'US','uk':'UK','united kingdom':'UK','canada':'CA','australia':'AU','singapore':'SG','uae':'AE','united arab emirates':'AE','germany':'DE','france':'FR'};
+function countryCode(location){
+ const key=String(location||'').trim().toLowerCase();
+ if(!key)return 'XX';
+ if(COUNTRY_CODES[key])return COUNTRY_CODES[key];
+ return key.slice(0,2).toUpperCase();
+}
+function monthTag(){const d=new Date();return MONTH_ABBR[d.getMonth()]+String(d.getFullYear()).slice(-2);}
+function angleFromCopyName(name){
+ const m=String(name||'').match(/·\s*([A-Za-z]+)/);
+ return m?m[1]:'General';
+}
+function setByPath(obj,path,value){
+ const keys=path.split('.');
+ let cur=obj;
+ for(let i=0;i<keys.length-1;i++){
+   const k=/^\d+$/.test(keys[i])?Number(keys[i]):keys[i];
+   cur=cur[k];
+ }
+ const lastKey=keys[keys.length-1];
+ const lk=/^\d+$/.test(lastKey)?Number(lastKey):lastKey;
+ cur[lk]=value;
+}
+function generateCampaignStructure(){
+ state.brief=brief();
+ const b=state.brief;
+ const cc=countryCode(state.audience.location||b.location);
+ const age=state.audience.age||b.ageRange||'25-45';
+ const objAbbr=OBJECTIVE_ABBR[b.objective]||(b.objective||'Campaign').replace(/[^A-Za-z]/g,'');
+ const campaignNameField=$('campaignName').value.trim();
+ const campaignName=campaignNameField||('SM_'+objAbbr+'_'+cc+'_'+age+'_'+monthTag());
+ const strategies=(state.audience.strategies&&state.audience.strategies.length)?state.audience.strategies:['Broad','Interest','Lookalike'];
+ const copies=(Array.isArray(state.copy)&&state.copy.length)?state.copy:CampaignGenerator.buildCampaign(b).copy;
+ const creatives=(Array.isArray(state.creative)&&state.creative.length)?state.creative:CampaignGenerator.buildCampaign(b).creative;
+ const optimisationEvent=b.objective==='Sales'?'Purchase':b.objective==='WhatsApp Leads'?'Conversation started':b.objective==='Website Traffic'?'Landing Page Views':'Lead';
+ const adSets=strategies.slice(0,3).map((strategy,si)=>{
+  const adSetName='AS_'+String(strategy).replace(/\s+/g,'')+'_'+cc+'_'+age;
+  const ads=copies.slice(0,3).map((c,ai)=>{
+   const angle=angleFromCopyName(c.name);
+   return {
+    id:'ad-'+si+'-'+ai,
+    name:'AD_'+angle.replace(/\s+/g,'')+'_Hook'+String(ai+1).padStart(2,'0'),
+    copy:c.name||'',
+    creative:(creatives[ai]&&creatives[ai].format)||'Single Image Ad',
+    headline:c.headline||'',
+    cta:c.cta||'Learn More',
+    destination:b.landingPage||'',
+    tracking:''
+   };
+  });
+  return {
+   id:'adset-'+si,
+   name:adSetName,
+   audience:strategy,
+   age,
+   location:state.audience.location||b.location||'',
+   placements:'Advantage+ Placements',
+   optimisationEvent,
+   budget:'',
+   ads
+  };
+ });
+ state.campaign={
+  name:campaignName,
+  objective:b.objective||'',
+  budget:state.campaign.budget||b.budget||'',
+  location:state.audience.location||b.location||'',
+  destination:state.campaign.destination||b.landingPage||'',
+  adSets
+ };
+ $('campaignName').value=state.campaign.name;
+ renderCampaignStructure();
+ $('status').textContent='Campaign structure generated — ₹0 (planning only)';
+}
+function renderCampaignStructure(){
+ const c=state.campaign;
+ if(!c||!Array.isArray(c.adSets)||!c.adSets.length){
+   $('campaignStructureResult').innerHTML='<div class="placeholder">Complete the brief (and ideally Audience/Ad Copy) and click Generate Structure.</div>';
+   return;
+ }
+ $('campaignStructureResult').innerHTML='<div class="structure-tree"><div class="structure-node campaign-node"><strong>CAMPAIGN</strong> · '+esc(c.name)+'</div>'+
+  c.adSets.map((as,si)=>
+   '<div class="structure-node adset-node">'+
+    '<div class="structure-node-head"><span class="structure-tag">AD SET '+(si+1)+'</span><input class="structure-field" data-path="adSets.'+si+'.name" value="'+attr(as.name)+'"></div>'+
+    '<div class="structure-grid">'+
+     '<label>Audience<input class="structure-field" data-path="adSets.'+si+'.audience" value="'+attr(as.audience)+'"></label>'+
+     '<label>Age<input class="structure-field" data-path="adSets.'+si+'.age" value="'+attr(as.age)+'"></label>'+
+     '<label>Location<input class="structure-field" data-path="adSets.'+si+'.location" value="'+attr(as.location)+'"></label>'+
+     '<label>Placements<input class="structure-field" data-path="adSets.'+si+'.placements" value="'+attr(as.placements)+'"></label>'+
+     '<label>Optimisation Event<input class="structure-field" data-path="adSets.'+si+'.optimisationEvent" value="'+attr(as.optimisationEvent)+'"></label>'+
+     '<label>Budget<input class="structure-field" data-path="adSets.'+si+'.budget" value="'+attr(as.budget)+'" placeholder="e.g. ₹150/day"></label>'+
+    '</div>'+
+    as.ads.map((ad,ai)=>
+     '<div class="structure-node ad-node">'+
+      '<div class="structure-node-head"><span class="structure-tag">AD '+(ai+1)+'</span><input class="structure-field" data-path="adSets.'+si+'.ads.'+ai+'.name" value="'+attr(ad.name)+'"></div>'+
+      '<div class="structure-grid">'+
+       '<label>Copy<input class="structure-field" data-path="adSets.'+si+'.ads.'+ai+'.copy" value="'+attr(ad.copy)+'"></label>'+
+       '<label>Creative<input class="structure-field" data-path="adSets.'+si+'.ads.'+ai+'.creative" value="'+attr(ad.creative)+'"></label>'+
+       '<label>Headline<input class="structure-field" data-path="adSets.'+si+'.ads.'+ai+'.headline" value="'+attr(ad.headline)+'"></label>'+
+       '<label>CTA<input class="structure-field" data-path="adSets.'+si+'.ads.'+ai+'.cta" value="'+attr(ad.cta)+'"></label>'+
+       '<label>Destination<input class="structure-field" data-path="adSets.'+si+'.ads.'+ai+'.destination" value="'+attr(ad.destination)+'"></label>'+
+       '<label>Tracking<input class="structure-field" data-path="adSets.'+si+'.ads.'+ai+'.tracking" value="'+attr(ad.tracking)+'" placeholder="e.g. UTM params"></label>'+
+      '</div>'+
+     '</div>'
+    ).join('')+
+   '</div>'
+  ).join('')+
+ '</div><small class="demo-badge">₹0 MODE — planning layer only; nothing is created in Meta Ads Manager</small>';
+ document.querySelectorAll('.structure-field').forEach(el=>el.oninput=()=>setByPath(state.campaign,el.dataset.path,el.value));
+}
+
 async function loadReferenceExample(){
   const btn=$('useReference');
   btn.disabled=true;
@@ -548,6 +672,7 @@ async function loadReferenceExample(){
     state.aiImages=null;
     state.audience=defaultAudience();
     state.offer=defaultOffer();
+    state.campaign=defaultCampaignStructure();
     state.strategy=strategyData.strategy||REFERENCE_STRATEGY;
     state.copy=Array.isArray(adData.ads)?adData.ads.slice():REFERENCE_ADS.slice();
     state.creative=Array.isArray(creativeData.creative)?creativeData.creative.slice():REFERENCE_CREATIVE.slice();
@@ -563,6 +688,8 @@ async function loadReferenceExample(){
     renderAudienceMatrix();
     fillOfferInputs(state.offer);
     renderOfferAnalysis();
+    $('campaignName').value='';$('campaignObjective').value='';$('campaignBudget').value='';$('campaignLocation').value='';$('campaignDestination').value='';
+    renderCampaignStructure();
     $('status').textContent='Reference loaded — Strategy + 3 Ad Copies + 4 Creative Ideas + 3 Reel Scripts ready';
     showTab('brief');
   }catch(err){
@@ -573,10 +700,15 @@ async function loadReferenceExample(){
 }
 $('useReference').onclick=loadReferenceExample;
 $('generate').onclick=()=>{state.brief=brief();generateAI();};
-$('regenStrategy').onclick=()=>regenerate('strategy');$('regenCopy').onclick=()=>regenerate('copy');$('regenCreative').onclick=()=>regenerate('creative');$('regenReels').onclick=()=>regenerate('reels');$('nextAudience').onclick=()=>showTab('audience');$('nextOffer').onclick=()=>showTab('offer');$('nextCopyFromOffer').onclick=()=>showTab('copy');$('nextCreative').onclick=()=>showTab('creative');$('nextReels').onclick=()=>showTab('reels');$('nextSaved').onclick=()=>showTab('saved');
+$('regenStrategy').onclick=()=>regenerate('strategy');$('regenCopy').onclick=()=>regenerate('copy');$('regenCreative').onclick=()=>regenerate('creative');$('regenReels').onclick=()=>regenerate('reels');$('nextAudience').onclick=()=>showTab('audience');$('nextOffer').onclick=()=>showTab('offer');$('nextStructure').onclick=()=>showTab('structure');$('nextCopyFromStructure').onclick=()=>showTab('copy');$('nextCreative').onclick=()=>showTab('creative');$('nextReels').onclick=()=>showTab('reels');$('nextSaved').onclick=()=>showTab('saved');
 $('genAudiencePlan').onclick=generateAudiencePlan;
 $('addMatrixRow').onclick=()=>{if(!state.audience)state.audience=defaultAudience();if(!Array.isArray(state.audience.matrix))state.audience.matrix=[];state.audience.matrix.push({audience:'',angle:'',creative:'',purpose:''});renderAudienceMatrix();};
 $('analyzeOffer').onclick=analyzeOffer;
+$('genCampaignStructure').onclick=generateCampaignStructure;
+$('campaignName').oninput=()=>{state.campaign.name=$('campaignName').value;};
+$('campaignBudget').oninput=()=>{state.campaign.budget=$('campaignBudget').value;};
+$('campaignLocation').oninput=()=>{state.campaign.location=$('campaignLocation').value;};
+$('campaignDestination').oninput=()=>{state.campaign.destination=$('campaignDestination').value;};
 
 $('aiMasterSwitch').onchange=onAiControlChange;
 document.querySelectorAll('.ai-stage-grid input[type=checkbox]').forEach(el=>el.onchange=onAiControlChange);
@@ -620,7 +752,7 @@ $('generateImagesBtn').onclick=async()=>{
 };
 
 $('save').onclick=()=>{const b=brief();if(!b.productName){$('status').textContent='Enter a product/service first.';return;}const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:b,state});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));$('status').textContent='Campaign saved';};
-function startNewCampaign(){ids.forEach(id=>$(id).value='');resetState();$('strategyResult').innerHTML='<div class="placeholder">Complete the brief and generate a strategy.</div>';$('copyResult').innerHTML='<div class="placeholder">Generate a campaign to create ad copy.</div>';$('creativeResult').innerHTML='<article><h3>Image Ad</h3><p>Visual concept and text hierarchy.</p></article><article><h3>Carousel</h3><p>Problem → solution → proof → CTA.</p></article><article><h3>Story</h3><p>Vertical 9:16 concept.</p></article><article><h3>Reel</h3><p>Scene-by-scene creative concept.</p></article>';$('reelsResult').innerHTML='<div class="placeholder">Generate a campaign to create reel scripts.</div>';fillAudienceInputs(state.audience);renderAudiencePlan();renderAudienceMatrix();fillOfferInputs(state.offer);renderOfferAnalysis();$('status').textContent='New campaign ready';renderAiControlSummary();showTab('brief');}
+function startNewCampaign(){ids.forEach(id=>$(id).value='');resetState();$('strategyResult').innerHTML='<div class="placeholder">Complete the brief and generate a strategy.</div>';$('copyResult').innerHTML='<div class="placeholder">Generate a campaign to create ad copy.</div>';$('creativeResult').innerHTML='<article><h3>Image Ad</h3><p>Visual concept and text hierarchy.</p></article><article><h3>Carousel</h3><p>Problem → solution → proof → CTA.</p></article><article><h3>Story</h3><p>Vertical 9:16 concept.</p></article><article><h3>Reel</h3><p>Scene-by-scene creative concept.</p></article>';$('reelsResult').innerHTML='<div class="placeholder">Generate a campaign to create reel scripts.</div>';fillAudienceInputs(state.audience);renderAudiencePlan();renderAudienceMatrix();fillOfferInputs(state.offer);renderOfferAnalysis();$('campaignName').value='';$('campaignObjective').value='';$('campaignBudget').value='';$('campaignLocation').value='';$('campaignDestination').value='';renderCampaignStructure();$('status').textContent='New campaign ready';renderAiControlSummary();showTab('brief');}
 $('newCampaign').onclick=()=>{$('newCampaignConfirm').hidden=false;};
 $('confirmNewCampaign').onclick=()=>{$('newCampaignConfirm').hidden=true;startNewCampaign();};
 $('cancelNewCampaign').onclick=()=>{$('newCampaignConfirm').hidden=true;};
@@ -633,24 +765,31 @@ $('exportText').onclick=()=>{
  download('ai-ads-campaign.txt',briefText+aiText,'text/plain');
 };
 function renderSaved(){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');$('savedList').innerHTML=items.length?items.map(x=>'<div class="saved-card"><div class="saved-meta"><strong>'+esc(x.brief.productName||'Untitled campaign')+'</strong><small>'+esc(x.brief.brandName||'')+' · '+new Date(x.savedAt).toLocaleString()+'</small></div><div class="saved-actions"><button class="secondary loadBtn" data-id="'+x.id+'">Load</button><button class="secondary duplicateBtn" data-id="'+x.id+'">Duplicate</button><button class="secondary danger deleteBtn" data-id="'+x.id+'">Delete</button></div></div>').join(''):'<div class="placeholder">No saved campaigns yet.</div>';document.querySelectorAll('.loadBtn').forEach(btn=>btn.onclick=()=>loadCampaign(Number(btn.dataset.id)));document.querySelectorAll('.duplicateBtn').forEach(btn=>btn.onclick=()=>duplicateCampaign(Number(btn.dataset.id)));document.querySelectorAll('.deleteBtn').forEach(btn=>btn.onclick=()=>deleteCampaign(Number(btn.dataset.id)));}
-function duplicateCampaign(id){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');const item=items.find(x=>x.id===id);if(!item)return;const copyBrief={...item.brief,productName:(item.brief.productName||'Untitled campaign')+' (Copy)'};const copyState=item.state?{...item.state,brief:copyBrief}:{brief:copyBrief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:item.state&&item.state.aiConfig||defaultAiConfig(),aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer()};items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:copyBrief,state:copyState});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));renderSaved();$('status').textContent='Campaign duplicated';}
+function duplicateCampaign(id){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');const item=items.find(x=>x.id===id);if(!item)return;const copyBrief={...item.brief,productName:(item.brief.productName||'Untitled campaign')+' (Copy)'};const copyState=item.state?{...item.state,brief:copyBrief}:{brief:copyBrief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:item.state&&item.state.aiConfig||defaultAiConfig(),aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure()};items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:copyBrief,state:copyState});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));renderSaved();$('status').textContent='Campaign duplicated';}
 function loadCampaign(id){
  const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');
  const item=items.find(x=>x.id===id);
  if(!item)return;
  fillBrief(item.brief);
- state=item.state||{brief:item.brief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer()};
+ state=item.state||{brief:item.brief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure()};
  state.aiConfig=state.aiConfig||defaultAiConfig();
  state.aiUsage=state.aiUsage||emptyAiUsage();
  if(state.aiImages===undefined)state.aiImages=null;
  state.audience=Object.assign(defaultAudience(),state.audience||{});
  state.offer=Object.assign(defaultOffer(),state.offer||{});
+ state.campaign=Object.assign(defaultCampaignStructure(),state.campaign||{});
  applyAiConfigToUI();
  fillAudienceInputs(state.audience);
  renderAudiencePlan();
  renderAudienceMatrix();
  fillOfferInputs(state.offer);
  renderOfferAnalysis();
+ $('campaignName').value=state.campaign.name||'';
+ $('campaignObjective').value=(state.brief&&state.brief.objective)||item.brief.objective||'';
+ $('campaignBudget').value=state.campaign.budget||'';
+ $('campaignLocation').value=state.campaign.location||'';
+ $('campaignDestination').value=state.campaign.destination||'';
+ renderCampaignStructure();
  if(!state.copy)generateDemo();else{renderResults();}
  state.brief=item.brief;
  $('status').textContent='Saved campaign loaded';
