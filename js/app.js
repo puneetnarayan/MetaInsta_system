@@ -7,47 +7,37 @@ function resetState(){state={brief:{},strategy:null,copy:null,creative:null,reel
 function showTab(name){document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===name));if(name==='saved')renderSaved();if(name==='export')renderPreview();}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 
+async function generateAI(){
+ const b=state.brief;
+ if(!b.brandName||!b.productName||!b.targetCustomer){$('status').textContent='Enter brand, product/service and target customer.';return;}
+ $('generate').disabled=true;$('generate').textContent='Generating…';$('status').textContent='ChatGPT is creating your campaign…';
+ try{
+   const response=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});
+   const data=await response.json();
+   if(!response.ok) throw new Error(data.error||'AI generation failed');
+   state.strategy=data.strategy;state.copy=data.copy;state.creative=data.creative;state.reels=data.reels;state.selectedCopy=state.copy?.[0]?.name||null;
+   renderResults();$('status').textContent='AI campaign generated';showTab('strategy');
+ }catch(err){
+   $('status').textContent='AI unavailable — '+err.message;
+   generateDemo();$('status').textContent='Demo campaign generated — AI unavailable';
+   showTab('strategy');
+ }finally{$('generate').disabled=false;$('generate').textContent='Generate Strategy';}
+}
 function generateDemo(){
  const b=state.brief;
- const brand=b.brandName||'Your Brand';
  const product=b.productName||'Your Product / Service';
  const audience=b.targetCustomer||'your ideal customer';
  const problem=b.problem||'a frustrating problem';
  const outcome=b.outcome||'a clear desired outcome';
  const offer=b.offer||'your offer';
  const location=b.location||'your target market';
-
- state.strategy={
-   objective:b.objective||'Lead Generation',
-   audience:audience+(b.ageRange?' · '+b.ageRange:'')+(location?' · '+location:''),
-   corePain:'The audience is likely to hesitate or delay action because '+problem.toLowerCase().replace(/[.!?]+$/,'')+'.',
-   desiredOutcome:'Help the audience move toward '+outcome.toLowerCase().replace(/[.!?]+$/)+'.',
-   positioning:product+' is positioned as a practical way for '+audience+' to address the problem and move toward the desired outcome.',
-   keyMessage:'You do not need to remain stuck with the problem. '+product+' gives you a clear next step toward '+outcome.toLowerCase().replace(/[.!?]+$/)+'.',
-   funnelAngle:'Problem awareness → useful insight → offer → simple CTA.',
-   testing:['Problem-led hook vs outcome-led hook','Short primary text vs story-led primary text','Direct CTA vs curiosity CTA']
- };
-
- state.copy=[
-  {name:'Ad 1 · Problem-led',hook:'Still struggling with '+problem.toLowerCase().replace(/[.!?]+$/)+'?',primaryText:'If you are '+audience.toLowerCase()+', you may recognise this: '+problem+'\n\n'+product+' is designed to help you move toward '+outcome.toLowerCase().replace(/[.!?]+$/)+'.\n\n'+offer+'. Take the next step and see whether it is right for you.',headline:'A practical next step for '+audience,description:offer,cta:'Learn More'},
-  {name:'Ad 2 · Outcome-led',hook:'What would change if '+outcome.toLowerCase().replace(/[.!?]+$/)+'?',primaryText:'Imagine being able to '+outcome.toLowerCase().replace(/[.!?]+$/)+' without constantly feeling held back by the same challenge.\n\n'+product+' helps '+audience.toLowerCase()+' work toward that outcome with a practical, focused approach.\n\n'+offer+'.',headline:'Move toward '+outcome,description:'See how it works',cta:'Learn More'},
-  {name:'Ad 3 · Conversational',hook:'Can I ask you a quick question?',primaryText:'When '+problem.toLowerCase().replace(/[.!?]+$/)+', what do you usually do?\n\n'+product+' was created for '+audience.toLowerCase()+' who want a clearer way forward. The goal is simple: '+outcome.toLowerCase().replace(/[.!?]+$/)+'.\n\n'+offer+'. Explore the details and decide if it fits your needs.',headline:'Could this be your next step?',description:'Explore the offer',cta:'Learn More'}
- ];
-
- state.creative=[
-  {format:'Single Image Ad',concept:'Primary visual: a relatable moment showing the customer before the solution. On-image text: “'+shortText(problem,58)+'”\nSupporting line: “Move toward '+shortText(outcome,55)+'.”\nCTA: '+(offer||'Learn More')},
-  {format:'Carousel',concept:'Card 1: The problem. Card 2: Why it keeps happening. Card 3: The practical shift. Card 4: What '+product+' provides. Card 5: Offer + CTA.'},
-  {format:'Instagram Story',concept:'Frame 1: question-led hook. Frame 2: audience pain point. Frame 3: one useful insight. Frame 4: introduce '+product+'. Frame 5: '+offer+' + CTA.'},
-  {format:'Instagram Reel',concept:'15–30 seconds. Open with the problem in the first 2 seconds, show a relatable example, introduce the solution, show the desired outcome, then finish with a clear CTA.'}
- ];
-
- state.reels=[
-  {title:'Reel 1 · Problem to solution',hook:'If '+problem.toLowerCase().replace(/[.!?]+$/)+', try this.',scenes:['0–2s — Hook: say the problem directly.','2–7s — Relatable example: show what the audience experiences.','7–15s — Insight: explain one practical shift.','15–23s — Solution: introduce '+product+'.','23–30s — CTA: invite viewers to explore the offer.']},
-  {title:'Reel 2 · Desired outcome',hook:'Imagine '+outcome.toLowerCase().replace(/[.!?]+$/)+'.',scenes:['0–2s — Hook with the desired outcome.','2–8s — Contrast it with the current frustration.','8–18s — Explain how '+product+' helps.','18–25s — Show the next step.','25–30s — CTA: '+offer+'.']},
-  {title:'Reel 3 · Question format',hook:'Quick question for '+audience.toLowerCase()+':',scenes:['0–3s — Ask a direct question.','3–9s — Name the common challenge.','9–17s — Give one useful insight.','17–25s — Present '+product+' as the offer.','25–30s — CTA: learn more and decide if it fits.']}
- ];
+ state.strategy={objective:b.objective||'Lead Generation',audience:audience+(b.ageRange?' · '+b.ageRange:'')+(location?' · '+location:''),corePain:'The audience is likely to hesitate or delay action because '+problem.toLowerCase().replace(/[.!?]+$/)+'.',desiredOutcome:'Help the audience move toward '+outcome.toLowerCase().replace(/[.!?]+$/)+'.',positioning:product+' is positioned as a practical way for '+audience+' to address the problem and move toward the desired outcome.',keyMessage:'You do not need to remain stuck with the problem. '+product+' gives you a clear next step toward '+outcome.toLowerCase().replace(/[.!?]+$/)+'.',funnelAngle:'Problem awareness → useful insight → offer → simple CTA.',testing:['Problem-led hook vs outcome-led hook','Short primary text vs story-led primary text','Direct CTA vs curiosity CTA']};
+ state.copy=[{name:'Ad 1 · Problem-led',hook:'Still struggling with '+problem.toLowerCase().replace(/[.!?]+$/)+'?',primaryText:'If you are '+audience.toLowerCase()+', you may recognise this: '+problem+'\\n\\n'+product+' is designed to help you move toward '+outcome.toLowerCase().replace(/[.!?]+$/)+'.\\n\\n'+offer+'. Take the next step and see whether it is right for you.',headline:'A practical next step for '+audience,description:offer,cta:'Learn More'},{name:'Ad 2 · Outcome-led',hook:'What would change if '+outcome.toLowerCase().replace(/[.!?]+$/)+'?',primaryText:'Imagine being able to '+outcome.toLowerCase().replace(/[.!?]+$/)+' without constantly feeling held back by the same challenge.\\n\\n'+product+' helps '+audience.toLowerCase()+' work toward that outcome with a practical, focused approach.\\n\\n'+offer+'.',headline:'Move toward '+outcome,description:'See how it works',cta:'Learn More'},{name:'Ad 3 · Conversational',hook:'Can I ask you a quick question?',primaryText:'When '+problem.toLowerCase().replace(/[.!?]+$/)+', what do you usually do?\\n\\n'+product+' was created for '+audience.toLowerCase()+' who want a clearer way forward. The goal is simple: '+outcome.toLowerCase().replace(/[.!?]+$/)+'.\\n\\n'+offer+'. Explore the details and decide if it fits your needs.',headline:'Could this be your next step?',description:'Explore the offer',cta:'Learn More'}];
+ state.creative=[{format:'Single Image Ad',concept:'Primary visual: a relatable moment showing the customer before the solution. On-image text: “'+shortText(problem,58)+'”\\nSupporting line: “Move toward '+shortText(outcome,55)+'.”\\nCTA: '+(offer||'Learn More')},{format:'Carousel',concept:'Card 1: The problem. Card 2: Why it keeps happening. Card 3: The practical shift. Card 4: What '+product+' provides. Card 5: Offer + CTA.'},{format:'Instagram Story',concept:'Frame 1: question-led hook. Frame 2: audience pain point. Frame 3: one useful insight. Frame 4: introduce '+product+'. Frame 5: '+offer+' + CTA.'},{format:'Instagram Reel',concept:'15–30 seconds. Open with the problem in the first 2 seconds, show a relatable example, introduce the solution, show the desired outcome, then finish with a clear CTA.'}];
+ state.reels=[{title:'Reel 1 · Problem to solution',hook:'If '+problem.toLowerCase().replace(/[.!?]+$/)+', try this.',scenes:['0–2s — Hook: say the problem directly.','2–7s — Relatable example: show what the audience experiences.','7–15s — Insight: explain one practical shift.','15–23s — Solution: introduce '+product+'.','23–30s — CTA: invite viewers to explore the offer.']},{title:'Reel 2 · Desired outcome',hook:'Imagine '+outcome.toLowerCase().replace(/[.!?]+$/)+'.',scenes:['0–2s — Hook with the desired outcome.','2–8s — Contrast it with the current frustration.','8–18s — Explain how '+product+' helps.','18–25s — Show the next step.','25–30s — CTA: '+offer+'.']},{title:'Reel 3 · Question format',hook:'Quick question for '+audience.toLowerCase()+':',scenes:['0–3s — Ask a direct question.','3–9s — Name the common challenge.','9–17s — Give one useful insight.','17–25s — Present '+product+' as the offer.','25–30s — CTA: learn more and decide if it fits.']}];
  state.selectedCopy=state.copy[0].name;renderResults();
 }
+
 function shortText(value,max){const s=String(value).trim();return s.length>max?s.slice(0,max-1).trim()+'…':s;}
 
 function renderResults(){
@@ -65,7 +55,7 @@ function renderReels(){$('reelsResult').innerHTML='<div class="ad-list">'+state.
 function regenerate(type){if(!state.brief.productName){$('status').textContent='Generate a campaign first.';showTab('brief');return;}const b=state.brief;if(type==='strategy'){state.strategy.message='Test the customer problem, transformation and offer in separate messages. '+new Date().toLocaleTimeString();renderResults();}if(type==='copy'){state.copy=state.copy.map((a,i)=>({...a,name:'Ad '+(i+1)+' • New',hook:i===0?'What if '+(b.outcome||'the result you want')+' was easier to reach?':i===1?'You do not need to stay stuck with '+(b.problem||'this challenge')+'.':'Ready to take the next step?',primaryText:'A fresh angle for '+(b.targetCustomer||'your audience')+': '+(b.productName||'our solution')+' can help you '+(b.outcome||'move forward')+'.'}));state.selectedCopy=state.copy[0].name;renderCopy();}if(type==='creative'){state.creative=state.creative.map((x,i)=>({...x,concept:'Alternative concept '+(i+1)+': '+x.concept}));renderCreative();}if(type==='reels'){state.reels=state.reels.map((r,i)=>({...r,title:'Reel '+(i+1)+' • New',hook:i===0?'Here is a simple way to '+(b.outcome||'get a better result')+'.':r.hook}));renderReels();}$('status').textContent='New '+type+' ideas generated';}
 const referenceBrief={};
 $('useReference').onclick=()=>{fillBrief(referenceBrief);$('status').textContent='Reference example loaded — review and confirm each field';showTab('brief');};
-$('generate').onclick=()=>{state.brief=brief();if(!state.brief.brandName||!state.brief.productName||!state.brief.targetCustomer){$('status').textContent='Enter brand, product/service and target customer.';return;}generateDemo();$('status').textContent='Demo campaign generated';showTab('strategy');};
+$('generate').onclick=()=>{state.brief=brief();generateAI();};
 $('regenStrategy').onclick=()=>regenerate('strategy');$('regenCopy').onclick=()=>regenerate('copy');$('regenCreative').onclick=()=>regenerate('creative');$('regenReels').onclick=()=>regenerate('reels');
 $('save').onclick=()=>{const b=brief();if(!b.productName){$('status').textContent='Enter a product/service first.';return;}const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:b,state});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));$('status').textContent='Campaign saved';};
 $('newCampaign').onclick=()=>{if(confirm('Start a new campaign? Unsaved changes will be cleared.')){ids.forEach(id=>$(id).value='');resetState();$('strategyResult').innerHTML='<div class="placeholder">Complete the brief and generate a strategy.</div>';$('copyResult').innerHTML='<div class="placeholder">Generate a campaign to create ad copy.</div>';$('creativeResult').innerHTML='<article><h3>Image Ad</h3><p>Visual concept and text hierarchy.</p></article><article><h3>Carousel</h3><p>Problem → solution → proof → CTA.</p></article><article><h3>Story</h3><p>Vertical 9:16 concept.</p></article><article><h3>Reel</h3><p>Scene-by-scene creative concept.</p></article>';$('reelsResult').innerHTML='<div class="placeholder">Generate a campaign to create reel scripts.</div>';$('status').textContent='New campaign ready';showTab('brief');}};
