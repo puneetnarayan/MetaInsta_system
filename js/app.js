@@ -10,17 +10,13 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showTab(b.datas
 async function generateAI(){
  const b=state.brief;
  if(!b.brandName||!b.productName||!b.targetCustomer){$('status').textContent='Enter brand, product/service and target customer.';return;}
- $('generate').disabled=true;$('generate').textContent='Generating…';$('status').textContent='ChatGPT is creating your campaign…';
+ $('generate').disabled=true;$('generate').textContent='Generating…';$('status').textContent='₹0 Mode — building campaign locally…';
  try{
-   const response=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});
-   const data=await response.json();
-   if(!response.ok) throw new Error(data.error||'AI generation failed');
-   state.strategy=data.strategy;state.copy=data.copy;state.creative=data.creative;state.reels=data.reels;state.selectedCopy=state.copy?.[0]?.name||null;
-   renderResults();$('status').textContent='AI campaign generated';showTab('strategy');
- }catch(err){
-   $('status').textContent='AI unavailable — '+err.message;
-   generateDemo();$('status').textContent='Demo campaign generated — AI unavailable';
+   generateDemo();
+   $('status').textContent='₹0 campaign generated — no paid AI/API used';
    showTab('strategy');
+ }catch(err){
+   $('status').textContent='Campaign generation failed — '+err.message;
  }finally{$('generate').disabled=false;$('generate').textContent='Generate Strategy';}
 }
 function generateDemo(){
@@ -41,7 +37,7 @@ function generateDemo(){
 function shortText(value,max){const s=String(value).trim();return s.length>max?s.slice(0,max-1).trim()+'…':s;}
 
 function renderResults(){
- $('strategyResult').innerHTML='<h3>Reference strategy generated — review before use</h3><div class="result-grid">'+Object.entries(state.strategy).map(([k,v])=>'<div class="result-card"><strong>'+esc(k)+'</strong><p>'+esc(Array.isArray(v)?v.join(' • '):v)+'</p></div>').join('')+'</div><small class="demo-badge">DEMO MODE — Claude API not connected</small>';
+ $('strategyResult').innerHTML='<h3>Campaign strategy generated — review before use</h3><div class="result-grid">'+Object.entries(state.strategy).map(([k,v])=>'<div class="result-card"><strong>'+esc(k)+'</strong><p>'+esc(Array.isArray(v)?v.join(' • '):v)+'</p></div>').join('')+'</div><small class="demo-badge">DEMO MODE — Claude API not connected</small>';
  renderCopy();renderCreative();renderReels();
 }
 function renderCopy(){
@@ -50,7 +46,7 @@ function renderCopy(){
  document.querySelectorAll('.useCopyBtn').forEach(btn=>btn.onclick=()=>{state.selectedCopy=state.copy[Number(btn.dataset.index)].name;renderCopy();});
  document.querySelectorAll('.copyBtn').forEach(btn=>btn.onclick=()=>{const a=state.copy[Number(btn.dataset.index)];navigator.clipboard?.writeText(Object.entries(a).map(([k,v])=>k+': '+v).join('\n'));$('status').textContent='Ad copied';});
 }
-function renderCreative(){$('creativeResult').innerHTML=state.creative.map((x,i)=>'<article class="creative-card"><h3>'+esc(x.format)+'</h3><p>'+esc(x.concept)+'</p><div class="card-actions"><button class="secondary creativeEdit" data-index="'+i+'">Edit</button><button class="secondary creativeUse" data-index="'+i+'">Use Idea</button></div></article>').join('')+'<small class="demo-badge">REFERENCE EXAMPLE — editable; confirm before use</small>';document.querySelectorAll('.creativeEdit').forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.index);const next=prompt('Edit the creative concept:',state.creative[i].concept);if(next!==null&&next.trim()){state.creative[i].concept=next.trim();renderCreative();}});document.querySelectorAll('.creativeUse').forEach(btn=>btn.onclick=()=>{$('status').textContent='Creative idea '+(Number(btn.dataset.index)+1)+' selected';});}
+function renderCreative(){$('creativeResult').innerHTML=state.creative.map((x,i)=>'<article class="creative-card"><h3>'+esc(x.format)+'</h3><p>'+esc(x.concept)+'</p><div class="card-actions"><button class="secondary creativeEdit" data-index="'+i+'">Edit</button><button class="secondary creativeUse" data-index="'+i+'">Use Idea</button></div></article>').join('')+'<small class="demo-badge">₹0 MODE — editable; confirm before use</small>';document.querySelectorAll('.creativeEdit').forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.index);const next=prompt('Edit the creative concept:',state.creative[i].concept);if(next!==null&&next.trim()){state.creative[i].concept=next.trim();renderCreative();}});document.querySelectorAll('.creativeUse').forEach(btn=>btn.onclick=()=>{$('status').textContent='Creative idea '+(Number(btn.dataset.index)+1)+' selected';});}
 function renderReels(){$('reelsResult').innerHTML='<div class="ad-list">'+state.reels.map((r,i)=>'<article class="ad-card"><h3>'+esc(r.title)+'</h3><label><span class="field-title">Hook</span><textarea class="editable textarea reel-field" data-index="'+i+'" data-key="hook">'+esc(r.hook)+'</textarea></label><div class="field-title">Scenes</div><ol class="reel-scenes">'+r.scenes.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol><button class="secondary copyReel" data-index="'+i+'">Copy Script</button></article>').join('')+'</div><small class="demo-badge">REFERENCE EXAMPLE — editable; confirm before use</small>';document.querySelectorAll('.reel-field').forEach(el=>el.oninput=()=>state.reels[Number(el.dataset.index)][el.dataset.key]=el.value);document.querySelectorAll('.copyReel').forEach(btn=>btn.onclick=()=>{const r=state.reels[Number(btn.dataset.index)];navigator.clipboard?.writeText(r.title+'\nHook: '+r.hook+'\nScenes:\n- '+r.scenes.join('\n- '));$('status').textContent='Reel script copied';});}
 function regenerate(type){if(!state.brief.productName){$('status').textContent='Generate a campaign first.';showTab('brief');return;}const b=state.brief;if(type==='strategy'){state.strategy.message='Test the customer problem, transformation and offer in separate messages. '+new Date().toLocaleTimeString();renderResults();}if(type==='copy'){state.copy=state.copy.map((a,i)=>({...a,name:'Ad '+(i+1)+' • New',hook:i===0?'What if '+(b.outcome||'the result you want')+' was easier to reach?':i===1?'You do not need to stay stuck with '+(b.problem||'this challenge')+'.':'Ready to take the next step?',primaryText:'A fresh angle for '+(b.targetCustomer||'your audience')+': '+(b.productName||'our solution')+' can help you '+(b.outcome||'move forward')+'.'}));state.selectedCopy=state.copy[0].name;renderCopy();}if(type==='creative'){state.creative=state.creative.map((x,i)=>({...x,concept:'Alternative concept '+(i+1)+': '+x.concept}));renderCreative();}if(type==='reels'){state.reels=state.reels.map((r,i)=>({...r,title:'Reel '+(i+1)+' • New',hook:i===0?'Here is a simple way to '+(b.outcome||'get a better result')+'.':r.hook}));renderReels();}$('status').textContent='New '+type+' ideas generated';}
 async function loadReferenceExample(){
