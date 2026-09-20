@@ -45,7 +45,7 @@ Return ONLY valid JSON matching the requested schema.`;
 
     const response=await fetch('https://api.openai.com/v1/responses',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization:`Bearer ${key}`'},
+      headers:{'Content-Type':'application/json',Authorization:'Bearer '+key},
       body:JSON.stringify({
         model:process.env.OPENAI_MODEL||'gpt-5.6-luna',
         reasoning:{effort:'low'},
