@@ -136,9 +136,17 @@ Return ONLY valid JSON matching the requested schema.`
             properties: {
               title: { type: 'string' },
               hook: { type: 'string' },
-              scenes: { type: 'array', items: { type: 'string' } }
+              angle: { type: 'string', enum: ['Problem-led', 'Outcome-led', 'Question', 'Story', 'Educational', 'Objection', 'Testimonial'] },
+              duration: { type: 'string', enum: ['15', '30', '45', '60'] },
+              scenes: { type: 'array', items: { type: 'string' } },
+              voiceover: { type: 'string' },
+              onScreenText: { type: 'string' },
+              cameraDirection: { type: 'string' },
+              bRoll: { type: 'string' },
+              cta: { type: 'string' },
+              caption: { type: 'string' }
             },
-            required: ['title', 'hook', 'scenes']
+            required: ['title', 'hook', 'angle', 'duration', 'scenes', 'voiceover', 'onScreenText', 'cameraDirection', 'bRoll', 'cta', 'caption']
           }
         }
       },
@@ -146,7 +154,17 @@ Return ONLY valid JSON matching the requested schema.`
     },
     prompt: (brief) => `You are the reel script engine for AI Ads Studio, a Facebook and Instagram campaign planning tool.
 
-Produce exactly 3 reel scripts (problem-led, outcome-led, question-led). Each needs a title, hook and 5-6 timed scenes (e.g. "0-3s — ..."), covering both spoken/voiceover direction and on-screen text, ending with a CTA scene.
+Produce exactly 3 reel scripts, each using a different angle from: Problem-led, Outcome-led, Question, Story, Educational, Objection, Testimonial. For each reel, produce:
+- title, hook
+- angle (one of the list above)
+- duration: one of "15", "30", "45", "60" (seconds), chosen to fit the content
+- scenes: 5-6 timed beats (e.g. "0-3s — ...") covering the arc of the reel
+- voiceover: the full spoken script/voiceover text for the reel
+- onScreenText: the key on-screen text/captions shown during the reel
+- cameraDirection: shot/camera guidance (e.g. handheld selfie-style, static tripod, close-up, etc.)
+- bRoll: suggested supporting b-roll footage to cut in
+- cta: the final call to action
+- caption: a ready-to-post social caption/description for the reel (separate from on-screen text)
 
 ${QUALITY_REFERENCE}
 
