@@ -53,8 +53,24 @@ function renderCopy(){
 function renderCreative(){$('creativeResult').innerHTML=state.creative.map((x,i)=>'<article class="creative-card"><h3>'+esc(x.format)+'</h3><p>'+esc(x.concept)+'</p><div class="card-actions"><button class="secondary creativeEdit" data-index="'+i+'">Edit</button><button class="secondary creativeUse" data-index="'+i+'">Use Idea</button></div></article>').join('')+'<small class="demo-badge">REFERENCE EXAMPLE — editable; confirm before use</small>';document.querySelectorAll('.creativeEdit').forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.index);const next=prompt('Edit the creative concept:',state.creative[i].concept);if(next!==null&&next.trim()){state.creative[i].concept=next.trim();renderCreative();}});document.querySelectorAll('.creativeUse').forEach(btn=>btn.onclick=()=>{$('status').textContent='Creative idea '+(Number(btn.dataset.index)+1)+' selected';});}
 function renderReels(){$('reelsResult').innerHTML='<div class="ad-list">'+state.reels.map((r,i)=>'<article class="ad-card"><h3>'+esc(r.title)+'</h3><label><span class="field-title">Hook</span><textarea class="editable textarea reel-field" data-index="'+i+'" data-key="hook">'+esc(r.hook)+'</textarea></label><div class="field-title">Scenes</div><ol class="reel-scenes">'+r.scenes.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol><button class="secondary copyReel" data-index="'+i+'">Copy Script</button></article>').join('')+'</div><small class="demo-badge">REFERENCE EXAMPLE — editable; confirm before use</small>';document.querySelectorAll('.reel-field').forEach(el=>el.oninput=()=>state.reels[Number(el.dataset.index)][el.dataset.key]=el.value);document.querySelectorAll('.copyReel').forEach(btn=>btn.onclick=()=>{const r=state.reels[Number(btn.dataset.index)];navigator.clipboard?.writeText(r.title+'\nHook: '+r.hook+'\nScenes:\n- '+r.scenes.join('\n- '));$('status').textContent='Reel script copied';});}
 function regenerate(type){if(!state.brief.productName){$('status').textContent='Generate a campaign first.';showTab('brief');return;}const b=state.brief;if(type==='strategy'){state.strategy.message='Test the customer problem, transformation and offer in separate messages. '+new Date().toLocaleTimeString();renderResults();}if(type==='copy'){state.copy=state.copy.map((a,i)=>({...a,name:'Ad '+(i+1)+' • New',hook:i===0?'What if '+(b.outcome||'the result you want')+' was easier to reach?':i===1?'You do not need to stay stuck with '+(b.problem||'this challenge')+'.':'Ready to take the next step?',primaryText:'A fresh angle for '+(b.targetCustomer||'your audience')+': '+(b.productName||'our solution')+' can help you '+(b.outcome||'move forward')+'.'}));state.selectedCopy=state.copy[0].name;renderCopy();}if(type==='creative'){state.creative=state.creative.map((x,i)=>({...x,concept:'Alternative concept '+(i+1)+': '+x.concept}));renderCreative();}if(type==='reels'){state.reels=state.reels.map((r,i)=>({...r,title:'Reel '+(i+1)+' • New',hook:i===0?'Here is a simple way to '+(b.outcome||'get a better result')+'.':r.hook}));renderReels();}$('status').textContent='New '+type+' ideas generated';}
-const referenceBrief={};
-$('useReference').onclick=()=>{fillBrief(referenceBrief);$('status').textContent='Reference example loaded — review and confirm each field';showTab('brief');};
+async function loadReferenceExample(){
+  const btn=$('useReference');
+  btn.disabled=true;
+  $('status').textContent='Loading reference example…';
+  try{
+    const response=await fetch('/reference/reference-input.json?'+Date.now(),{cache:'no-store'});
+    if(!response.ok) throw new Error('Reference file could not be loaded');
+    const referenceBrief=await response.json();
+    fillBrief(referenceBrief);
+    $('status').textContent='Reference example loaded — review and confirm each field';
+    showTab('brief');
+  }catch(err){
+    $('status').textContent='Could not load reference example — '+err.message;
+  }finally{
+    btn.disabled=false;
+  }
+}
+$('useReference').onclick=loadReferenceExample;
 $('generate').onclick=()=>{state.brief=brief();generateAI();};
 $('regenStrategy').onclick=()=>regenerate('strategy');$('regenCopy').onclick=()=>regenerate('copy');$('regenCreative').onclick=()=>regenerate('creative');$('regenReels').onclick=()=>regenerate('reels');
 $('save').onclick=()=>{const b=brief();if(!b.productName){$('status').textContent='Enter a product/service first.';return;}const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:b,state});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));$('status').textContent='Campaign saved';};
