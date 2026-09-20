@@ -1,0 +1,9 @@
+{
+  "name": "ai-ads-studio",
+  "private": true,
+  "version": "1.0.0",
+  "description": "AI-assisted Facebook + Instagram campaign creator",
+  "scripts": {
+    "test": "node --test \"test/**/*.test.js\""
+  }
+}
