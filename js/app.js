@@ -176,8 +176,8 @@ async function loadReferenceExample(){
     try{
       const [briefResponse,adResponse,reelResponse]=await Promise.all([
         fetch(base+'reference-input.json?v='+Date.now(),{cache:'no-store'}),
-        fetch(base+'reference/reference-ad-copies.json?v='+Date.now(),{cache:'no-store'}),
-        fetch(base+'reference/reference-reel-scripts.json?v='+Date.now(),{cache:'no-store'})
+        fetch(base+'reference-ad-copies.json?v='+Date.now(),{cache:'no-store'}),
+        fetch(base+'reference-reel-scripts.json?v='+Date.now(),{cache:'no-store'})
       ]);
       if(!briefResponse.ok)throw new Error('Reference brief '+briefResponse.status);
       if(!adResponse.ok)throw new Error('Reference ads '+adResponse.status);
