@@ -321,6 +321,7 @@ function showTab(name){
  if(name==='plan90')renderPlan90();
  if(name==='saved')renderSaved();
  if(name==='export')renderPreview();
+ if(name==='help')renderHelp();
 }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 
@@ -1202,6 +1203,43 @@ function renderPlan90(){
   state.plan90.months[Number(btn.dataset.mi)].weeks[Number(btn.dataset.wi)].tasks.push({text:'',done:false});
   renderPlan90();
  });
+}
+
+// ---- Help tab ----
+const HELP_TOPICS=[
+ {tab:'brief',group:'Plan',title:'Campaign Brief',summary:'Start here. Enter your brand, product/service, target customer, problem, outcome, objective and (optionally) a landing page URL.',tips:['Click "Use Reference Example" to see a fully filled-in example campaign before starting your own.','The AI Control panel here is OFF by default — everything works at ₹0 until you explicitly turn a stage on.']},
+ {tab:'strategy',group:'Plan',title:'Strategy',summary:'A campaign strategy generated from your brief — audience, core pain, positioning, key message and testing angles.',tips:['Generate a campaign from the Brief tab first if this is empty.','Review and edit before moving on — tone and positioning here carry into later tabs.']},
+ {tab:'audience',group:'Plan',title:'Audience',summary:'Define who the campaign speaks to: demographics, awareness level, buying intent and audience strategy (Broad / Interest / Custom / Lookalike / Advantage+ / Retargeting).',tips:['Click "Generate Audience Plan" for a message and a testing matrix.','Feeds the Campaign tab\'s ad-set naming and the Optimisation tab\'s audience test ideas.']},
+ {tab:'offer',group:'Plan',title:'Offer',summary:'Define price, bonuses, guarantee, scarcity and proof, then run a ₹0 heuristic analysis (clarity, value proposition, risk reversal, proof, urgency, CTA).',tips:['A ⚠ here means "consider adding this" — it is not a guarantee of better results.']},
+ {tab:'structure',group:'Plan',title:'Campaign (Structure)',summary:'Plan the Campaign → Ad Set → Ad hierarchy with an editable naming convention, budgets and UTM tracking.',tips:['Planning only — nothing here is created in Meta Ads Manager.','Fill in Audience and Ad Copy first for better auto-generated names.']},
+ {tab:'copy',group:'Create',title:'Ad Copy',summary:'Primary text, headline, description and CTA for 3 ad variations, with live Meta character-count guidance.',tips:['Yellow fields are generated starting points — edit them freely before use.']},
+ {tab:'creative',group:'Create',title:'Creative Ideas',summary:'Visual concepts per format, an editable Creative Matrix (Angle × Format), and the AI Image Factory for optional AI-generated images.',tips:['AI Images are OFF by default and never generate automatically — you always click "Generate AI Images" yourself after reviewing the prompt.','Do not rely on generated images for readable text — add text overlays separately.']},
+ {tab:'reels',group:'Create',title:'Reel Scripts',summary:'Full reel scripts (title, hook, angle, duration, scenes, voiceover, on-screen text, camera direction, b-roll, CTA, caption) plus the Reel Factory beat-by-beat shot-list builder.',tips:[]},
+ {tab:'landing',group:'Create',title:'Landing Page',summary:'Analyse your destination URL — fetched automatically where possible, or paste the page text if it can\'t be fetched — and compare it against your ad hook with Message Match.',tips:['Checks are only ever based on real signals found on the page — never invented.']},
+ {tab:'checklist',group:'Launch',title:'Launch Checklist',summary:'A 31-item Pre-launch / Campaign / Ads / Final checklist to work through before publishing in Meta Ads Manager.',tips:['Checking an item only records that you confirmed it yourself — nothing is verified automatically.']},
+ {tab:'performance',group:'Analyse',title:'Performance',summary:'Import real ad performance data (CSV, paste, or manual entry) and see ₹0 dashboard metrics and a spend-by-campaign chart.',tips:['A ratio only shows when the underlying numbers are present — a blank/— means the data isn\'t there, never a guess.']},
+ {tab:'optimisation',group:'Analyse',title:'Optimisation',summary:'Campaign Doctor checks 10 areas of your campaign; Optimisation Ideas turns performance data into testable hypotheses; Generate New Creative Set closes the loop.',tips:['Come back here after each round of running the campaign and importing fresh Performance data.']},
+ {tab:'prompts',group:'Tools',title:'Prompt Library',summary:'18 original prompt/framework templates — search, filter by category/framework, copy, edit, and save your own.',tips:['Use these as starting points for writing strategy, copy, creative, reel or optimisation content yourself.']},
+ {tab:'plan90',group:'Tools',title:'90-Day Plan',summary:'A 3-month, 12-week planning structure (Foundation → Optimisation → Consolidation) with editable tasks tied back into this app\'s own tabs.',tips:['A planning aid, not a guarantee of results — adjust it to your own timeline.']},
+ {tab:'saved',group:'Tools',title:'Saved',summary:'Every campaign you save lives here, in this browser\'s local storage — load, duplicate or delete.',tips:['Nothing leaves your browser unless you explicitly export it.']},
+ {tab:'export',group:'Tools',title:'Export',summary:'Export the full campaign as JSON or a text summary — never includes API keys.',tips:[]}
+];
+function renderHelp(){
+ const el=$('helpResult');
+ if(!el)return;
+ const groups=['Plan','Create','Launch','Analyse','Tools'];
+ el.innerHTML='<div class="ai-image-panel"><div class="ai-image-head"><strong>Field colours</strong></div>'+
+  '<p class="section-help">Light orange fields need your input. Light yellow fields are generated/heuristic starting points — freely editable. A yellow field turns a deeper yellow while you\'re actively editing it.</p></div>'+
+  '<div class="ai-image-panel"><div class="ai-image-head"><strong>AI is optional, everywhere</strong></div>'+
+  '<p class="section-help">Every stage works at ₹0 by default using this app\'s built-in local logic. AI (OpenAI/Anthropic) is only used for a stage if you explicitly switch it on in the AI Control panel on the Campaign Brief tab, and AI Images specifically only generate when you click "Generate AI Images" after reviewing the prompt.</p></div>'+
+  '<div class="ai-image-panel"><div class="ai-image-head"><strong>Recommended sequence</strong></div>'+
+  '<p class="section-help">'+HELP_TOPICS.map(t=>esc(t.title)).join(' → ')+'</p></div>'+
+  groups.map(g=>'<h3 class="variants-head">'+esc(g)+'</h3>'+HELP_TOPICS.filter(t=>t.group===g).map(t=>
+   '<article class="prompt-card"><h4>'+esc(t.title)+'</h4><p>'+esc(t.summary)+'</p>'+
+   (t.tips.length?'<ul class="reel-scenes">'+t.tips.map(tip=>'<li>'+esc(tip)+'</li>').join('')+'</ul>':'')+
+   '<div class="card-actions"><button class="secondary helpGoToTab" data-tab="'+attr(t.tab)+'">Go to '+esc(t.title)+' →</button></div></article>'
+  ).join('')).join('');
+ document.querySelectorAll('.helpGoToTab').forEach(btn=>btn.onclick=()=>showTab(btn.dataset.tab));
 }
 async function regenerate(type){
  if(!state.brief.productName){$('status').textContent='Generate a campaign first.';showTab('brief');return;}
