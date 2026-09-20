@@ -1,6 +1,9 @@
 const ids=['brandName','productName','productDescription','objective','location','targetCustomer','ageRange','offer','budget','problem','outcome','tone','landingPage'];const $=id=>document.getElementById(id);
 let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null};
 
+const REFERENCE_ADS=[{"name":"Ad Version 1 · Problem-led","hook":"Still knowing what you want to say — but hesitating when it's your turn to speak?","primaryText":"You know the answer.\n\nYou have an idea.\n\nBut when the meeting turns to you, you suddenly start searching for words, translating in your head or wondering whether you are saying it correctly.\n\nIf this sounds familiar, you are not alone.\n\nThe Speak in Meetings Workshop is designed for working professionals who want to express their ideas more clearly and participate with greater confidence in workplace conversations.\n\n4-day live workshop · ₹997\n\nExplore the workshop and see if it is right for you.","headline":"Speak with more confidence in meetings","description":"4-day live workshop for working professionals.","cta":"Learn More"},{"name":"Ad Version 2 · Outcome-led","hook":"Imagine expressing your idea clearly when the meeting turns to you.","primaryText":"You don't necessarily need more words.\n\nYou need to feel more comfortable using the words you already know.\n\nThe Speak in Meetings Workshop helps working professionals practise how to express ideas, respond naturally and participate more confidently in workplace conversations.\n\nIf your goal is to speak more clearly without constantly worrying about finding the perfect words, this workshop may be a useful next step.\n\n4-day live workshop · ₹997","headline":"Express your ideas with confidence","description":"Practical workplace communication training.","cta":"Learn More"},{"name":"Ad Version 3 · Conversational","hook":"Quick question: do you stay quiet in meetings even when you have something useful to say?","primaryText":"Maybe you know exactly what you want to say.\n\nThen the moment comes.\n\nYou hesitate.\n\nYou search for the right words.\n\nSomeone else speaks.\n\nAnd the opportunity passes.\n\nThe Speak in Meetings Workshop is created for working professionals who want to become more comfortable expressing themselves in meetings and workplace conversations.\n\nLearn, practise and build confidence through a focused 4-day live workshop.\n\n₹997","headline":"Have something to say? Say it clearly.","description":"Build practical speaking confidence at work.","cta":"Learn More"}];
+const REFERENCE_REELS=[{"title":"Reel 1 · Problem to Solution","hook":"Ever had the perfect answer five minutes after the meeting ended?","scenes":["0–3s — Hook: “Ever had the perfect answer five minutes after the meeting ended?”","3–7s — Show a professional listening in a meeting but not speaking. Voiceover: “You knew exactly what you wanted to say...”","7–12s — Show hesitation. Voiceover: “...but you started searching for words and the conversation moved on.”","12–18s — Show a confident interaction. Voiceover: “With practice, you can learn to express your ideas more naturally.”","18–24s — Introduce the workshop. Voiceover: “That's what we practise in the Speak in Meetings Workshop.”","24–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More to see the details.”"]},{"title":"Reel 2 · Outcome-led","hook":"Imagine your next meeting feeling easier.","scenes":["0–3s — Show the desired outcome immediately.","3–8s — Voiceover: “You have the knowledge. You have the ideas.”","8–15s — Show the person speaking clearly. Voiceover: “The next step is expressing those ideas clearly when the moment comes.”","15–24s — Show workshop practice. Voiceover: “The Speak in Meetings Workshop gives you a focused environment to practise workplace communication.”","24–30s — End frame: “4-day live workshop · ₹997” and “Learn More.”"]},{"title":"Reel 3 · Question Format","hook":"Do you stay quiet in meetings even when you have something useful to say?","scenes":["0–3s — Put the question on screen and pause for recognition.","3–9s — Show a meeting situation. Voiceover: “Maybe you're searching for the right words.”","9–17s — Show a simple speaking exercise. Voiceover: “Maybe you're worried about making a mistake.”","17–25s — Introduce the workshop. Voiceover: “The Speak in Meetings Workshop helps you practise expressing your ideas more clearly and confidently.”","25–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More.”"]}];
+
 function brief(){return Object.fromEntries(ids.map(id=>[id,$(id).value.trim()]));}
 function fillBrief(b){
  ids.forEach(id=>{
@@ -169,18 +172,40 @@ async function loadReferenceExample(){
   $('status').textContent='Loading complete reference campaign…';
   try{
     const base='/reference/';
-    const [briefResponse,adResponse,reelResponse]=await Promise.all([
-      fetch(base+'reference-input.json?v='+Date.now(),{cache:'no-store'}),
-      fetch(base+'reference-ad-copies.json?v='+Date.now(),{cache:'no-store'}),
-      fetch(base+'reference-reel-scripts.json?v='+Date.now(),{cache:'no-store'})
-    ]);
-    if(!briefResponse.ok)throw new Error('Reference brief could not be loaded ('+briefResponse.status+')');
-    if(!adResponse.ok)throw new Error('Reference ad copies could not be loaded ('+adResponse.status+')');
-    if(!reelResponse.ok)throw new Error('Reference reel scripts could not be loaded ('+reelResponse.status+')');
-
-    const referenceBrief=await briefResponse.json();
-    const adData=await adResponse.json();
-    const reelData=await reelResponse.json();
+    let referenceBrief, adData, reelData;
+    try{
+      const [briefResponse,adResponse,reelResponse]=await Promise.all([
+        fetch(base+'reference-input.json?v='+Date.now(),{cache:'no-store'}),
+        fetch(base+'reference/reference-ad-copies.json?v='+Date.now(),{cache:'no-store'}),
+        fetch(base+'reference/reference-reel-scripts.json?v='+Date.now(),{cache:'no-store'})
+      ]);
+      if(!briefResponse.ok)throw new Error('Reference brief '+briefResponse.status);
+      if(!adResponse.ok)throw new Error('Reference ads '+adResponse.status);
+      if(!reelResponse.ok)throw new Error('Reference reels '+reelResponse.status);
+      referenceBrief=await briefResponse.json();
+      adData=await adResponse.json();
+      reelData=await reelResponse.json();
+    }catch(fetchError){
+      // Offline-safe fallback: the complete reference outputs are built into the app.
+      // This keeps the sample campaign working even if a static JSON asset is unavailable.
+      referenceBrief={
+        brandName:'Coach Sapna Narayan',
+        productName:'Speak in Meetings Workshop',
+        productDescription:'A 4-day live workshop that helps working professionals speak clearly and confidently in meetings, presentations and workplace conversations.',
+        objective:'Lead Generation',
+        location:'India',
+        targetCustomer:'Working professionals who hesitate to speak in English at work',
+        ageRange:'25–45',
+        offer:'₹997',
+        budget:'₹500/day',
+        problem:"I know what I want to say, but I hesitate, search for words and lose confidence when speaking in meetings.",
+        outcome:'Speak naturally and confidently in meetings, express ideas clearly and participate without fear or hesitation.',
+        tone:'Professional + Friendly',
+        landingPage:'https://coachsapnanarayan.com/speak-in-meetings'
+      };
+      adData={ads:REFERENCE_ADS};
+      reelData={scripts:REFERENCE_REELS};
+    }
 
     const missing=ids.filter(id=>referenceBrief[id]===undefined);
     fillBrief(referenceBrief);
@@ -192,13 +217,11 @@ async function loadReferenceExample(){
     state.brief=brief();
     generateDemo();
 
-    // Dedicated repository files are the authoritative sample outputs.
-    state.copy=Array.isArray(adData.ads)?adData.ads.slice():[];
-    state.reels=Array.isArray(reelData.scripts)?reelData.scripts.slice():[];
+    state.copy=Array.isArray(adData.ads)?adData.ads.slice():REFERENCE_ADS.slice();
+    state.reels=Array.isArray(reelData.scripts)?reelData.scripts.slice():REFERENCE_REELS.slice();
     state.selectedCopy=state.copy.length?state.copy[0].name:null;
 
-    if(!state.copy.length)throw new Error('Reference ad copy file contains no ads');
-    if(!state.reels.length)throw new Error('Reference reel script file contains no scripts');
+    if(!state.copy.length||!state.reels.length)throw new Error('Reference outputs are empty');
 
     renderResults();
     $('status').textContent='Reference loaded — 3 Ad Copies + 3 Reel Scripts ready';
