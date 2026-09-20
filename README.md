@@ -55,7 +55,7 @@ The complete reference input, strategy, ad copy, creative concepts and reel scri
 - [Reference Campaign](reference/reference-campaign.md) — the human-readable write-up of the full campaign (quality bar for future AI generation)
 - `reference/reference-input.json` — the brief fields (also matches every placeholder shown in the Campaign Brief form)
 - `reference/reference-strategy.json` — the reference Strategy tab output
-- `reference/reference-ad-copies.json` — the 3 reference Ad Copy variations
+- `reference/reference-copy-variations.json` — the 3 reference Ad Copy variations
 - `reference/reference-creative.json` — the 4 reference Creative Ideas (one per format)
 - `reference/reference-reel-scripts.json` — the 3 reference Reel Scripts
 - `reference/images/*.svg`, `reference/creative-board.svg` — the sample creative visuals
