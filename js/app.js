@@ -124,6 +124,30 @@ function guessColumnMapping(headers){
  });
 }
 function defaultOptimisation(){return {tests:[]};}
+// ---- Phase 12: Prompt Library (₹0, original, local) ----
+const PROMPT_CATEGORIES=['Strategy','Audience','Offer','Copy','Creative','Reels','Landing Page','Analysis','Optimisation'];
+const PROMPT_FRAMEWORKS=['Problem-led','Outcome-led','PAS','AIDA','Story','Question','Objection','Education','Proof'];
+const PROMPT_LIBRARY=[
+ {id:'p1',category:'Strategy',framework:'Problem-led',title:'Problem-First Positioning Brief',description:'Frame the campaign strategy around the customer\'s problem before introducing the solution.',promptText:'Describe the customer\'s problem in their own words, as if they were complaining about it to a friend. Then explain, in one sentence, why most solutions fail to fix it. Finally, state how {{product}} addresses the root cause rather than the symptom.'},
+ {id:'p2',category:'Strategy',framework:'Outcome-led',title:'Outcome-First Positioning Brief',description:'Frame the strategy around the transformation the customer wants, then work backward.',promptText:'Describe the specific outcome the customer wants in concrete, observable terms (not a feeling, but something they could point to). Then explain the one belief or habit standing between them and that outcome. Position {{product}} as the bridge across that specific gap.'},
+ {id:'p3',category:'Audience',framework:'Question',title:'Audience Reflection Prompt',description:'Use direct questions to help the customer recognise themselves before you describe them.',promptText:'Write three questions a member of {{audience}} would answer "yes" to if they matched the target profile. Each question should reference a specific moment or behaviour, not a demographic trait.'},
+ {id:'p4',category:'Audience',framework:'Story',title:'Day-in-the-Life Framework',description:'Describe the audience through a short scene rather than a list of traits.',promptText:'Write a 3-4 sentence scene describing a typical day for {{audience}}, ending at the exact moment they encounter the problem {{product}} solves. Keep it specific and ordinary — avoid generic language.'},
+ {id:'p5',category:'Offer',framework:'PAS',title:'PAS Offer Stack',description:'Problem, Agitate, Solve — used to structure an offer summary.',promptText:'Problem: state the customer\'s problem in one sentence.\nAgitate: describe what it costs them (time, money, confidence) if it goes unsolved.\nSolve: describe how {{product}} solves it, what\'s included, and the price.'},
+ {id:'p6',category:'Offer',framework:'Proof',title:'Proof-Led Offer Summary',description:'Lead the offer with evidence rather than claims.',promptText:'List every piece of real evidence you have for {{product}} — results, testimonials, credentials, guarantees, before/afters. Then write a one-paragraph offer summary that leads with the strongest piece of proof.'},
+ {id:'p7',category:'Copy',framework:'AIDA',title:'AIDA Ad Template',description:'Attention, Interest, Desire, Action — a classic structure for short ad copy.',promptText:'Attention: one line that stops the scroll for {{audience}}.\nInterest: one line connecting to their specific situation.\nDesire: one line showing the outcome {{product}} makes possible.\nAction: a single, clear CTA.'},
+ {id:'p8',category:'Copy',framework:'PAS',title:'PAS Ad Copy',description:'Structure a short ad around Problem-Agitate-Solve.',promptText:'Open with the problem in the customer\'s own words. Agitate it with one honest consequence of leaving it unsolved. Resolve it by introducing {{product}} and a single next step.'},
+ {id:'p9',category:'Copy',framework:'Question',title:'Question-Hook Ad Copy',description:'Open with a question that makes the reader self-identify.',promptText:'Write an opening question that only someone dealing with {{problem}} would stop to answer. Follow it with two sentences that validate the feeling, then introduce {{product}} as the next step.'},
+ {id:'p10',category:'Copy',framework:'Objection',title:'Objection-Handling Ad Copy',description:'Name the most common hesitation directly, then reframe it.',promptText:'State the single most common reason {{audience}} hesitates to try {{product}}. Acknowledge it directly in one sentence, then reframe it with one piece of evidence or a guarantee.'},
+ {id:'p11',category:'Creative',framework:'Story',title:'Before/After Story Concept',description:'A visual concept built around contrast.',promptText:'Describe a single visual moment that captures the "before" state (the problem). Describe a second visual moment that captures the "after" state (the outcome). Describe how the two would sit side by side in one image or a short sequence.'},
+ {id:'p12',category:'Creative',framework:'Proof',title:'Proof-Led Creative Concept',description:'A visual concept that leads with evidence.',promptText:'Choose the single strongest piece of proof for {{product}} (a number, a result, a quote). Describe a visual that puts that proof front and centre, with the product/offer as a secondary element.'},
+ {id:'p13',category:'Reels',framework:'Story',title:'Reel Story Arc Template',description:'A five-beat story arc for a short-form video.',promptText:'Hook (0-3s): the moment the problem shows up.\nProblem (3-10s): why it\'s frustrating, in the audience\'s own words.\nTurn (10-18s): the shift — what changes.\nSolution (18-25s): {{product}} in action.\nCTA (25-30s): the single next step.'},
+ {id:'p14',category:'Reels',framework:'Education',title:'Educational Reel Template',description:'Teach one useful thing, then connect it to the offer.',promptText:'State one genuinely useful tip related to {{problem}} that works whether or not someone buys {{product}}. Explain it in under 20 seconds of spoken script. Then connect it to {{product}} as a natural next step, not a hard pivot.'},
+ {id:'p15',category:'Landing Page',framework:'Proof',title:'Proof Block Template',description:'Structure a proof section for a landing page.',promptText:'List 3 pieces of proof for {{product}} in order of strength. Write one sentence of context for each (who, what result, in what timeframe). Avoid vague claims — cite something specific for each.'},
+ {id:'p16',category:'Landing Page',framework:'Objection',title:'FAQ / Objection Block Template',description:'Turn common hesitations into an FAQ section.',promptText:'List the top 3 objections {{audience}} would have about {{product}}. Write each as a question in their own words, followed by a direct, honest answer (no more than 2 sentences).'},
+ {id:'p17',category:'Analysis',framework:'Question',title:'Diagnostic Question Set',description:'A set of questions to diagnose why a campaign underperformed.',promptText:'For the metric that concerns you most (CTR, CPL, ROAS, etc.), ask: Is this a reach problem, a relevance problem, or a conversion problem? Which single stage of the funnel (hook, offer, landing page, checkout) is most likely responsible? What is the smallest test that would confirm or rule that out?'},
+ {id:'p18',category:'Optimisation',framework:'Outcome-led',title:'Hypothesis Framing Template',description:'Frame a test as a hypothesis, not a guess.',promptText:'Observation: what you actually saw in the data.\nHypothesis: what you think might explain it (stated as "might" or "may", never as certain).\nTest: the smallest, single-variable change that would confirm or rule out the hypothesis.'}
+];
+function defaultPromptLibrary(){return {overrides:{},custom:[]};}
 const REEL_BEATS=['Hook','Problem','Turn','Solution','CTA'];
 const REEL_SHOT_FIELDS=['time','visual','voiceover','onScreenText','sound'];
 function reelShotFieldLabel(key){return {time:'Time',visual:'Visual Direction',voiceover:'Voiceover / Caption',onScreenText:'On-Screen Text',sound:'Sound / Music'}[key]||key;}
@@ -160,7 +184,7 @@ function normalizeReel(r){
  };
 }
 const CREATIVE_FORMATS=['Single Image Ad','Carousel','Instagram Story','Instagram Reel'];
-let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist(),performance:defaultPerformance(),optimisation:defaultOptimisation()};
+let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist(),performance:defaultPerformance(),optimisation:defaultOptimisation(),promptLibrary:defaultPromptLibrary()};
 
 const REFERENCE_ADS=[{"name":"Ad Version 1 · Problem-led","hook":"Still knowing what you want to say — but hesitating when it's your turn to speak?","primaryText":"You know the answer.\n\nYou have an idea.\n\nBut when the meeting turns to you, you suddenly start searching for words, translating in your head or wondering whether you are saying it correctly.\n\nIf this sounds familiar, you are not alone.\n\nThe Speak in Meetings Workshop is designed for working professionals who want to express their ideas more clearly and participate with greater confidence in workplace conversations.\n\n4-day live workshop · ₹997\n\nExplore the workshop and see if it is right for you.","headline":"Speak with more confidence in meetings","description":"4-day live workshop for working professionals.","cta":"Learn More"},{"name":"Ad Version 2 · Outcome-led","hook":"Imagine expressing your idea clearly when the meeting turns to you.","primaryText":"You don't necessarily need more words.\n\nYou need to feel more comfortable using the words you already know.\n\nThe Speak in Meetings Workshop helps working professionals practise how to express ideas, respond naturally and participate more confidently in workplace conversations.\n\nIf your goal is to speak more clearly without constantly worrying about finding the perfect words, this workshop may be a useful next step.\n\n4-day live workshop · ₹997","headline":"Express your ideas with confidence","description":"Practical workplace communication training.","cta":"Learn More"},{"name":"Ad Version 3 · Conversational","hook":"Quick question: do you stay quiet in meetings even when you have something useful to say?","primaryText":"Maybe you know exactly what you want to say.\n\nThen the moment comes.\n\nYou hesitate.\n\nYou search for the right words.\n\nSomeone else speaks.\n\nAnd the opportunity passes.\n\nThe Speak in Meetings Workshop is created for working professionals who want to become more comfortable expressing themselves in meetings and workplace conversations.\n\nLearn, practise and build confidence through a focused 4-day live workshop.\n\n₹997","headline":"Have something to say? Say it clearly.","description":"Build practical speaking confidence at work.","cta":"Learn More"}];
 const REFERENCE_REELS=[{"title": "Reel 1 · Problem to Solution", "hook": "Ever had the perfect answer five minutes after the meeting ended?", "angle": "Problem-led", "duration": "30", "scenes": ["0–3s — Hook: “Ever had the perfect answer five minutes after the meeting ended?”", "3–7s — Show a professional listening in a meeting but not speaking. Voiceover: “You knew exactly what you wanted to say...”", "7–12s — Show hesitation. Voiceover: “...but you started searching for words and the conversation moved on.”", "12–18s — Show a confident interaction. Voiceover: “With practice, you can learn to express your ideas more naturally.”", "18–24s — Introduce the workshop. Voiceover: “That's what we practise in the Speak in Meetings Workshop.”", "24–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More to see the details.”"], "voiceover": "Ever had the perfect answer five minutes after the meeting ended? You knew exactly what you wanted to say, but you started searching for words and the conversation moved on. With practice, you can learn to express your ideas more naturally — that's what we practise in the Speak in Meetings Workshop.", "onScreenText": "Ever had the perfect answer... after the meeting ended?", "cameraDirection": "Handheld, relatable meeting-room framing for the opening scene; cut to a clean end card with workshop details for the CTA.", "bRoll": "A professional in a video call, listening but staying quiet, followed by a confident follow-up conversation.", "cta": "Learn More", "caption": "Ever had the perfect answer... 5 minutes too late? 👀 4-day live workshop · ₹997 · Learn More."}, {"title": "Reel 2 · Outcome-led", "hook": "Imagine your next meeting feeling easier.", "angle": "Outcome-led", "duration": "30", "scenes": ["0–3s — Show the desired outcome immediately.", "3–8s — Voiceover: “You have the knowledge. You have the ideas.”", "8–15s — Show the person speaking clearly. Voiceover: “The next step is expressing those ideas clearly when the moment comes.”", "15–24s — Show workshop practice. Voiceover: “The Speak in Meetings Workshop gives you a focused environment to practise workplace communication.”", "24–30s — End frame: “4-day live workshop · ₹997” and “Learn More.”"], "voiceover": "Imagine your next meeting feeling easier. You have the knowledge, you have the ideas — the next step is expressing them clearly when the moment comes. The Speak in Meetings Workshop gives you a focused environment to practise workplace communication.", "onScreenText": "Imagine your next meeting feeling easier.", "cameraDirection": "Open on a confident, resolved moment for the outcome shot, then cut to workshop-practice footage, ending on a clean end card.", "bRoll": "A professional speaking clearly and confidently in a meeting, contrasted with a brief earlier hesitation.", "cta": "Learn More", "caption": "Imagine your next meeting feeling easier 🙌 4-day live workshop · ₹997 · Learn More."}, {"title": "Reel 3 · Question Format", "hook": "Do you stay quiet in meetings even when you have something useful to say?", "angle": "Question", "duration": "30", "scenes": ["0–3s — Put the question on screen and pause for recognition.", "3–9s — Show a meeting situation. Voiceover: “Maybe you're searching for the right words.”", "9–17s — Show a simple speaking exercise. Voiceover: “Maybe you're worried about making a mistake.”", "17–25s — Introduce the workshop. Voiceover: “The Speak in Meetings Workshop helps you practise expressing your ideas more clearly and confidently.”", "25–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More.”"], "voiceover": "Do you stay quiet in meetings even when you have something useful to say? Maybe you're searching for the right words, or worried about making a mistake. The Speak in Meetings Workshop helps you practise expressing your ideas more clearly and confidently.", "onScreenText": "Do you stay quiet in meetings even when you have something to say?", "cameraDirection": "Direct-to-camera delivery for the opening question, cut to a simple speaking-exercise demonstration, ending on a clean end card.", "bRoll": "A relatable meeting scene where someone visibly hesitates before staying silent.", "cta": "Learn More", "caption": "Quick question 👇 do you stay quiet even when you have something to say? 4-day live workshop · ₹997 · Learn More."}];
@@ -212,7 +236,7 @@ function fillBrief(b){
 }
 function resetState(){
  const keepAiConfig=state.aiConfig||defaultAiConfig();
- state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:keepAiConfig,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist(),performance:defaultPerformance(),optimisation:defaultOptimisation()};
+ state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:keepAiConfig,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist(),performance:defaultPerformance(),optimisation:defaultOptimisation(),promptLibrary:defaultPromptLibrary()};
 }
 function showTab(name){
  document.querySelectorAll('nav button').forEach(b=>{const active=b.dataset.tab===name;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});
@@ -259,6 +283,7 @@ function showTab(name){
  if(name==='checklist'){if(!state.checklist)state.checklist=defaultChecklist();renderChecklist();}
  if(name==='performance')renderPerformance();
  if(name==='optimisation')renderOptimisationTab();
+ if(name==='prompts')renderPromptLibrary();
  if(name==='saved')renderSaved();
  if(name==='export')renderPreview();
 }
@@ -1037,6 +1062,72 @@ function renderOptimisationTab(){
  renderOptObservations();
  renderOptTests();
 }
+
+// ---- Phase 12: Prompt Library rendering (search, filter, copy, edit, save) ----
+function effectivePromptList(){
+ if(!state.promptLibrary)state.promptLibrary=defaultPromptLibrary();
+ const overrides=state.promptLibrary.overrides||{};
+ const builtIn=PROMPT_LIBRARY.map(p=>Object.assign({},p,overrides[p.id]||{},{custom:false}));
+ const custom=(state.promptLibrary.custom||[]).map(p=>Object.assign({},p,{custom:true}));
+ return builtIn.concat(custom);
+}
+function populatePromptFilterOptions(){
+ const catSel=$('promptCategoryFilter'),fwSel=$('promptFrameworkFilter');
+ if(catSel&&catSel.options.length<=1){PROMPT_CATEGORIES.forEach(c=>catSel.insertAdjacentHTML('beforeend','<option value="'+attr(c)+'">'+esc(c)+'</option>'));}
+ if(fwSel&&fwSel.options.length<=1){PROMPT_FRAMEWORKS.forEach(f=>fwSel.insertAdjacentHTML('beforeend','<option value="'+attr(f)+'">'+esc(f)+'</option>'));}
+}
+function renderPromptLibrary(){
+ const el=$('promptLibraryResult');
+ if(!el)return;
+ populatePromptFilterOptions();
+ const search=($('promptSearch').value||'').trim().toLowerCase();
+ const catFilter=$('promptCategoryFilter').value;
+ const fwFilter=$('promptFrameworkFilter').value;
+ const list=effectivePromptList().filter(p=>{
+  if(catFilter&&p.category!==catFilter)return false;
+  if(fwFilter&&p.framework!==fwFilter)return false;
+  if(search){
+   const hay=(p.title+' '+p.description+' '+p.promptText).toLowerCase();
+   if(!hay.includes(search))return false;
+  }
+  return true;
+ });
+ if(!list.length){el.innerHTML='<div class="placeholder">No prompts match your search/filter.</div>';return;}
+ el.innerHTML=list.map((p,i)=>'<article class="prompt-card" data-id="'+attr(p.id)+'"><h4>'+esc(p.title)+(p.custom?' <span class="ai-badge">Custom</span>':'')+'</h4>'+
+  '<div class="ai-select-grid"><label>Title<input class="promptField" data-id="'+attr(p.id)+'" data-key="title" value="'+attr(p.title)+'"></label>'+
+  '<label>Category<select class="promptField" data-id="'+attr(p.id)+'" data-key="category">'+PROMPT_CATEGORIES.map(c=>'<option value="'+attr(c)+'"'+(p.category===c?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select></label>'+
+  '<label>Framework<select class="promptField" data-id="'+attr(p.id)+'" data-key="framework">'+PROMPT_FRAMEWORKS.map(f=>'<option value="'+attr(f)+'"'+(p.framework===f?' selected':'')+'>'+esc(f)+'</option>').join('')+'</select></label></div>'+
+  '<label><span class="field-title">Description</span><input class="promptField" data-id="'+attr(p.id)+'" data-key="description" value="'+attr(p.description)+'"></label>'+
+  '<label><span class="field-title">Prompt Text</span><textarea class="editable textarea promptField" data-id="'+attr(p.id)+'" data-key="promptText" rows="4">'+esc(p.promptText)+'</textarea></label>'+
+  '<div class="card-actions"><button class="secondary copyPromptBtn" data-id="'+attr(p.id)+'">Copy</button>'+(p.custom?'<button class="ghost danger removeCustomPromptBtn" data-id="'+attr(p.id)+'">Remove</button>':'')+'</div></article>').join('');
+ document.querySelectorAll('.promptField').forEach(input=>{
+  const evt=input.tagName==='SELECT'?'change':'input';
+  input.addEventListener(evt,()=>updatePromptField(input.dataset.id,input.dataset.key,input.value));
+ });
+ document.querySelectorAll('.copyPromptBtn').forEach(btn=>btn.onclick=()=>{
+  const p=effectivePromptList().find(x=>x.id===btn.dataset.id);
+  if(p){navigator.clipboard?.writeText(p.promptText);$('status').textContent='Prompt copied';}
+ });
+ document.querySelectorAll('.removeCustomPromptBtn').forEach(btn=>btn.onclick=()=>{
+  state.promptLibrary.custom=state.promptLibrary.custom.filter(p=>p.id!==btn.dataset.id);
+  renderPromptLibrary();
+  $('status').textContent='Custom prompt removed';
+ });
+}
+function updatePromptField(id,key,value){
+ if(!state.promptLibrary)state.promptLibrary=defaultPromptLibrary();
+ const custom=state.promptLibrary.custom.find(p=>p.id===id);
+ if(custom){custom[key]=value;return;}
+ if(!state.promptLibrary.overrides[id])state.promptLibrary.overrides[id]={};
+ state.promptLibrary.overrides[id][key]=value;
+}
+function addCustomPrompt(){
+ if(!state.promptLibrary)state.promptLibrary=defaultPromptLibrary();
+ const id='custom-'+Date.now();
+ state.promptLibrary.custom.push({id,category:PROMPT_CATEGORIES[0],framework:PROMPT_FRAMEWORKS[0],title:'New Custom Prompt',description:'',promptText:''});
+ renderPromptLibrary();
+ $('status').textContent='Custom prompt added — edit it below';
+}
 async function regenerate(type){
  if(!state.brief.productName){$('status').textContent='Generate a campaign first.';showTab('brief');return;}
  if(stageIsAi(type)){
@@ -1424,6 +1515,7 @@ async function loadReferenceExample(){
     state.checklist=defaultChecklist();
     state.performance=defaultPerformance();
     state.optimisation=defaultOptimisation();
+    state.promptLibrary=defaultPromptLibrary();
 
     if(!state.strategy||!state.copy.length||!state.creative.length||!state.reels.length)throw new Error('Reference outputs are empty');
 
@@ -1451,6 +1543,7 @@ async function loadReferenceExample(){
     renderChecklist();
     renderPerformance();
     renderOptimisationTab();
+    renderPromptLibrary();
     $('status').textContent='Reference loaded — Strategy, Audience, Offer, Campaign Structure, 3 Ad Copies, Creative Matrix + 4 Creative Ideas, 3 Reel Scripts ready';
     showTab('brief');
   }catch(err){
@@ -1461,7 +1554,7 @@ async function loadReferenceExample(){
 }
 $('useReference').onclick=loadReferenceExample;
 $('generate').onclick=()=>{state.brief=brief();generateAI();};
-$('regenStrategy').onclick=()=>regenerate('strategy');$('regenCopy').onclick=()=>regenerate('copy');$('regenCreative').onclick=()=>regenerate('creative');$('regenReels').onclick=()=>regenerate('reels');$('nextAudience').onclick=()=>showTab('audience');$('nextOffer').onclick=()=>showTab('offer');$('nextStructure').onclick=()=>showTab('structure');$('nextCopyFromStructure').onclick=()=>showTab('copy');$('nextCreative').onclick=()=>showTab('creative');$('nextReels').onclick=()=>showTab('reels');$('nextLanding').onclick=()=>showTab('landing');$('nextChecklist').onclick=()=>showTab('checklist');$('nextPerformance').onclick=()=>showTab('performance');$('nextOptimisation').onclick=()=>showTab('optimisation');$('nextSaved').onclick=()=>showTab('saved');
+$('regenStrategy').onclick=()=>regenerate('strategy');$('regenCopy').onclick=()=>regenerate('copy');$('regenCreative').onclick=()=>regenerate('creative');$('regenReels').onclick=()=>regenerate('reels');$('nextAudience').onclick=()=>showTab('audience');$('nextOffer').onclick=()=>showTab('offer');$('nextStructure').onclick=()=>showTab('structure');$('nextCopyFromStructure').onclick=()=>showTab('copy');$('nextCreative').onclick=()=>showTab('creative');$('nextReels').onclick=()=>showTab('reels');$('nextLanding').onclick=()=>showTab('landing');$('nextChecklist').onclick=()=>showTab('checklist');$('nextPerformance').onclick=()=>showTab('performance');$('nextOptimisation').onclick=()=>showTab('optimisation');$('nextPrompts').onclick=()=>showTab('prompts');$('nextSaved').onclick=()=>showTab('saved');
 $('genAudiencePlan').onclick=generateAudiencePlan;
 $('addMatrixRow').onclick=()=>{if(!state.audience)state.audience=defaultAudience();if(!Array.isArray(state.audience.matrix))state.audience.matrix=[];state.audience.matrix.push({audience:'',angle:'',creative:'',purpose:''});renderAudienceMatrix();};
 $('analyzeOffer').onclick=analyzeOffer;
@@ -1497,6 +1590,10 @@ $('perfCsvInput').onchange=handlePerfCsvInput;
 $('refreshDoctor').onclick=renderCampaignDoctor;
 $('genOptimisation').onclick=generateOptimisation;
 $('genNewCreativeSet').onclick=()=>{generateCreativeMatrix();$('status').textContent='New creative set generated — ₹0, closing the optimisation loop';showTab('creative');};
+$('promptSearch').oninput=renderPromptLibrary;
+$('promptCategoryFilter').onchange=renderPromptLibrary;
+$('promptFrameworkFilter').onchange=renderPromptLibrary;
+$('addCustomPrompt').onclick=addCustomPrompt;
 $('generateImagesBtn').onclick=async()=>{
  if(!stageIsAi('images'))return;
  if(!Array.isArray(state.creative)||!state.creative.length){$('status').textContent='Generate creative concepts first.';return;}
@@ -1532,7 +1629,7 @@ $('generateImagesBtn').onclick=async()=>{
 };
 
 $('save').onclick=()=>{const b=brief();if(!b.productName){$('status').textContent='Enter a product/service first.';return;}const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:b,state});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));$('status').textContent='Campaign saved';};
-function startNewCampaign(){ids.forEach(id=>$(id).value='');resetState();$('strategyResult').innerHTML='<div class="placeholder">Complete the brief and generate a strategy.</div>';$('copyResult').innerHTML='<div class="placeholder">Generate a campaign to create ad copy.</div>';$('creativeResult').innerHTML='<article><h3>Image Ad</h3><p>Visual concept and text hierarchy.</p></article><article><h3>Carousel</h3><p>Problem → solution → proof → CTA.</p></article><article><h3>Story</h3><p>Vertical 9:16 concept.</p></article><article><h3>Reel</h3><p>Scene-by-scene creative concept.</p></article>';$('reelsResult').innerHTML='<div class="placeholder">Generate a campaign to create reel scripts.</div>';fillAudienceInputs(state.audience);renderAudiencePlan();renderAudienceMatrix();fillOfferInputs(state.offer);renderOfferAnalysis();$('campaignName').value='';$('campaignObjective').value='';$('campaignBudget').value='';$('campaignLocation').value='';$('campaignDestination').value='';renderCampaignStructure();renderCreativeMatrix();fillImageFactoryGlobalInputs();renderImageConceptSelect();renderImagePrompts();renderReelSelect();renderReelShotList();fillLandingPageInputs();renderLandingPageAnalysis();renderChecklist();renderPerformance();renderOptimisationTab();$('status').textContent='New campaign ready';renderAiControlSummary();showTab('brief');}
+function startNewCampaign(){ids.forEach(id=>$(id).value='');resetState();$('strategyResult').innerHTML='<div class="placeholder">Complete the brief and generate a strategy.</div>';$('copyResult').innerHTML='<div class="placeholder">Generate a campaign to create ad copy.</div>';$('creativeResult').innerHTML='<article><h3>Image Ad</h3><p>Visual concept and text hierarchy.</p></article><article><h3>Carousel</h3><p>Problem → solution → proof → CTA.</p></article><article><h3>Story</h3><p>Vertical 9:16 concept.</p></article><article><h3>Reel</h3><p>Scene-by-scene creative concept.</p></article>';$('reelsResult').innerHTML='<div class="placeholder">Generate a campaign to create reel scripts.</div>';fillAudienceInputs(state.audience);renderAudiencePlan();renderAudienceMatrix();fillOfferInputs(state.offer);renderOfferAnalysis();$('campaignName').value='';$('campaignObjective').value='';$('campaignBudget').value='';$('campaignLocation').value='';$('campaignDestination').value='';renderCampaignStructure();renderCreativeMatrix();fillImageFactoryGlobalInputs();renderImageConceptSelect();renderImagePrompts();renderReelSelect();renderReelShotList();fillLandingPageInputs();renderLandingPageAnalysis();renderChecklist();renderPerformance();renderOptimisationTab();renderPromptLibrary();$('status').textContent='New campaign ready';renderAiControlSummary();showTab('brief');}
 $('newCampaign').onclick=()=>{$('newCampaignConfirm').hidden=false;};
 $('confirmNewCampaign').onclick=()=>{$('newCampaignConfirm').hidden=true;startNewCampaign();};
 $('cancelNewCampaign').onclick=()=>{$('newCampaignConfirm').hidden=true;};
@@ -1546,13 +1643,13 @@ $('exportText').onclick=()=>{
  download('ai-ads-campaign.txt',briefText+aiText,'text/plain');
 };
 function renderSaved(){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');$('savedList').innerHTML=items.length?items.map(x=>'<div class="saved-card"><div class="saved-meta"><strong>'+esc(x.brief.productName||'Untitled campaign')+'</strong><small>'+esc(x.brief.brandName||'')+' · '+new Date(x.savedAt).toLocaleString()+'</small></div><div class="saved-actions"><button class="secondary loadBtn" data-id="'+x.id+'">Load</button><button class="secondary duplicateBtn" data-id="'+x.id+'">Duplicate</button><button class="secondary danger deleteBtn" data-id="'+x.id+'">Delete</button></div></div>').join(''):'<div class="placeholder">No saved campaigns yet.</div>';document.querySelectorAll('.loadBtn').forEach(btn=>btn.onclick=()=>loadCampaign(Number(btn.dataset.id)));document.querySelectorAll('.duplicateBtn').forEach(btn=>btn.onclick=()=>duplicateCampaign(Number(btn.dataset.id)));document.querySelectorAll('.deleteBtn').forEach(btn=>btn.onclick=()=>deleteCampaign(Number(btn.dataset.id)));}
-function duplicateCampaign(id){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');const item=items.find(x=>x.id===id);if(!item)return;const copyBrief={...item.brief,productName:(item.brief.productName||'Untitled campaign')+' (Copy)'};const copyState=item.state?{...item.state,brief:copyBrief}:{brief:copyBrief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:item.state&&item.state.aiConfig||defaultAiConfig(),aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist(),performance:defaultPerformance(),optimisation:defaultOptimisation()};items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:copyBrief,state:copyState});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));renderSaved();$('status').textContent='Campaign duplicated';}
+function duplicateCampaign(id){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');const item=items.find(x=>x.id===id);if(!item)return;const copyBrief={...item.brief,productName:(item.brief.productName||'Untitled campaign')+' (Copy)'};const copyState=item.state?{...item.state,brief:copyBrief}:{brief:copyBrief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:item.state&&item.state.aiConfig||defaultAiConfig(),aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist(),performance:defaultPerformance(),optimisation:defaultOptimisation(),promptLibrary:defaultPromptLibrary()};items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:copyBrief,state:copyState});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));renderSaved();$('status').textContent='Campaign duplicated';}
 function loadCampaign(id){
  const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');
  const item=items.find(x=>x.id===id);
  if(!item)return;
  fillBrief(item.brief);
- state=item.state||{brief:item.brief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist(),performance:defaultPerformance(),optimisation:defaultOptimisation()};
+ state=item.state||{brief:item.brief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage(),checklist:defaultChecklist(),performance:defaultPerformance(),optimisation:defaultOptimisation(),promptLibrary:defaultPromptLibrary()};
  state.aiConfig=state.aiConfig||defaultAiConfig();
  state.aiUsage=state.aiUsage||emptyAiUsage();
  if(state.aiImages===undefined)state.aiImages=null;
@@ -1573,6 +1670,9 @@ function loadCampaign(id){
  if(!Array.isArray(state.performance.rows))state.performance.rows=[];
  state.optimisation=Object.assign(defaultOptimisation(),state.optimisation||{});
  if(!Array.isArray(state.optimisation.tests))state.optimisation.tests=[];
+ state.promptLibrary=Object.assign(defaultPromptLibrary(),state.promptLibrary||{});
+ if(!state.promptLibrary.overrides||typeof state.promptLibrary.overrides!=='object')state.promptLibrary.overrides={};
+ if(!Array.isArray(state.promptLibrary.custom))state.promptLibrary.custom=[];
  applyAiConfigToUI();
  fillAudienceInputs(state.audience);
  renderAudiencePlan();
@@ -1596,6 +1696,7 @@ function loadCampaign(id){
  renderChecklist();
  renderPerformance();
  renderOptimisationTab();
+ renderPromptLibrary();
  if(!state.copy)generateDemo();else{renderResults();}
  state.brief=item.brief;
  $('status').textContent='Saved campaign loaded';
