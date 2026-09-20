@@ -243,18 +243,19 @@ function mapAspectToSize(aspectRatio) {
 async function callOpenAIImages({ model, quality, aspectRatio, concepts, brief }) {
   const key = process.env.OPENAI_API_KEY;
   if (!key) return { error: 'OpenAI API key is not configured. Using ₹0 built-in result.' };
-  const list = (Array.isArray(concepts) ? concepts : []).slice(0, 4);
+  const list = (Array.isArray(concepts) ? concepts : []).slice(0, 6);
   if (!list.length) return { error: 'No creative concepts supplied to generate images from.' };
-  const size = mapAspectToSize(aspectRatio);
   try {
     const results = await Promise.all(
       list.map(async (concept) => {
+        const size = mapAspectToSize(concept.aspectRatio || aspectRatio);
+        const prompt = typeof concept.prompt === 'string' && concept.prompt.trim() ? concept.prompt.trim() : buildImagePrompt(concept, brief);
         const response = await fetch('https://api.openai.com/v1/images/generations', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
           body: JSON.stringify({
             model,
-            prompt: buildImagePrompt(concept, brief),
+            prompt,
             size,
             quality: mapQuality(quality),
             n: 1

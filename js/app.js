@@ -1,12 +1,27 @@
 const ids=['brandName','productName','productDescription','objective','location','targetCustomer','ageRange','offer','budget','problem','outcome','tone','landingPage'];const $=id=>document.getElementById(id);
-function defaultAiConfig(){return {master:false,stages:{strategy:false,copy:false,creative:false,images:false,reels:false},textProvider:'openai',textModel:AI_MODELS.openai.text[0],imageProvider:'openai',imageModel:AI_MODELS.openai.image[0],imageQuality:'medium',imageAspectRatio:'1:1'};}
+function defaultAiConfig(){return {master:false,stages:{strategy:false,copy:false,creative:false,images:false,reels:false},textProvider:'openai',textModel:AI_MODELS.openai.text[0],imageProvider:'openai',imageModel:AI_MODELS.openai.image[0],imageQuality:'medium'};}
 function emptyAiUsage(){return {strategy:null,copy:null,creative:null,images:null,reels:null};}
 function defaultAudience(){return {primaryCustomer:'',location:'',age:'',gender:'Any',occupation:'',income:'Mid-market',problem:'',outcome:'',awareness:'Problem Aware',intent:'Warm',strategies:['Broad'],plan:null,matrix:[]};}
 function defaultOffer(){return {product:'',price:'',discount:'',duration:'',scarcity:'',cta:'',bonuses:'',guarantee:'',proof:'',analysis:null,variants:null};}
 function defaultCampaignStructure(){return {name:'',objective:'',budget:'',location:'',destination:'',adSets:[]};}
+function defaultImageFactory(){return {selected:[],global:{emotion:'',lighting:'',brandContext:'',textOverlay:'No readable text in the image — text overlays are added afterward in the app.',negative:'no watermark, no distorted hands, no extra limbs',aspectRatio:'1:1'},prompts:[]};}
+const PROMPT_FIELD_ORDER=['subject','setting','emotion','composition','lighting','brandContext','textOverlay','aspectRatio','negative'];
+function promptFieldLabel(key){return {subject:'Subject',setting:'Setting',emotion:'Emotion',composition:'Composition',lighting:'Lighting',brandContext:'Brand context',textOverlay:'Text-overlay guidance',aspectRatio:'Aspect ratio',negative:'Negative guidance'}[key]||key;}
+function buildPromptText(fields){return PROMPT_FIELD_ORDER.filter(k=>fields[k]).map(k=>promptFieldLabel(k)+': '+fields[k]).join('. ');}
+function derivePromptFields(concept,b){
+ const customer=(b&&b.targetCustomer)||'the target customer';
+ const firstLine=String((concept&&concept.concept)||'').split(/[.\n]/)[0].trim();
+ const fields={subject:customer+(firstLine?' — '+firstLine:''),setting:'A realistic, relatable environment relevant to '+customer,composition:'Clear focal subject, natural framing, mobile-friendly'};
+ const format=concept&&concept.format;
+ if(format==='Single Image Ad')fields.composition='Single hero shot, centered subject, calm negative space reserved for a text overlay to be added later in the app';
+ else if(format==='Carousel')fields.composition='Consistent visual style suitable for a multi-card carousel sequence, subject clearly visible on each card';
+ else if(format==='Instagram Story')fields.composition='Vertical 9:16 framing, subject centered with safe margins at top and bottom for on-screen UI elements';
+ else if(format==='Instagram Reel')fields.composition='Vertical 9:16 framing, expressive first-frame suitable as a video thumbnail, subject mid-action';
+ return fields;
+}
 const CREATIVE_ANGLES=['Problem','Outcome','Question','Story','Objection','Myth','Education','Proof','Testimonial','Comparison','Before/After','Demonstration','FAQ','Urgency','Offer'];
 const CREATIVE_FORMATS=['Single Image Ad','Carousel','Instagram Story','Instagram Reel'];
-let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[]};
+let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory()};
 
 const REFERENCE_ADS=[{"name":"Ad Version 1 · Problem-led","hook":"Still knowing what you want to say — but hesitating when it's your turn to speak?","primaryText":"You know the answer.\n\nYou have an idea.\n\nBut when the meeting turns to you, you suddenly start searching for words, translating in your head or wondering whether you are saying it correctly.\n\nIf this sounds familiar, you are not alone.\n\nThe Speak in Meetings Workshop is designed for working professionals who want to express their ideas more clearly and participate with greater confidence in workplace conversations.\n\n4-day live workshop · ₹997\n\nExplore the workshop and see if it is right for you.","headline":"Speak with more confidence in meetings","description":"4-day live workshop for working professionals.","cta":"Learn More"},{"name":"Ad Version 2 · Outcome-led","hook":"Imagine expressing your idea clearly when the meeting turns to you.","primaryText":"You don't necessarily need more words.\n\nYou need to feel more comfortable using the words you already know.\n\nThe Speak in Meetings Workshop helps working professionals practise how to express ideas, respond naturally and participate more confidently in workplace conversations.\n\nIf your goal is to speak more clearly without constantly worrying about finding the perfect words, this workshop may be a useful next step.\n\n4-day live workshop · ₹997","headline":"Express your ideas with confidence","description":"Practical workplace communication training.","cta":"Learn More"},{"name":"Ad Version 3 · Conversational","hook":"Quick question: do you stay quiet in meetings even when you have something useful to say?","primaryText":"Maybe you know exactly what you want to say.\n\nThen the moment comes.\n\nYou hesitate.\n\nYou search for the right words.\n\nSomeone else speaks.\n\nAnd the opportunity passes.\n\nThe Speak in Meetings Workshop is created for working professionals who want to become more comfortable expressing themselves in meetings and workplace conversations.\n\nLearn, practise and build confidence through a focused 4-day live workshop.\n\n₹997","headline":"Have something to say? Say it clearly.","description":"Build practical speaking confidence at work.","cta":"Learn More"}];
 const REFERENCE_REELS=[{"title":"Reel 1 · Problem to Solution","hook":"Ever had the perfect answer five minutes after the meeting ended?","scenes":["0–3s — Hook: “Ever had the perfect answer five minutes after the meeting ended?”","3–7s — Show a professional listening in a meeting but not speaking. Voiceover: “You knew exactly what you wanted to say...”","7–12s — Show hesitation. Voiceover: “...but you started searching for words and the conversation moved on.”","12–18s — Show a confident interaction. Voiceover: “With practice, you can learn to express your ideas more naturally.”","18–24s — Introduce the workshop. Voiceover: “That's what we practise in the Speak in Meetings Workshop.”","24–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More to see the details.”"]},{"title":"Reel 2 · Outcome-led","hook":"Imagine your next meeting feeling easier.","scenes":["0–3s — Show the desired outcome immediately.","3–8s — Voiceover: “You have the knowledge. You have the ideas.”","8–15s — Show the person speaking clearly. Voiceover: “The next step is expressing those ideas clearly when the moment comes.”","15–24s — Show workshop practice. Voiceover: “The Speak in Meetings Workshop gives you a focused environment to practise workplace communication.”","24–30s — End frame: “4-day live workshop · ₹997” and “Learn More.”"]},{"title":"Reel 3 · Question Format","hook":"Do you stay quiet in meetings even when you have something useful to say?","scenes":["0–3s — Put the question on screen and pause for recognition.","3–9s — Show a meeting situation. Voiceover: “Maybe you're searching for the right words.”","9–17s — Show a simple speaking exercise. Voiceover: “Maybe you're worried about making a mistake.”","17–25s — Introduce the workshop. Voiceover: “The Speak in Meetings Workshop helps you practise expressing your ideas more clearly and confidently.”","25–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More.”"]}];
@@ -58,7 +73,7 @@ function fillBrief(b){
 }
 function resetState(){
  const keepAiConfig=state.aiConfig||defaultAiConfig();
- state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:keepAiConfig,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[]};
+ state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:keepAiConfig,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory()};
 }
 function showTab(name){
  document.querySelectorAll('nav button').forEach(b=>{const active=b.dataset.tab===name;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});
@@ -93,7 +108,7 @@ function showTab(name){
  }
  if(name==='audience')renderAudiencePlan(),renderAudienceMatrix();
  if(name==='offer')renderOfferAnalysis();
- if(name==='creative')renderCreativeMatrix();
+ if(name==='creative'){renderCreativeMatrix();renderImageConceptSelect();fillImageFactoryGlobalInputs();renderImagePrompts();}
  if(name==='copy')renderCopy();
  if(name==='reels')renderReels();
  if(name==='saved')renderSaved();
@@ -117,7 +132,6 @@ function readAiConfigFromUI(){
  state.aiConfig.imageProvider=$('imageProviderSelect').value;
  state.aiConfig.imageModel=$('imageModelSelect').value;
  state.aiConfig.imageQuality=$('imageQualitySelect').value;
- state.aiConfig.imageAspectRatio=$('imageAspectSelect').value;
 }
 function applyAiConfigToUI(){
  const cfg=state.aiConfig=state.aiConfig||defaultAiConfig();
@@ -129,7 +143,6 @@ function applyAiConfigToUI(){
  $('textModelSelect').value=cfg.textModel||AI_MODELS[state.aiConfig.textProvider].text[0];
  $('imageModelSelect').value=cfg.imageModel||AI_MODELS[state.aiConfig.imageProvider].image[0];
  $('imageQualitySelect').value=cfg.imageQuality||'medium';
- $('imageAspectSelect').value=cfg.imageAspectRatio||'1:1';
  readAiConfigFromUI();
  renderAiControlSummary();
 }
@@ -169,7 +182,9 @@ function renderAiControlSummary(){
  $('generateImagesBtn').disabled=!imagesOn;
  $('aiImagesStatus').textContent=imagesOn?('AI ON • '+providerLabel(state.aiConfig.imageProvider)):'AI Images OFF — showing ₹0 reference creatives';
  const perImg=AI_COST_CONFIG.image[state.aiConfig.imageQuality]||AI_COST_CONFIG.image.medium;
- $('aiImagesCostEstimate').textContent=imagesOn?('Estimated '+formatInr(perImg*4)+' for 4 images'):'';
+ const factory=state.imageFactory||defaultImageFactory();
+ const imgCount=(factory.prompts&&factory.prompts.length)||(factory.selected&&factory.selected.length)||0;
+ $('aiImagesCostEstimate').textContent=!imagesOn?'':imgCount?('Estimated '+formatInr(perImg*imgCount)+' for '+imgCount+' image'+(imgCount===1?'':'s')):'Select concepts and generate prompts to see a cost estimate';
 
  renderAiUsageSummary();
 }
@@ -313,6 +328,81 @@ function renderCreative(){
  document.querySelectorAll('.creativeCancel').forEach(btn=>btn.onclick=()=>{editingCreativeIndex=null;renderCreative();});
  document.querySelectorAll('.creativeSave').forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.index);const field=document.querySelector('.creativeEditField[data-index="'+i+'"]');if(field&&field.value.trim())state.creative[i].concept=field.value.trim();editingCreativeIndex=null;renderCreative();});
  document.querySelectorAll('.creativeUse').forEach(btn=>btn.onclick=()=>{$('status').textContent='Creative idea '+(Number(btn.dataset.index)+1)+' selected';});
+ renderImageConceptSelect();
+}
+
+// ---- Phase 6: AI Image Factory (select concepts -> generate prompts -> review -> generate images) ----
+function fillImageFactoryGlobalInputs(){
+ const g=(state.imageFactory&&state.imageFactory.global)||defaultImageFactory().global;
+ $('imgEmotion').value=g.emotion||'';
+ $('imgLighting').value=g.lighting||'';
+ $('imgBrandContext').value=g.brandContext||'';
+ $('imgTextOverlay').value=g.textOverlay||'';
+ $('imgNegative').value=g.negative||'';
+ $('imgAspectSelect').value=g.aspectRatio||'1:1';
+}
+function readImageFactoryGlobal(){
+ if(!state.imageFactory)state.imageFactory=defaultImageFactory();
+ state.imageFactory.global={
+  emotion:$('imgEmotion').value.trim(),
+  lighting:$('imgLighting').value.trim(),
+  brandContext:$('imgBrandContext').value.trim(),
+  textOverlay:$('imgTextOverlay').value.trim(),
+  negative:$('imgNegative').value.trim(),
+  aspectRatio:$('imgAspectSelect').value
+ };
+}
+function renderImageConceptSelect(){
+ const container=$('imageConceptSelect');
+ if(!container)return;
+ if(!state.imageFactory)state.imageFactory=defaultImageFactory();
+ const concepts=Array.isArray(state.creative)?state.creative:[];
+ if(!concepts.length){container.innerHTML='<div class="placeholder">Generate creative ideas first.</div>';return;}
+ state.imageFactory.selected=state.imageFactory.selected.filter(i=>i<concepts.length);
+ container.innerHTML='<div class="field-title">Select concepts for image generation</div>'+concepts.map((c,i)=>'<label class="checkbox-item"><input type="checkbox" class="imgConceptBox" value="'+i+'" '+(state.imageFactory.selected.includes(i)?'checked':'')+'>'+esc(c.format)+' — '+esc(shortText(c.concept,60))+'</label>').join('');
+ document.querySelectorAll('.imgConceptBox').forEach(el=>el.onchange=()=>{
+  const i=Number(el.value);
+  const sel=state.imageFactory.selected;
+  if(el.checked){if(!sel.includes(i))sel.push(i);}else{state.imageFactory.selected=sel.filter(x=>x!==i);}
+ });
+}
+function generateImagePrompts(){
+ if(!state.imageFactory)state.imageFactory=defaultImageFactory();
+ if(!Array.isArray(state.creative)||!state.creative.length){$('status').textContent='Generate creative ideas first.';return;}
+ if(!state.imageFactory.selected.length){$('status').textContent='Select at least one concept to generate prompts for.';return;}
+ readImageFactoryGlobal();
+ const g=state.imageFactory.global;
+ state.imageFactory.prompts=state.imageFactory.selected.map(i=>{
+  const concept=state.creative[i];
+  const derived=derivePromptFields(concept,state.brief||{});
+  const fields=Object.assign({},derived,{emotion:g.emotion,lighting:g.lighting,brandContext:g.brandContext,textOverlay:g.textOverlay,aspectRatio:g.aspectRatio,negative:g.negative});
+  return {conceptIndex:i,format:concept.format,fields,promptText:buildPromptText(fields)};
+ });
+ renderImagePrompts();
+ renderAiControlSummary();
+ $('status').textContent='Prompts generated — ₹0, review and edit before generating images';
+}
+function renderImagePrompts(){
+ const container=$('imagePromptsResult');
+ if(!container)return;
+ const prompts=(state.imageFactory&&state.imageFactory.prompts)||[];
+ if(!prompts.length){container.innerHTML='';return;}
+ container.innerHTML=prompts.map((p,i)=>'<article class="prompt-card"><h4>'+esc(p.format)+'</h4>'+
+  PROMPT_FIELD_ORDER.filter(k=>k!=='aspectRatio').map(k=>'<label><span class="field-title">'+esc(promptFieldLabel(k))+'</span><textarea class="editable textarea promptField" data-index="'+i+'" data-key="'+k+'" rows="2">'+esc(p.fields[k]||'')+'</textarea></label>').join('')+
+  '<label>Aspect Ratio<select class="promptField" data-index="'+i+'" data-key="aspectRatio"><option value="1:1"'+(p.fields.aspectRatio==='1:1'?' selected':'')+'>1:1 Square</option><option value="4:5"'+(p.fields.aspectRatio==='4:5'?' selected':'')+'>4:5 Portrait</option><option value="9:16"'+(p.fields.aspectRatio==='9:16'?' selected':'')+'>9:16 Story/Reel</option><option value="16:9"'+(p.fields.aspectRatio==='16:9'?' selected':'')+'>16:9 Landscape</option></select></label>'+
+  '<div class="prompt-preview" data-index="'+i+'">'+esc(p.promptText)+'</div>'+
+ '</article>').join('');
+ document.querySelectorAll('.promptField').forEach(el=>{
+  const evt=el.tagName==='SELECT'?'change':'input';
+  el.addEventListener(evt,()=>{
+   const i=Number(el.dataset.index),key=el.dataset.key;
+   const p=state.imageFactory.prompts[i];
+   p.fields[key]=el.value;
+   p.promptText=buildPromptText(p.fields);
+   const preview=document.querySelector('.prompt-preview[data-index="'+i+'"]');
+   if(preview)preview.textContent=p.promptText;
+  });
+ });
 }
 
 // ---- Phase 5: Creative Factory matrix (₹0, local; additive to the existing format cards above) ----
@@ -727,6 +817,7 @@ async function loadReferenceExample(){
     state.aiMode=false;
     state.aiUsage=emptyAiUsage();
     state.aiImages=null;
+    state.imageFactory=defaultImageFactory();
     state.audience=Object.assign(defaultAudience(),audienceData.audience||REFERENCE_AUDIENCE);
     state.offer=Object.assign(defaultOffer(),offerData.offer||REFERENCE_OFFER);
     state.campaign=Object.assign(defaultCampaignStructure(),structureData.structure||REFERENCE_CAMPAIGN_STRUCTURE);
@@ -753,6 +844,9 @@ async function loadReferenceExample(){
     $('campaignDestination').value=state.campaign.destination||'';
     renderCampaignStructure();
     renderCreativeMatrix();
+    fillImageFactoryGlobalInputs();
+    renderImageConceptSelect();
+    renderImagePrompts();
     $('status').textContent='Reference loaded — Strategy, Audience, Offer, Campaign Structure, 3 Ad Copies, Creative Matrix + 4 Creative Ideas, 3 Reel Scripts ready';
     showTab('brief');
   }catch(err){
@@ -782,28 +876,35 @@ $('textModelSelect').onchange=onAiControlChange;
 $('imageProviderSelect').onchange=onAiControlChange;
 $('imageModelSelect').onchange=onAiControlChange;
 $('imageQualitySelect').onchange=onAiControlChange;
-$('imageAspectSelect').onchange=onAiControlChange;
 $('aiImagesOnlyBtn').onclick=()=>{
  $('aiMasterSwitch').checked=true;
  document.querySelectorAll('.ai-stage-grid input[type=checkbox]').forEach(el=>{el.checked=el.dataset.stage==='images';});
  onAiControlChange();
  $('status').textContent='AI Images Only preset applied';
 };
+$('genImagePrompts').onclick=generateImagePrompts;
 $('generateImagesBtn').onclick=async()=>{
  if(!stageIsAi('images'))return;
  if(!Array.isArray(state.creative)||!state.creative.length){$('status').textContent='Generate creative concepts first.';return;}
+ if(!state.imageFactory)state.imageFactory=defaultImageFactory();
+ if(!state.imageFactory.prompts.length){
+   if(!state.imageFactory.selected.length)state.imageFactory.selected=state.creative.map((c,i)=>i);
+   generateImagePrompts();
+ }
+ if(!state.imageFactory.prompts.length){$('status').textContent='Generate prompts first.';return;}
  const btn=$('generateImagesBtn');
  btn.disabled=true;const orig=btn.textContent;btn.textContent='Generating images…';
  $('status').textContent='Calling '+providerLabel(state.aiConfig.imageProvider)+' for images…';
  try{
-   const data=await callGenerateStage('images',state.brief,{quality:state.aiConfig.imageQuality,aspectRatio:state.aiConfig.imageAspectRatio,creativeConcepts:state.creative,model:state.aiConfig.imageModel,provider:state.aiConfig.imageProvider});
+   const concepts=state.imageFactory.prompts.map(p=>({format:p.format,prompt:p.promptText,aspectRatio:p.fields.aspectRatio}));
+   const data=await callGenerateStage('images',state.brief,{quality:state.aiConfig.imageQuality,aspectRatio:state.imageFactory.global.aspectRatio,creativeConcepts:concepts,model:state.aiConfig.imageModel,provider:state.aiConfig.imageProvider});
    state.aiImages=Array.isArray(data.images)?data.images:[];
    const imageCount=(data.usage&&data.usage.imageCount)||state.aiImages.length;
    state.aiUsage.images={
      provider:state.aiConfig.imageProvider,
      model:state.aiConfig.imageModel,
      quality:state.aiConfig.imageQuality,
-     aspectRatio:state.aiConfig.imageAspectRatio,
+     aspectRatio:state.imageFactory.global.aspectRatio,
      imageCount,
      costUsd:estimateImageCostUsd(state.aiConfig.imageQuality,imageCount)
    };
@@ -817,7 +918,7 @@ $('generateImagesBtn').onclick=async()=>{
 };
 
 $('save').onclick=()=>{const b=brief();if(!b.productName){$('status').textContent='Enter a product/service first.';return;}const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:b,state});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));$('status').textContent='Campaign saved';};
-function startNewCampaign(){ids.forEach(id=>$(id).value='');resetState();$('strategyResult').innerHTML='<div class="placeholder">Complete the brief and generate a strategy.</div>';$('copyResult').innerHTML='<div class="placeholder">Generate a campaign to create ad copy.</div>';$('creativeResult').innerHTML='<article><h3>Image Ad</h3><p>Visual concept and text hierarchy.</p></article><article><h3>Carousel</h3><p>Problem → solution → proof → CTA.</p></article><article><h3>Story</h3><p>Vertical 9:16 concept.</p></article><article><h3>Reel</h3><p>Scene-by-scene creative concept.</p></article>';$('reelsResult').innerHTML='<div class="placeholder">Generate a campaign to create reel scripts.</div>';fillAudienceInputs(state.audience);renderAudiencePlan();renderAudienceMatrix();fillOfferInputs(state.offer);renderOfferAnalysis();$('campaignName').value='';$('campaignObjective').value='';$('campaignBudget').value='';$('campaignLocation').value='';$('campaignDestination').value='';renderCampaignStructure();renderCreativeMatrix();$('status').textContent='New campaign ready';renderAiControlSummary();showTab('brief');}
+function startNewCampaign(){ids.forEach(id=>$(id).value='');resetState();$('strategyResult').innerHTML='<div class="placeholder">Complete the brief and generate a strategy.</div>';$('copyResult').innerHTML='<div class="placeholder">Generate a campaign to create ad copy.</div>';$('creativeResult').innerHTML='<article><h3>Image Ad</h3><p>Visual concept and text hierarchy.</p></article><article><h3>Carousel</h3><p>Problem → solution → proof → CTA.</p></article><article><h3>Story</h3><p>Vertical 9:16 concept.</p></article><article><h3>Reel</h3><p>Scene-by-scene creative concept.</p></article>';$('reelsResult').innerHTML='<div class="placeholder">Generate a campaign to create reel scripts.</div>';fillAudienceInputs(state.audience);renderAudiencePlan();renderAudienceMatrix();fillOfferInputs(state.offer);renderOfferAnalysis();$('campaignName').value='';$('campaignObjective').value='';$('campaignBudget').value='';$('campaignLocation').value='';$('campaignDestination').value='';renderCampaignStructure();renderCreativeMatrix();fillImageFactoryGlobalInputs();renderImageConceptSelect();renderImagePrompts();$('status').textContent='New campaign ready';renderAiControlSummary();showTab('brief');}
 $('newCampaign').onclick=()=>{$('newCampaignConfirm').hidden=false;};
 $('confirmNewCampaign').onclick=()=>{$('newCampaignConfirm').hidden=true;startNewCampaign();};
 $('cancelNewCampaign').onclick=()=>{$('newCampaignConfirm').hidden=true;};
@@ -826,17 +927,18 @@ $('exportJson').onclick=()=>download('ai-ads-campaign.json',JSON.stringify(state
 $('exportText').onclick=()=>{
  const briefText=Object.entries(brief()).map(([k,v])=>k+': '+v).join('\n');
  const cfg=state.aiConfig||defaultAiConfig();
- const aiText='\n\nAI CONFIGURATION\nMaster: '+(cfg.master?'ON':'OFF')+'\nText Provider: '+providerLabel(cfg.textProvider)+' ('+cfg.textModel+')\nImage Provider: '+providerLabel(cfg.imageProvider)+' ('+cfg.imageModel+', '+cfg.imageQuality+', '+cfg.imageAspectRatio+')\nStages: '+Object.entries(cfg.stages).map(([k,v])=>k+'='+(v?'ON':'OFF')).join(', ')+'\n\n'+($('aiUsagePre')?$('aiUsagePre').textContent:'');
+ const factory=state.imageFactory||defaultImageFactory();
+ const aiText='\n\nAI CONFIGURATION\nMaster: '+(cfg.master?'ON':'OFF')+'\nText Provider: '+providerLabel(cfg.textProvider)+' ('+cfg.textModel+')\nImage Provider: '+providerLabel(cfg.imageProvider)+' ('+cfg.imageModel+', '+cfg.imageQuality+', '+factory.global.aspectRatio+')\nStages: '+Object.entries(cfg.stages).map(([k,v])=>k+'='+(v?'ON':'OFF')).join(', ')+'\n\n'+($('aiUsagePre')?$('aiUsagePre').textContent:'');
  download('ai-ads-campaign.txt',briefText+aiText,'text/plain');
 };
 function renderSaved(){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');$('savedList').innerHTML=items.length?items.map(x=>'<div class="saved-card"><div class="saved-meta"><strong>'+esc(x.brief.productName||'Untitled campaign')+'</strong><small>'+esc(x.brief.brandName||'')+' · '+new Date(x.savedAt).toLocaleString()+'</small></div><div class="saved-actions"><button class="secondary loadBtn" data-id="'+x.id+'">Load</button><button class="secondary duplicateBtn" data-id="'+x.id+'">Duplicate</button><button class="secondary danger deleteBtn" data-id="'+x.id+'">Delete</button></div></div>').join(''):'<div class="placeholder">No saved campaigns yet.</div>';document.querySelectorAll('.loadBtn').forEach(btn=>btn.onclick=()=>loadCampaign(Number(btn.dataset.id)));document.querySelectorAll('.duplicateBtn').forEach(btn=>btn.onclick=()=>duplicateCampaign(Number(btn.dataset.id)));document.querySelectorAll('.deleteBtn').forEach(btn=>btn.onclick=()=>deleteCampaign(Number(btn.dataset.id)));}
-function duplicateCampaign(id){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');const item=items.find(x=>x.id===id);if(!item)return;const copyBrief={...item.brief,productName:(item.brief.productName||'Untitled campaign')+' (Copy)'};const copyState=item.state?{...item.state,brief:copyBrief}:{brief:copyBrief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:item.state&&item.state.aiConfig||defaultAiConfig(),aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[]};items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:copyBrief,state:copyState});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));renderSaved();$('status').textContent='Campaign duplicated';}
+function duplicateCampaign(id){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');const item=items.find(x=>x.id===id);if(!item)return;const copyBrief={...item.brief,productName:(item.brief.productName||'Untitled campaign')+' (Copy)'};const copyState=item.state?{...item.state,brief:copyBrief}:{brief:copyBrief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:item.state&&item.state.aiConfig||defaultAiConfig(),aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory()};items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:copyBrief,state:copyState});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));renderSaved();$('status').textContent='Campaign duplicated';}
 function loadCampaign(id){
  const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');
  const item=items.find(x=>x.id===id);
  if(!item)return;
  fillBrief(item.brief);
- state=item.state||{brief:item.brief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[]};
+ state=item.state||{brief:item.brief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory()};
  state.aiConfig=state.aiConfig||defaultAiConfig();
  state.aiUsage=state.aiUsage||emptyAiUsage();
  if(state.aiImages===undefined)state.aiImages=null;
@@ -844,6 +946,10 @@ function loadCampaign(id){
  state.offer=Object.assign(defaultOffer(),state.offer||{});
  state.campaign=Object.assign(defaultCampaignStructure(),state.campaign||{});
  if(!Array.isArray(state.creativeMatrix))state.creativeMatrix=[];
+ state.imageFactory=Object.assign(defaultImageFactory(),state.imageFactory||{});
+ state.imageFactory.global=Object.assign(defaultImageFactory().global,state.imageFactory.global||{});
+ if(!Array.isArray(state.imageFactory.selected))state.imageFactory.selected=[];
+ if(!Array.isArray(state.imageFactory.prompts))state.imageFactory.prompts=[];
  applyAiConfigToUI();
  fillAudienceInputs(state.audience);
  renderAudiencePlan();
@@ -857,6 +963,9 @@ function loadCampaign(id){
  $('campaignDestination').value=state.campaign.destination||'';
  renderCampaignStructure();
  renderCreativeMatrix();
+ fillImageFactoryGlobalInputs();
+ renderImageConceptSelect();
+ renderImagePrompts();
  if(!state.copy)generateDemo();else{renderResults();}
  state.brief=item.brief;
  $('status').textContent='Saved campaign loaded';

@@ -13,6 +13,7 @@ AI-assisted Facebook + Instagram campaign creator built with plain HTML, CSS and
 - Ad copy variations with live Meta character-count guidance (primary text / headline / description)
 - Creative concepts, with inline (non-blocking) editing, and optional manually-triggered AI image generation per concept
 - **Creative Matrix** (within Creative Ideas): an editable Angle × Format planning table (Angle/Format/Hook/Visual/CTA), selecting from 15 reusable angles (Problem, Outcome, Question, Story, Objection, Myth, Education, Proof, Testimonial, Comparison, Before/After, Demonstration, FAQ, Urgency, Offer), generated locally at ₹0 and additive to the existing format cards
+- **AI Image Factory** (within Creative Ideas): select which creative concepts to generate images for, generate a structured, editable prompt per concept at ₹0 (Subject, Setting, Emotion, Composition, Lighting, Brand context, Text-overlay guidance, Aspect ratio, Negative guidance), review/edit every field with a live prompt preview, and only then trigger AI image generation from the reviewed prompts — see below
 - Reel script concepts
 - Save, duplicate, load and delete campaigns in browser localStorage (including AI settings and usage)
 - New Campaign / Clear workflow with an inline confirmation (no blocking browser dialogs)
@@ -36,11 +37,22 @@ The Campaign Brief tab has an **AI Control** panel:
 - **Estimated campaign AI cost** — computed from `AI_COST_CONFIG` (approximate, sourced provider pricing) and planning token assumptions, always labeled as an ESTIMATE, never a live bill.
 - **AI Usage** (collapsible) — actual token counts and cost per stage once generated, using the provider's own returned usage figures where available.
 
-**AI Images are never generated automatically.** Turning the AI Images switch on only enables the **Generate AI Images** button in the Creative Ideas tab, which shows its own estimated cost and must be clicked deliberately.
+**AI Images are never generated automatically.** Turning the AI Images switch on only enables the **Generate AI Images** button in the AI Image Factory (Creative Ideas tab), which shows its own estimated cost and must be clicked deliberately.
 
 If an AI call fails for any reason (missing server-side API key, provider error, network issue), that one stage falls back to its ₹0 built-in result with a clear status message — no panel is ever left blank, and no other stage is affected.
 
-`api/generate.js` is the single serverless endpoint for all of this. It accepts `{ stage, provider, model, brief, creativeConcepts, quality }`, reads `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` from Vercel's server-side environment variables (never sent to or stored in the browser), and returns only the generated content plus usage — never a key. ChatGPT Go and Claude Pro are consumer subscriptions and are unrelated to this — AI Control always uses the OpenAI API / Anthropic API billed to whichever server-side key is configured.
+`api/generate.js` is the single serverless endpoint for all of this. It accepts `{ stage, provider, model, brief, creativeConcepts, quality, aspectRatio }`, reads `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` from Vercel's server-side environment variables (never sent to or stored in the browser), and returns only the generated content plus usage — never a key. ChatGPT Go and Claude Pro are consumer subscriptions and are unrelated to this — AI Control always uses the OpenAI API / Anthropic API billed to whichever server-side key is configured.
+
+### AI Image Factory (Creative Ideas tab)
+
+Generating an image is a deliberate, four-step, always-reviewable flow — nothing is sent to an image API until step 2 is clicked, and nothing is generated as an image until step 4:
+
+1. **Select concepts** — check which of the existing creative concepts (from Creative Ideas / the Creative Matrix) you want an image for.
+2. **Generate Prompts — ₹0** — builds one structured, editable prompt per selected concept, entirely locally: `Subject`, `Setting` and `Composition` are derived per concept from its format (Single Image Ad / Carousel / Instagram Story / Instagram Reel) and the campaign brief; `Emotion`, `Lighting`, `Brand context`, `Text-overlay guidance`, `Aspect ratio` and `Negative guidance` are shared fields you fill in once and apply to every selected concept.
+3. **Review / edit** — every field on every prompt card is a plain editable text input, with a live prompt-text preview underneath that updates as you type — this is exactly the text that will be sent if you continue.
+4. **Generate AI Images** — only enabled once AI Images is switched on; sends the reviewed prompt text (not a prompt rebuilt from scratch) for each selected concept to `api/generate.js`, which passes it straight to the image API. The cost estimate updates to reflect the number of prompts actually selected/generated, not a fixed count.
+
+Per the roadmap's own guidance: **do not rely on generated images for readable text** — the default Text-overlay guidance field tells the model not to render text, and final text overlays belong in the app / ad creative tool, not baked into the image.
 
 ## Tests
 
