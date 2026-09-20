@@ -127,7 +127,8 @@ function renderResults(){
  renderCopy();renderCreative();renderReels();
 }
 function renderCopy(){
- $('copyResult').innerHTML='<div class="ad-list">'+state.copy.map((a,i)=>'<article class="ad-card '+(state.selectedCopy===a.name?'selected':'')+'"><h3>'+esc(a.name)+(state.selectedCopy===a.name?'<span class="selected-tag">Selected</span>':'')+'</h3><label><span class="field-title">Hook</span><textarea class="editable textarea copy-field" data-index="'+i+'" data-key="hook">'+esc(a.hook)+'</textarea></label><label><span class="field-title">Primary Text</span><textarea class="editable textarea copy-field" data-index="'+i+'" data-key="primaryText">'+esc(a.primaryText)+'</textarea></label><label><span class="field-title">Headline</span><input class="editable copy-field" data-index="'+i+'" data-key="headline" value="'+attr(a.headline)+'"></label><label><span class="field-title">Description</span><input class="editable copy-field" data-index="'+i+'" data-key="description" value="'+attr(a.description)+'"></label><label><span class="field-title">CTA</span><input class="editable copy-field" data-index="'+i+'" data-key="cta" value="'+attr(a.cta)+'"></label><div class="card-actions"><button class="secondary useCopyBtn" data-index="'+i+'">'+(state.selectedCopy===a.name?'✓ Selected':'Use This Version')+'</button><button class="secondary copyBtn" data-index="'+i+'">Copy Ad</button></div></article>').join('')+'</div><small class="demo-badge">₹0 MODE — editable; confirm before use</small>';
+ const copies=Array.isArray(state.copy)?state.copy:[];
+ $('copyResult').innerHTML='<div class="ad-list">'+copies.map((a,i)=>'<article class="ad-card '+(state.selectedCopy===a.name?'selected':'')+'"><h3>'+esc(a.name)+(state.selectedCopy===a.name?'<span class="selected-tag">Selected</span>':'')+'</h3><label><span class="field-title">Hook</span><textarea class="editable textarea copy-field" data-index="'+i+'" data-key="hook">'+esc(a.hook)+'</textarea></label><label><span class="field-title">Primary Text</span><textarea class="editable textarea copy-field" data-index="'+i+'" data-key="primaryText">'+esc(a.primaryText)+'</textarea></label><label><span class="field-title">Headline</span><input class="editable copy-field" data-index="'+i+'" data-key="headline" value="'+attr(a.headline)+'"></label><label><span class="field-title">Description</span><input class="editable copy-field" data-index="'+i+'" data-key="description" value="'+attr(a.description)+'"></label><label><span class="field-title">CTA</span><input class="editable copy-field" data-index="'+i+'" data-key="cta" value="'+attr(a.cta)+'"></label><div class="card-actions"><button class="secondary useCopyBtn" data-index="'+i+'">'+(state.selectedCopy===a.name?'✓ Selected':'Use This Version')+'</button><button class="secondary copyBtn" data-index="'+i+'">Copy Ad</button></div></article>').join('')+'</div><small class="demo-badge">₹0 MODE — editable; confirm before use</small>';
  document.querySelectorAll('.copy-field').forEach(el=>el.oninput=()=>{state.copy[Number(el.dataset.index)][el.dataset.key]=el.value;});
  document.querySelectorAll('.useCopyBtn').forEach(btn=>btn.onclick=()=>{state.selectedCopy=state.copy[Number(btn.dataset.index)].name;renderCopy();});
  document.querySelectorAll('.copyBtn').forEach(btn=>btn.onclick=()=>{const a=state.copy[Number(btn.dataset.index)];navigator.clipboard?.writeText(Object.entries(a).map(([k,v])=>k+': '+v).join('\n'));$('status').textContent='Ad copied';});
@@ -140,7 +141,7 @@ function renderCreative(){
  document.querySelectorAll('.creativeEdit').forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.index);const next=prompt('Edit the creative concept:',state.creative[i].concept);if(next!==null&&next.trim()){state.creative[i].concept=next.trim();renderCreative();}});
  document.querySelectorAll('.creativeUse').forEach(btn=>btn.onclick=()=>{$('status').textContent='Creative idea '+(Number(btn.dataset.index)+1)+' selected';});
 }
-function renderReels(){$('reelsResult').innerHTML='<div class="ad-list">'+state.reels.map((r,i)=>'<article class="ad-card"><h3>'+esc(r.title)+'</h3><label><span class="field-title">Hook</span><textarea class="editable textarea reel-field" data-index="'+i+'" data-key="hook">'+esc(r.hook)+'</textarea></label><div class="field-title">Scenes</div><ol class="reel-scenes">'+r.scenes.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol><button class="secondary copyReel" data-index="'+i+'">Copy Script</button></article>').join('')+'</div><small class="demo-badge">₹0 MODE — editable; confirm before use</small>';document.querySelectorAll('.reel-field').forEach(el=>el.oninput=()=>state.reels[Number(el.dataset.index)][el.dataset.key]=el.value);document.querySelectorAll('.copyReel').forEach(btn=>btn.onclick=()=>{const r=state.reels[Number(btn.dataset.index)];navigator.clipboard?.writeText(r.title+'\nHook: '+r.hook+'\nScenes:\n- '+r.scenes.join('\n- '));$('status').textContent='Reel script copied';});}
+function renderReels(){const reels=Array.isArray(state.reels)?state.reels:[];$('reelsResult').innerHTML='<div class="ad-list">'+reels.map((r,i)=>'<article class="ad-card"><h3>'+esc(r.title)+'</h3><label><span class="field-title">Hook</span><textarea class="editable textarea reel-field" data-index="'+i+'" data-key="hook">'+esc(r.hook)+'</textarea></label><div class="field-title">Scenes</div><ol class="reel-scenes">'+r.scenes.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol><button class="secondary copyReel" data-index="'+i+'">Copy Script</button></article>').join('')+'</div><small class="demo-badge">₹0 MODE — editable; confirm before use</small>';document.querySelectorAll('.reel-field').forEach(el=>el.oninput=()=>state.reels[Number(el.dataset.index)][el.dataset.key]=el.value);document.querySelectorAll('.copyReel').forEach(btn=>btn.onclick=()=>{const r=state.reels[Number(btn.dataset.index)];navigator.clipboard?.writeText(r.title+'\nHook: '+r.hook+'\nScenes:\n- '+r.scenes.join('\n- '));$('status').textContent='Reel script copied';});}
 function regenerate(type){
  if(!state.brief.productName){$('status').textContent='Generate a campaign first.';showTab('brief');return;}
  const oldBrief={...state.brief};
@@ -168,16 +169,20 @@ async function loadReferenceExample(){
     // This keeps every downstream tab ready immediately after the reference is loaded.
     state.brief=brief();
     generateDemo();
-    if(Array.isArray(referenceBrief.adCopies)&&referenceBrief.adCopies.length){
-      state.copy=referenceBrief.adCopies;
-      state.selectedCopy=state.copy[0].name;
-      renderCopy();
+
+    // Reference outputs are authoritative for the sample campaign.
+    // Always replace the generated outputs with the repository reference data.
+    if(Array.isArray(referenceBrief.adCopies)){
+      state.copy=referenceBrief.adCopies.slice();
+      state.selectedCopy=state.copy.length?state.copy[0].name:null;
     }
-    if(Array.isArray(referenceBrief.reelScripts)&&referenceBrief.reelScripts.length){
-      state.reels=referenceBrief.reelScripts;
-      renderReels();
+    if(Array.isArray(referenceBrief.reelScripts)){
+      state.reels=referenceBrief.reelScripts.slice();
     }
-    $('status').textContent='Reference campaign loaded — Ad Copy and Reel Scripts populated; review before use';
+
+    // Render every output again after the reference data has been applied.
+    renderResults();
+    $('status').textContent='Reference campaign loaded — Ad Copy and Reel Scripts populated';
     showTab('brief');
   }catch(err){
     $('status').textContent='Reference loading error — '+err.message;
