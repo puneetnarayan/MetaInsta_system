@@ -6,23 +6,37 @@ AI-assisted Facebook + Instagram campaign creator built with plain HTML, CSS and
 
 - Campaign Brief form
 - Demo Mode strategy generation (₹0, local, no API calls)
-- Optional real AI generation via an opt-in toggle, calling the `api/generate.js` Vercel serverless function (OpenAI, your own key/billing)
+- **AI Control panel**: an AI Master Switch plus five independent per-stage switches (Strategy, Ad Copy, Creative Concepts, AI Images, Reel Scripts), a Text Provider (OpenAI or Anthropic) with model selector, and separate Image Provider/Model/Quality controls
 - Ad copy variations with live Meta character-count guidance (primary text / headline / description)
-- Creative concepts, with inline (non-blocking) editing
+- Creative concepts, with inline (non-blocking) editing, and optional manually-triggered AI image generation per concept
 - Reel script concepts
-- Save, duplicate, load and delete campaigns in browser localStorage
+- Save, duplicate, load and delete campaigns in browser localStorage (including AI settings and usage)
 - New Campaign / Clear workflow with an inline confirmation (no blocking browser dialogs)
-- JSON and text export
+- JSON and text export (including AI configuration and usage, never secrets)
 - Responsive desktop/mobile layout
 - Basic accessibility: ARIA tab roles, live status region
 - Vercel-ready static deployment
 - Unit tests for the campaign-generation logic (`npm test`)
 
-## Demo Mode vs. real AI
+## AI Control: ₹0 by default, AI only where you choose
 
-By default, the generator is a local, deterministic placeholder (₹0 Mode). It does **not** call any external API or expose a key in the browser.
+The generator is a local, deterministic placeholder (₹0 Mode) unless you explicitly turn AI on. Nothing calls an external API or exposes a key in the browser by default.
 
-The brief screen also has an opt-in "Use real AI generation" checkbox. When enabled, campaign generation calls the `api/generate.js` Vercel serverless function, which uses the OpenAI Responses API server-side (via `OPENAI_API_KEY`/`OPENAI_MODEL` environment variables on Vercel). This mode incurs your own OpenAI usage cost — it is off by default and clearly labeled in the UI. If the AI call fails, the app falls back to the ₹0 demo campaign and reports the error.
+The Campaign Brief tab has an **AI Control** panel:
+
+- **AI Master Switch** — must be on for any stage's AI switch to take effect.
+- **Per-stage switches** — Strategy AI, Ad Copy AI, Creative Concepts AI, AI Images, Reel Scripts AI. Each is fully independent: turning one on never affects the others, and `Generate Campaign` always computes the ₹0 built-in result for every stage first, then overwrites only the stages whose AI switch is on.
+- **Text Provider / Text Model** — OpenAI (`gpt-5.6-luna`) or Anthropic (`claude-sonnet-5`), used for Strategy/Ad Copy/Creative Concepts/Reel Scripts.
+- **Image Provider / Image Model / Image Quality** — OpenAI only for now (`gpt-image-1.5`, Low/Medium/High).
+- **AI Images Only** preset — one click sets Master ON, AI Images ON, and every text stage OFF.
+- **Estimated campaign AI cost** — computed from `AI_COST_CONFIG` (approximate, sourced provider pricing) and planning token assumptions, always labeled as an ESTIMATE, never a live bill.
+- **AI Usage** (collapsible) — actual token counts and cost per stage once generated, using the provider's own returned usage figures where available.
+
+**AI Images are never generated automatically.** Turning the AI Images switch on only enables the **Generate AI Images** button in the Creative Ideas tab, which shows its own estimated cost and must be clicked deliberately.
+
+If an AI call fails for any reason (missing server-side API key, provider error, network issue), that one stage falls back to its ₹0 built-in result with a clear status message — no panel is ever left blank, and no other stage is affected.
+
+`api/generate.js` is the single serverless endpoint for all of this. It accepts `{ stage, provider, model, brief, creativeConcepts, quality }`, reads `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` from Vercel's server-side environment variables (never sent to or stored in the browser), and returns only the generated content plus usage — never a key. ChatGPT Go and Claude Pro are consumer subscriptions and are unrelated to this — AI Control always uses the OpenAI API / Anthropic API billed to whichever server-side key is configured.
 
 ## Tests
 
@@ -36,9 +50,8 @@ npm test
 
 1. Structured prompt system refinements for strategy, copy, creatives and reels
 2. Campaign editing and regeneration history
-3. Image-generation workflow
-4. Meta Ads API integration
-5. Campaign performance analysis
+3. Meta Ads API integration
+4. Campaign performance analysis
 
 ## Deployment
 
