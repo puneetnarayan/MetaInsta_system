@@ -1,0 +1,33 @@
+{
+  "campaign": "Speak in Meetings Workshop",
+  "audience": {
+    "primaryCustomer": "Working professionals who hesitate to speak in English at work",
+    "location": "India",
+    "age": "25–45",
+    "gender": "Any",
+    "occupation": "Mid-level managers and individual contributors who attend regular meetings",
+    "income": "Mid-market",
+    "problem": "I know what I want to say, but I hesitate, search for words and lose confidence when speaking in meetings.",
+    "outcome": "Speak naturally and confidently in meetings, express ideas clearly and participate without fear or hesitation.",
+    "awareness": "Problem Aware",
+    "intent": "Warm",
+    "strategies": ["Broad", "Interest", "Retargeting"],
+    "plan": {
+      "primaryAudience": "Working professionals who hesitate to speak in English at work · 25–45 · Mid-level managers and individual contributors who attend regular meetings · India",
+      "pain": "I know what I want to say, but I hesitate, search for words and lose confidence when speaking in meetings.",
+      "motivation": "Speak naturally and confidently in meetings, express ideas clearly and participate without fear or hesitation.",
+      "awareness": "Problem Aware — They know the problem but not the solution. Lead with the problem in their own words, then introduce a solution.",
+      "message": "For working professionals who hesitate to speak in English at work dealing with hesitation and lost confidence in meetings, position Speak in Meetings Workshop as the practical next step toward speaking naturally and confidently.",
+      "options": [
+        "Broad: Let Meta’s delivery system find responders with minimal targeting restrictions.",
+        "Interest: Target based on stated interests and behaviours related to workplace communication, public speaking and professional development.",
+        "Retargeting: Re-engage people who visited the landing page or engaged with an ad but did not sign up."
+      ]
+    },
+    "matrix": [
+      { "audience": "Broad", "angle": "Problem-led", "creative": "Single Image Ad", "purpose": "Test broad reach with a problem-recognition hook" },
+      { "audience": "Interest", "angle": "Outcome-led", "creative": "Instagram Reel", "purpose": "Test interest-based targeting with an outcome-focused reel" },
+      { "audience": "Retargeting", "angle": "Question-led", "creative": "Instagram Story", "purpose": "Re-engage warm visitors with a reflective question" }
+    ]
+  }
+}

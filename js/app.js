@@ -4,12 +4,18 @@ function emptyAiUsage(){return {strategy:null,copy:null,creative:null,images:nul
 function defaultAudience(){return {primaryCustomer:'',location:'',age:'',gender:'Any',occupation:'',income:'Mid-market',problem:'',outcome:'',awareness:'Problem Aware',intent:'Warm',strategies:['Broad'],plan:null,matrix:[]};}
 function defaultOffer(){return {product:'',price:'',discount:'',duration:'',scarcity:'',cta:'',bonuses:'',guarantee:'',proof:'',analysis:null,variants:null};}
 function defaultCampaignStructure(){return {name:'',objective:'',budget:'',location:'',destination:'',adSets:[]};}
-let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure()};
+const CREATIVE_ANGLES=['Problem','Outcome','Question','Story','Objection','Myth','Education','Proof','Testimonial','Comparison','Before/After','Demonstration','FAQ','Urgency','Offer'];
+const CREATIVE_FORMATS=['Single Image Ad','Carousel','Instagram Story','Instagram Reel'];
+let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[]};
 
 const REFERENCE_ADS=[{"name":"Ad Version 1 · Problem-led","hook":"Still knowing what you want to say — but hesitating when it's your turn to speak?","primaryText":"You know the answer.\n\nYou have an idea.\n\nBut when the meeting turns to you, you suddenly start searching for words, translating in your head or wondering whether you are saying it correctly.\n\nIf this sounds familiar, you are not alone.\n\nThe Speak in Meetings Workshop is designed for working professionals who want to express their ideas more clearly and participate with greater confidence in workplace conversations.\n\n4-day live workshop · ₹997\n\nExplore the workshop and see if it is right for you.","headline":"Speak with more confidence in meetings","description":"4-day live workshop for working professionals.","cta":"Learn More"},{"name":"Ad Version 2 · Outcome-led","hook":"Imagine expressing your idea clearly when the meeting turns to you.","primaryText":"You don't necessarily need more words.\n\nYou need to feel more comfortable using the words you already know.\n\nThe Speak in Meetings Workshop helps working professionals practise how to express ideas, respond naturally and participate more confidently in workplace conversations.\n\nIf your goal is to speak more clearly without constantly worrying about finding the perfect words, this workshop may be a useful next step.\n\n4-day live workshop · ₹997","headline":"Express your ideas with confidence","description":"Practical workplace communication training.","cta":"Learn More"},{"name":"Ad Version 3 · Conversational","hook":"Quick question: do you stay quiet in meetings even when you have something useful to say?","primaryText":"Maybe you know exactly what you want to say.\n\nThen the moment comes.\n\nYou hesitate.\n\nYou search for the right words.\n\nSomeone else speaks.\n\nAnd the opportunity passes.\n\nThe Speak in Meetings Workshop is created for working professionals who want to become more comfortable expressing themselves in meetings and workplace conversations.\n\nLearn, practise and build confidence through a focused 4-day live workshop.\n\n₹997","headline":"Have something to say? Say it clearly.","description":"Build practical speaking confidence at work.","cta":"Learn More"}];
 const REFERENCE_REELS=[{"title":"Reel 1 · Problem to Solution","hook":"Ever had the perfect answer five minutes after the meeting ended?","scenes":["0–3s — Hook: “Ever had the perfect answer five minutes after the meeting ended?”","3–7s — Show a professional listening in a meeting but not speaking. Voiceover: “You knew exactly what you wanted to say...”","7–12s — Show hesitation. Voiceover: “...but you started searching for words and the conversation moved on.”","12–18s — Show a confident interaction. Voiceover: “With practice, you can learn to express your ideas more naturally.”","18–24s — Introduce the workshop. Voiceover: “That's what we practise in the Speak in Meetings Workshop.”","24–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More to see the details.”"]},{"title":"Reel 2 · Outcome-led","hook":"Imagine your next meeting feeling easier.","scenes":["0–3s — Show the desired outcome immediately.","3–8s — Voiceover: “You have the knowledge. You have the ideas.”","8–15s — Show the person speaking clearly. Voiceover: “The next step is expressing those ideas clearly when the moment comes.”","15–24s — Show workshop practice. Voiceover: “The Speak in Meetings Workshop gives you a focused environment to practise workplace communication.”","24–30s — End frame: “4-day live workshop · ₹997” and “Learn More.”"]},{"title":"Reel 3 · Question Format","hook":"Do you stay quiet in meetings even when you have something useful to say?","scenes":["0–3s — Put the question on screen and pause for recognition.","3–9s — Show a meeting situation. Voiceover: “Maybe you're searching for the right words.”","9–17s — Show a simple speaking exercise. Voiceover: “Maybe you're worried about making a mistake.”","17–25s — Introduce the workshop. Voiceover: “The Speak in Meetings Workshop helps you practise expressing your ideas more clearly and confidently.”","25–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More.”"]}];
 const REFERENCE_STRATEGY={"objective": "Generate qualified leads from working professionals in India who want to communicate more confidently in workplace meetings.", "audience": "Working professionals aged approximately 25–45 who understand English but hesitate when speaking in meetings, presentations or workplace conversations. They may know the answer but hesitate to speak, mentally translate before responding, search for the right words while speaking, avoid participating in meetings and worry about making mistakes. They want to sound clear and professional rather than simply \"speak more English.\"", "corePain": "I know what I want to say, but when the meeting starts I hesitate, search for words and lose confidence.", "desiredOutcome": "Move the customer from hesitation to clear expression, greater confidence and more participation, focused on practical workplace communication rather than presenting fluency as an abstract goal.", "positioning": "Speak in Meetings Workshop is positioned as a practical, focused workshop for working professionals who want to communicate more clearly and confidently during real workplace situations.", "keyMessage": "You may already have the intent or ability to express yourself. The barrier is turning that intention into action. The workshop provides a structured way to practise the communication skills needed in meetings and workplace conversations.", "funnelAngle": "Problem awareness → Recognition → Practical solution → Workshop → Lead. The first interaction should make the viewer recognise their own situation before the workshop is introduced as a possible next step.", "testing": ["Test 1 — Problem-led: focus on hesitation, searching for words and staying silent in meetings.", "Test 2 — Outcome-led: focus on speaking clearly, expressing ideas and participating confidently.", "Test 3 — Question-led: use questions that make the viewer reflect on their own meeting experience."], "tone": "Professional + Friendly"};
 const REFERENCE_CREATIVE=[{"format": "Single Image Ad", "concept": "Show a professional sitting in a meeting while others are speaking. They have an idea but appear hesitant to raise their hand or enter the conversation. On-image headline: \"I know what I want to say...\" Supporting text: \"...but I hesitate when it's my turn.\" Bottom CTA: \"Speak with more confidence in meetings.\" Visual direction: a clean professional workplace photograph, with the text kept minimal and readable on mobile."}, {"format": "Carousel", "concept": "Card 1 — Problem: \"Do you hesitate before speaking in meetings?\" Card 2 — Recognition: You know the idea, you just struggle to express it quickly. Card 3 — Insight: You don't always need more vocabulary — you need practice expressing your ideas naturally. Card 4 — Solution: Speak in Meetings Workshop, a focused 4-day live workshop for working professionals. Card 5 — CTA: \"Ready to speak with more confidence?\" ₹997 · Learn More."}, {"format": "Instagram Story", "concept": "Frame 1: Meeting starts, someone asks \"What do you think?\" Frame 2: You know the answer, but you start searching for the right words. Frame 3: What if you could express your ideas more naturally? Frame 4: Speak in Meetings Workshop — 4-day live workshop for working professionals. Frame 5: ₹997 — Explore the workshop. Learn More."}, {"format": "Instagram Reel", "concept": "A short 20–30 second video contrasting hesitation with confident participation. Opening text: \"Ever had the perfect answer... after the meeting ended?\" Visual sequence: person in an online meeting → manager asks a question → person hesitates → another participant answers → person later thinks of the answer → transition to the workshop → show practical speaking practice → end with workshop details. End frame: Speak in Meetings Workshop, 4-day live workshop · ₹997 · Learn More."}];
+const REFERENCE_AUDIENCE={"primaryCustomer": "Working professionals who hesitate to speak in English at work", "location": "India", "age": "25–45", "gender": "Any", "occupation": "Mid-level managers and individual contributors who attend regular meetings", "income": "Mid-market", "problem": "I know what I want to say, but I hesitate, search for words and lose confidence when speaking in meetings.", "outcome": "Speak naturally and confidently in meetings, express ideas clearly and participate without fear or hesitation.", "awareness": "Problem Aware", "intent": "Warm", "strategies": ["Broad", "Interest", "Retargeting"], "plan": {"primaryAudience": "Working professionals who hesitate to speak in English at work · 25–45 · Mid-level managers and individual contributors who attend regular meetings · India", "pain": "I know what I want to say, but I hesitate, search for words and lose confidence when speaking in meetings.", "motivation": "Speak naturally and confidently in meetings, express ideas clearly and participate without fear or hesitation.", "awareness": "Problem Aware — They know the problem but not the solution. Lead with the problem in their own words, then introduce a solution.", "message": "For working professionals who hesitate to speak in English at work dealing with hesitation and lost confidence in meetings, position Speak in Meetings Workshop as the practical next step toward speaking naturally and confidently.", "options": ["Broad: Let Meta’s delivery system find responders with minimal targeting restrictions.", "Interest: Target based on stated interests and behaviours related to workplace communication, public speaking and professional development.", "Retargeting: Re-engage people who visited the landing page or engaged with an ad but did not sign up."]}, "matrix": [{"audience": "Broad", "angle": "Problem-led", "creative": "Single Image Ad", "purpose": "Test broad reach with a problem-recognition hook"}, {"audience": "Interest", "angle": "Outcome-led", "creative": "Instagram Reel", "purpose": "Test interest-based targeting with an outcome-focused reel"}, {"audience": "Retargeting", "angle": "Question-led", "creative": "Instagram Story", "purpose": "Re-engage warm visitors with a reflective question"}]};
+const REFERENCE_OFFER={"product": "Speak in Meetings Workshop", "price": "₹997", "discount": "", "duration": "4 days", "scarcity": "Limited to 20 participants per cohort", "cta": "Learn More", "bonuses": "Free 1:1 feedback session after Day 4", "guarantee": "Not satisfied after Day 1? Full refund, no questions asked.", "proof": "Delivered to working professionals across India; testimonials and outcomes shared on the landing page.", "analysis": [{"label": "Offer clarity", "ok": true, "note": "Product and price are both specified."}, {"label": "Value proposition", "ok": true, "note": "Duration/scope is specified, helping set expectations."}, {"label": "Risk reversal", "ok": true, "note": "A guarantee is included."}, {"label": "Proof", "ok": true, "note": "Proof/evidence is included."}, {"label": "Urgency", "ok": true, "note": "A scarcity or time-limited element is present."}, {"label": "CTA", "ok": true, "note": "A clear CTA is specified."}], "variants": [{"name": "Current Offer", "description": "Speak in Meetings Workshop · ₹997 · Includes: Free 1:1 feedback session after Day 4 · Not satisfied after Day 1? Full refund, no questions asked."}, {"name": "Outcome-focused", "description": "Get speak naturally and confidently in meetings with Speak in Meetings Workshop · ₹997. Not satisfied after Day 1? Full refund, no questions asked."}, {"name": "Bonus-focused", "description": "Speak in Meetings Workshop · ₹997 · Plus: Free 1:1 feedback session after Day 4 · Limited to 20 participants per cohort"}]};
+const REFERENCE_CAMPAIGN_STRUCTURE={"name": "SM_LeadGen_IN_25-45_Sept26", "objective": "Lead Generation", "budget": "₹500/day", "location": "India", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "adSets": [{"id": "adset-0", "name": "AS_Broad_IN_25-45", "audience": "Broad", "age": "25–45", "location": "India", "placements": "Advantage+ Placements", "optimisationEvent": "Lead", "budget": "₹200/day", "ads": [{"id": "ad-0-0", "name": "AD_Problem_Hook01", "copy": "Ad Version 1 · Problem-led", "creative": "Single Image Ad", "headline": "Speak with more confidence in meetings", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_broad&utm_content=problem_hook01"}, {"id": "ad-0-1", "name": "AD_Outcome_Hook02", "copy": "Ad Version 2 · Outcome-led", "creative": "Carousel", "headline": "Express your ideas with confidence", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_broad&utm_content=outcome_hook02"}, {"id": "ad-0-2", "name": "AD_Conversational_Hook03", "copy": "Ad Version 3 · Conversational", "creative": "Instagram Story", "headline": "Have something to say? Say it clearly.", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_broad&utm_content=conversational_hook03"}]}, {"id": "adset-1", "name": "AS_Interest_IN_25-45", "audience": "Interest", "age": "25–45", "location": "India", "placements": "Advantage+ Placements", "optimisationEvent": "Lead", "budget": "₹200/day", "ads": [{"id": "ad-1-0", "name": "AD_Problem_Hook01", "copy": "Ad Version 1 · Problem-led", "creative": "Single Image Ad", "headline": "Speak with more confidence in meetings", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_interest&utm_content=problem_hook01"}, {"id": "ad-1-1", "name": "AD_Outcome_Hook02", "copy": "Ad Version 2 · Outcome-led", "creative": "Carousel", "headline": "Express your ideas with confidence", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_interest&utm_content=outcome_hook02"}, {"id": "ad-1-2", "name": "AD_Conversational_Hook03", "copy": "Ad Version 3 · Conversational", "creative": "Instagram Story", "headline": "Have something to say? Say it clearly.", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_interest&utm_content=conversational_hook03"}]}, {"id": "adset-2", "name": "AS_Retargeting_IN_25-45", "audience": "Retargeting", "age": "25–45", "location": "India", "placements": "Advantage+ Placements", "optimisationEvent": "Lead", "budget": "₹100/day", "ads": [{"id": "ad-2-0", "name": "AD_Problem_Hook01", "copy": "Ad Version 1 · Problem-led", "creative": "Single Image Ad", "headline": "Speak with more confidence in meetings", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_retargeting&utm_content=problem_hook01"}, {"id": "ad-2-1", "name": "AD_Outcome_Hook02", "copy": "Ad Version 2 · Outcome-led", "creative": "Carousel", "headline": "Express your ideas with confidence", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_retargeting&utm_content=outcome_hook02"}, {"id": "ad-2-2", "name": "AD_Conversational_Hook03", "copy": "Ad Version 3 · Conversational", "creative": "Instagram Story", "headline": "Have something to say? Say it clearly.", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_retargeting&utm_content=conversational_hook03"}]}]};
+const REFERENCE_CREATIVE_MATRIX=[{"angle": "Problem", "format": "Single Image Ad", "hook": "Still knowing what you want to say — but hesitating when it's your turn to speak?", "visual": "A professional sitting in a meeting, hesitating to raise their hand or enter the conversation", "cta": "Learn More"}, {"angle": "Outcome", "format": "Instagram Reel", "hook": "Imagine expressing your idea clearly when the meeting turns to you.", "visual": "A confident professional speaking naturally in a meeting, contrasted with the earlier hesitation", "cta": "Learn More"}, {"angle": "Question", "format": "Instagram Story", "hook": "Quick question: do you stay quiet in meetings even when you have something useful to say?", "visual": "The question on screen, followed by a relatable meeting scene", "cta": "Learn More"}, {"angle": "Proof", "format": "Carousel", "hook": "What actually changes after 4 days of practice?", "visual": "A before/after contrast across the carousel cards — hesitant participation versus confident participation", "cta": "Learn More"}, {"angle": "Objection", "format": "Instagram Reel", "hook": "\"My English isn't the problem — I just freeze up.\"", "visual": "A professional voicing the common hesitation directly, then a reassuring reframe toward practice over vocabulary", "cta": "Learn More"}];
 
 // AI provider/model catalog. Keep model names in one place so they can be updated later.
 const AI_MODELS={
@@ -52,7 +58,7 @@ function fillBrief(b){
 }
 function resetState(){
  const keepAiConfig=state.aiConfig||defaultAiConfig();
- state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:keepAiConfig,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure()};
+ state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:keepAiConfig,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[]};
 }
 function showTab(name){
  document.querySelectorAll('nav button').forEach(b=>{const active=b.dataset.tab===name;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});
@@ -87,6 +93,7 @@ function showTab(name){
  }
  if(name==='audience')renderAudiencePlan(),renderAudienceMatrix();
  if(name==='offer')renderOfferAnalysis();
+ if(name==='creative')renderCreativeMatrix();
  if(name==='copy')renderCopy();
  if(name==='reels')renderReels();
  if(name==='saved')renderSaved();
@@ -306,6 +313,40 @@ function renderCreative(){
  document.querySelectorAll('.creativeCancel').forEach(btn=>btn.onclick=()=>{editingCreativeIndex=null;renderCreative();});
  document.querySelectorAll('.creativeSave').forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.index);const field=document.querySelector('.creativeEditField[data-index="'+i+'"]');if(field&&field.value.trim())state.creative[i].concept=field.value.trim();editingCreativeIndex=null;renderCreative();});
  document.querySelectorAll('.creativeUse').forEach(btn=>btn.onclick=()=>{$('status').textContent='Creative idea '+(Number(btn.dataset.index)+1)+' selected';});
+}
+
+// ---- Phase 5: Creative Factory matrix (₹0, local; additive to the existing format cards above) ----
+function generateCreativeMatrix(){
+ state.brief=brief();
+ const b=state.brief;
+ const clean=s=>String(s).trim().replace(/[.!?]+$/,'');
+ const problem=clean(b.problem||'a frustrating problem');
+ const outcome=clean(b.outcome||'a clear desired outcome');
+ const cta=b.objective==='Sales'?'Shop Now':b.objective==='WhatsApp Leads'?'Send Message':'Learn More';
+ state.creativeMatrix=[
+  {angle:'Problem',format:'Single Image Ad',hook:'Still '+problem.toLowerCase()+'?',visual:'A realistic, relatable moment showing the problem as it actually happens',cta},
+  {angle:'Outcome',format:'Instagram Reel',hook:'Imagine being able to '+outcome.toLowerCase()+'.',visual:'A confident before/after contrast built around the desired outcome',cta},
+  {angle:'Question',format:'Instagram Story',hook:'Quick question — does this sound familiar?',visual:'The question on screen, followed by a relatable scene',cta},
+  {angle:'Proof',format:'Carousel',hook:'What actually changes with practice?',visual:'Evidence, results or a before/after sequence, card by card',cta},
+  {angle:'Objection',format:'Instagram Reel',hook:'"This probably won’t work for me because..."',visual:'Name the most common hesitation directly, then reframe it',cta}
+ ];
+ renderCreativeMatrix();
+ $('status').textContent='Creative matrix generated — ₹0';
+}
+function renderCreativeMatrix(){
+ const rows=state.creativeMatrix||[];
+ $('creativeMatrixResult').innerHTML=rows.length?'<table class="matrix-table"><thead><tr><th>Angle</th><th>Format</th><th>Hook</th><th>Visual</th><th>CTA</th><th></th></tr></thead><tbody>'+
+  rows.map((r,i)=>'<tr>'+
+   '<td><select class="cmField" data-index="'+i+'" data-key="angle">'+CREATIVE_ANGLES.map(a=>'<option value="'+attr(a)+'"'+(r.angle===a?' selected':'')+'>'+esc(a)+'</option>').join('')+'</select></td>'+
+   '<td><select class="cmField" data-index="'+i+'" data-key="format">'+CREATIVE_FORMATS.map(f=>'<option value="'+attr(f)+'"'+(r.format===f?' selected':'')+'>'+esc(f)+'</option>').join('')+'</select></td>'+
+   '<td><input class="cmField" data-index="'+i+'" data-key="hook" value="'+attr(r.hook)+'"></td>'+
+   '<td><input class="cmField" data-index="'+i+'" data-key="visual" value="'+attr(r.visual)+'"></td>'+
+   '<td><input class="cmField" data-index="'+i+'" data-key="cta" value="'+attr(r.cta)+'"></td>'+
+   '<td><button class="ghost danger cmRemove" data-index="'+i+'" type="button">✕</button></td>'+
+  '</tr>').join('')+
+ '</tbody></table>':'<div class="placeholder">No creative matrix rows yet. Generate a matrix or add a row.</div>';
+ document.querySelectorAll('.cmField').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{state.creativeMatrix[Number(el.dataset.index)][el.dataset.key]=el.value;}));
+ document.querySelectorAll('.cmRemove').forEach(btn=>btn.onclick=()=>{state.creativeMatrix.splice(Number(btn.dataset.index),1);renderCreativeMatrix();});
 }
 function renderReels(){
  const reels=Array.isArray(state.reels)&&state.reels.length?state.reels:REFERENCE_REELS.slice();
@@ -616,25 +657,37 @@ async function loadReferenceExample(){
   $('status').textContent='Loading complete reference campaign…';
   try{
     const base='/reference/';
-    let referenceBrief, adData, reelData, strategyData, creativeData;
+    let referenceBrief, adData, reelData, strategyData, creativeData, audienceData, offerData, structureData, creativeMatrixData;
     try{
-      const [briefResponse,adResponse,reelResponse,strategyResponse,creativeResponse]=await Promise.all([
+      const [briefResponse,adResponse,reelResponse,strategyResponse,creativeResponse,audienceResponse,offerResponse,structureResponse,creativeMatrixResponse]=await Promise.all([
         fetch(base+'reference-input.json?v='+Date.now(),{cache:'no-store'}),
         fetch(base+'reference-copy-variations.json?v='+Date.now(),{cache:'no-store'}),
         fetch(base+'reference-reel-scripts.json?v='+Date.now(),{cache:'no-store'}),
         fetch(base+'reference-strategy.json?v='+Date.now(),{cache:'no-store'}),
-        fetch(base+'reference-creative.json?v='+Date.now(),{cache:'no-store'})
+        fetch(base+'reference-creative.json?v='+Date.now(),{cache:'no-store'}),
+        fetch(base+'reference-audience.json?v='+Date.now(),{cache:'no-store'}),
+        fetch(base+'reference-offer.json?v='+Date.now(),{cache:'no-store'}),
+        fetch(base+'reference-campaign-structure.json?v='+Date.now(),{cache:'no-store'}),
+        fetch(base+'reference-creative-matrix.json?v='+Date.now(),{cache:'no-store'})
       ]);
       if(!briefResponse.ok)throw new Error('Reference brief '+briefResponse.status);
       if(!adResponse.ok)throw new Error('Reference ads '+adResponse.status);
       if(!reelResponse.ok)throw new Error('Reference reels '+reelResponse.status);
       if(!strategyResponse.ok)throw new Error('Reference strategy '+strategyResponse.status);
       if(!creativeResponse.ok)throw new Error('Reference creative '+creativeResponse.status);
+      if(!audienceResponse.ok)throw new Error('Reference audience '+audienceResponse.status);
+      if(!offerResponse.ok)throw new Error('Reference offer '+offerResponse.status);
+      if(!structureResponse.ok)throw new Error('Reference campaign structure '+structureResponse.status);
+      if(!creativeMatrixResponse.ok)throw new Error('Reference creative matrix '+creativeMatrixResponse.status);
       referenceBrief=await briefResponse.json();
       adData=await adResponse.json();
       reelData=await reelResponse.json();
       strategyData=await strategyResponse.json();
       creativeData=await creativeResponse.json();
+      audienceData=await audienceResponse.json();
+      offerData=await offerResponse.json();
+      structureData=await structureResponse.json();
+      creativeMatrixData=await creativeMatrixResponse.json();
     }catch(fetchError){
       // Offline-safe fallback: the complete reference outputs are built into the app.
       // This keeps the sample campaign working even if a static JSON asset is unavailable.
@@ -657,6 +710,10 @@ async function loadReferenceExample(){
       reelData={scripts:REFERENCE_REELS};
       strategyData={strategy:REFERENCE_STRATEGY};
       creativeData={creative:REFERENCE_CREATIVE};
+      audienceData={audience:REFERENCE_AUDIENCE};
+      offerData={offer:REFERENCE_OFFER};
+      structureData={structure:REFERENCE_CAMPAIGN_STRUCTURE};
+      creativeMatrixData={creativeMatrix:REFERENCE_CREATIVE_MATRIX};
     }
 
     const missing=ids.filter(id=>referenceBrief[id]===undefined);
@@ -670,9 +727,10 @@ async function loadReferenceExample(){
     state.aiMode=false;
     state.aiUsage=emptyAiUsage();
     state.aiImages=null;
-    state.audience=defaultAudience();
-    state.offer=defaultOffer();
-    state.campaign=defaultCampaignStructure();
+    state.audience=Object.assign(defaultAudience(),audienceData.audience||REFERENCE_AUDIENCE);
+    state.offer=Object.assign(defaultOffer(),offerData.offer||REFERENCE_OFFER);
+    state.campaign=Object.assign(defaultCampaignStructure(),structureData.structure||REFERENCE_CAMPAIGN_STRUCTURE);
+    state.creativeMatrix=Array.isArray(creativeMatrixData.creativeMatrix)?creativeMatrixData.creativeMatrix.slice():REFERENCE_CREATIVE_MATRIX.slice();
     state.strategy=strategyData.strategy||REFERENCE_STRATEGY;
     state.copy=Array.isArray(adData.ads)?adData.ads.slice():REFERENCE_ADS.slice();
     state.creative=Array.isArray(creativeData.creative)?creativeData.creative.slice():REFERENCE_CREATIVE.slice();
@@ -688,9 +746,14 @@ async function loadReferenceExample(){
     renderAudienceMatrix();
     fillOfferInputs(state.offer);
     renderOfferAnalysis();
-    $('campaignName').value='';$('campaignObjective').value='';$('campaignBudget').value='';$('campaignLocation').value='';$('campaignDestination').value='';
+    $('campaignName').value=state.campaign.name||'';
+    $('campaignObjective').value=state.campaign.objective||'';
+    $('campaignBudget').value=state.campaign.budget||'';
+    $('campaignLocation').value=state.campaign.location||'';
+    $('campaignDestination').value=state.campaign.destination||'';
     renderCampaignStructure();
-    $('status').textContent='Reference loaded — Strategy + 3 Ad Copies + 4 Creative Ideas + 3 Reel Scripts ready';
+    renderCreativeMatrix();
+    $('status').textContent='Reference loaded — Strategy, Audience, Offer, Campaign Structure, 3 Ad Copies, Creative Matrix + 4 Creative Ideas, 3 Reel Scripts ready';
     showTab('brief');
   }catch(err){
     $('status').textContent='Reference loading error — '+err.message;
@@ -709,6 +772,8 @@ $('campaignName').oninput=()=>{state.campaign.name=$('campaignName').value;};
 $('campaignBudget').oninput=()=>{state.campaign.budget=$('campaignBudget').value;};
 $('campaignLocation').oninput=()=>{state.campaign.location=$('campaignLocation').value;};
 $('campaignDestination').oninput=()=>{state.campaign.destination=$('campaignDestination').value;};
+$('genCreativeMatrix').onclick=generateCreativeMatrix;
+$('addCreativeMatrixRow').onclick=()=>{if(!Array.isArray(state.creativeMatrix))state.creativeMatrix=[];state.creativeMatrix.push({angle:CREATIVE_ANGLES[0],format:CREATIVE_FORMATS[0],hook:'',visual:'',cta:'Learn More'});renderCreativeMatrix();};
 
 $('aiMasterSwitch').onchange=onAiControlChange;
 document.querySelectorAll('.ai-stage-grid input[type=checkbox]').forEach(el=>el.onchange=onAiControlChange);
@@ -752,7 +817,7 @@ $('generateImagesBtn').onclick=async()=>{
 };
 
 $('save').onclick=()=>{const b=brief();if(!b.productName){$('status').textContent='Enter a product/service first.';return;}const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:b,state});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));$('status').textContent='Campaign saved';};
-function startNewCampaign(){ids.forEach(id=>$(id).value='');resetState();$('strategyResult').innerHTML='<div class="placeholder">Complete the brief and generate a strategy.</div>';$('copyResult').innerHTML='<div class="placeholder">Generate a campaign to create ad copy.</div>';$('creativeResult').innerHTML='<article><h3>Image Ad</h3><p>Visual concept and text hierarchy.</p></article><article><h3>Carousel</h3><p>Problem → solution → proof → CTA.</p></article><article><h3>Story</h3><p>Vertical 9:16 concept.</p></article><article><h3>Reel</h3><p>Scene-by-scene creative concept.</p></article>';$('reelsResult').innerHTML='<div class="placeholder">Generate a campaign to create reel scripts.</div>';fillAudienceInputs(state.audience);renderAudiencePlan();renderAudienceMatrix();fillOfferInputs(state.offer);renderOfferAnalysis();$('campaignName').value='';$('campaignObjective').value='';$('campaignBudget').value='';$('campaignLocation').value='';$('campaignDestination').value='';renderCampaignStructure();$('status').textContent='New campaign ready';renderAiControlSummary();showTab('brief');}
+function startNewCampaign(){ids.forEach(id=>$(id).value='');resetState();$('strategyResult').innerHTML='<div class="placeholder">Complete the brief and generate a strategy.</div>';$('copyResult').innerHTML='<div class="placeholder">Generate a campaign to create ad copy.</div>';$('creativeResult').innerHTML='<article><h3>Image Ad</h3><p>Visual concept and text hierarchy.</p></article><article><h3>Carousel</h3><p>Problem → solution → proof → CTA.</p></article><article><h3>Story</h3><p>Vertical 9:16 concept.</p></article><article><h3>Reel</h3><p>Scene-by-scene creative concept.</p></article>';$('reelsResult').innerHTML='<div class="placeholder">Generate a campaign to create reel scripts.</div>';fillAudienceInputs(state.audience);renderAudiencePlan();renderAudienceMatrix();fillOfferInputs(state.offer);renderOfferAnalysis();$('campaignName').value='';$('campaignObjective').value='';$('campaignBudget').value='';$('campaignLocation').value='';$('campaignDestination').value='';renderCampaignStructure();renderCreativeMatrix();$('status').textContent='New campaign ready';renderAiControlSummary();showTab('brief');}
 $('newCampaign').onclick=()=>{$('newCampaignConfirm').hidden=false;};
 $('confirmNewCampaign').onclick=()=>{$('newCampaignConfirm').hidden=true;startNewCampaign();};
 $('cancelNewCampaign').onclick=()=>{$('newCampaignConfirm').hidden=true;};
@@ -765,19 +830,20 @@ $('exportText').onclick=()=>{
  download('ai-ads-campaign.txt',briefText+aiText,'text/plain');
 };
 function renderSaved(){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');$('savedList').innerHTML=items.length?items.map(x=>'<div class="saved-card"><div class="saved-meta"><strong>'+esc(x.brief.productName||'Untitled campaign')+'</strong><small>'+esc(x.brief.brandName||'')+' · '+new Date(x.savedAt).toLocaleString()+'</small></div><div class="saved-actions"><button class="secondary loadBtn" data-id="'+x.id+'">Load</button><button class="secondary duplicateBtn" data-id="'+x.id+'">Duplicate</button><button class="secondary danger deleteBtn" data-id="'+x.id+'">Delete</button></div></div>').join(''):'<div class="placeholder">No saved campaigns yet.</div>';document.querySelectorAll('.loadBtn').forEach(btn=>btn.onclick=()=>loadCampaign(Number(btn.dataset.id)));document.querySelectorAll('.duplicateBtn').forEach(btn=>btn.onclick=()=>duplicateCampaign(Number(btn.dataset.id)));document.querySelectorAll('.deleteBtn').forEach(btn=>btn.onclick=()=>deleteCampaign(Number(btn.dataset.id)));}
-function duplicateCampaign(id){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');const item=items.find(x=>x.id===id);if(!item)return;const copyBrief={...item.brief,productName:(item.brief.productName||'Untitled campaign')+' (Copy)'};const copyState=item.state?{...item.state,brief:copyBrief}:{brief:copyBrief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:item.state&&item.state.aiConfig||defaultAiConfig(),aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure()};items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:copyBrief,state:copyState});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));renderSaved();$('status').textContent='Campaign duplicated';}
+function duplicateCampaign(id){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');const item=items.find(x=>x.id===id);if(!item)return;const copyBrief={...item.brief,productName:(item.brief.productName||'Untitled campaign')+' (Copy)'};const copyState=item.state?{...item.state,brief:copyBrief}:{brief:copyBrief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:item.state&&item.state.aiConfig||defaultAiConfig(),aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[]};items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:copyBrief,state:copyState});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));renderSaved();$('status').textContent='Campaign duplicated';}
 function loadCampaign(id){
  const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');
  const item=items.find(x=>x.id===id);
  if(!item)return;
  fillBrief(item.brief);
- state=item.state||{brief:item.brief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure()};
+ state=item.state||{brief:item.brief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[]};
  state.aiConfig=state.aiConfig||defaultAiConfig();
  state.aiUsage=state.aiUsage||emptyAiUsage();
  if(state.aiImages===undefined)state.aiImages=null;
  state.audience=Object.assign(defaultAudience(),state.audience||{});
  state.offer=Object.assign(defaultOffer(),state.offer||{});
  state.campaign=Object.assign(defaultCampaignStructure(),state.campaign||{});
+ if(!Array.isArray(state.creativeMatrix))state.creativeMatrix=[];
  applyAiConfigToUI();
  fillAudienceInputs(state.audience);
  renderAudiencePlan();
@@ -790,6 +856,7 @@ function loadCampaign(id){
  $('campaignLocation').value=state.campaign.location||'';
  $('campaignDestination').value=state.campaign.destination||'';
  renderCampaignStructure();
+ renderCreativeMatrix();
  if(!state.copy)generateDemo();else{renderResults();}
  state.brief=item.brief;
  $('status').textContent='Saved campaign loaded';

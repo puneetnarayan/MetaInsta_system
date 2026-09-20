@@ -1,0 +1,27 @@
+{
+  "campaign": "Speak in Meetings Workshop",
+  "offer": {
+    "product": "Speak in Meetings Workshop",
+    "price": "₹997",
+    "discount": "",
+    "duration": "4 days",
+    "scarcity": "Limited to 20 participants per cohort",
+    "cta": "Learn More",
+    "bonuses": "Free 1:1 feedback session after Day 4",
+    "guarantee": "Not satisfied after Day 1? Full refund, no questions asked.",
+    "proof": "Delivered to working professionals across India; testimonials and outcomes shared on the landing page.",
+    "analysis": [
+      { "label": "Offer clarity", "ok": true, "note": "Product and price are both specified." },
+      { "label": "Value proposition", "ok": true, "note": "Duration/scope is specified, helping set expectations." },
+      { "label": "Risk reversal", "ok": true, "note": "A guarantee is included." },
+      { "label": "Proof", "ok": true, "note": "Proof/evidence is included." },
+      { "label": "Urgency", "ok": true, "note": "A scarcity or time-limited element is present." },
+      { "label": "CTA", "ok": true, "note": "A clear CTA is specified." }
+    ],
+    "variants": [
+      { "name": "Current Offer", "description": "Speak in Meetings Workshop · ₹997 · Includes: Free 1:1 feedback session after Day 4 · Not satisfied after Day 1? Full refund, no questions asked." },
+      { "name": "Outcome-focused", "description": "Get speak naturally and confidently in meetings with Speak in Meetings Workshop · ₹997. Not satisfied after Day 1? Full refund, no questions asked." },
+      { "name": "Bonus-focused", "description": "Speak in Meetings Workshop · ₹997 · Plus: Free 1:1 feedback session after Day 4 · Limited to 20 participants per cohort" }
+    ]
+  }
+}
