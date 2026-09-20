@@ -15,6 +15,7 @@ AI-assisted Facebook + Instagram campaign creator built with plain HTML, CSS and
 - **Creative Matrix** (within Creative Ideas): an editable Angle × Format planning table (Angle/Format/Hook/Visual/CTA), selecting from 15 reusable angles (Problem, Outcome, Question, Story, Objection, Myth, Education, Proof, Testimonial, Comparison, Before/After, Demonstration, FAQ, Urgency, Offer), generated locally at ₹0 and additive to the existing format cards
 - **AI Image Factory** (within Creative Ideas): select which creative concepts to generate images for, generate a structured, editable prompt per concept at ₹0 (Subject, Setting, Emotion, Composition, Lighting, Brand context, Text-overlay guidance, Aspect ratio, Negative guidance), review/edit every field with a live prompt preview, and only then trigger AI image generation from the reviewed prompts — see below
 - Reel script concepts
+- **Reel Factory** (within Reel Scripts): select one or more reel scripts → generate a ₹0, fully-local, beat-by-beat shot list (Hook / Problem / Turn / Solution / CTA), each beat with editable Time, Visual Direction, Voiceover/Caption, On-Screen Text and Sound/Music fields, plus a Copy Shot List action per reel
 - Save, duplicate, load and delete campaigns in browser localStorage (including AI settings and usage)
 - New Campaign / Clear workflow with an inline confirmation (no blocking browser dialogs)
 - JSON and text export (including AI configuration and usage, never secrets)
@@ -53,6 +54,15 @@ Generating an image is a deliberate, four-step, always-reviewable flow — nothi
 4. **Generate AI Images** — only enabled once AI Images is switched on; sends the reviewed prompt text (not a prompt rebuilt from scratch) for each selected concept to `api/generate.js`, which passes it straight to the image API. The cost estimate updates to reflect the number of prompts actually selected/generated, not a fixed count.
 
 Per the roadmap's own guidance: **do not rely on generated images for readable text** — the default Text-overlay guidance field tells the model not to render text, and final text overlays belong in the app / ad creative tool, not baked into the image.
+
+### Reel Factory (Reel Scripts tab)
+
+Turns a reel script (title + hook + free-text scenes) into a production-ready shot list — always ₹0, entirely local, no AI involved:
+
+1. **Select reels** — check which reel script(s) to build a shot list for.
+2. **Generate Shot List — ₹0** — derives a standard 5-beat structure (Hook / Problem / Turn / Solution / CTA) from the reel's hook and the campaign brief, each beat with a suggested Time range, Visual Direction, Voiceover/Caption, On-Screen Text and Sound/Music cue.
+3. **Review / edit** — every field on every beat is a plain editable textarea; edits are kept in `state.reelFactory` and included in Save/Export.
+4. **Copy Shot List** — copies the full beat-by-beat breakdown for one reel to the clipboard, ready to hand to an editor or use as a filming brief.
 
 ## Tests
 
