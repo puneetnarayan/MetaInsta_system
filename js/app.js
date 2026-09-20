@@ -27,13 +27,90 @@ function generateDemo(){
  const outcome=b.outcome||'a clear desired outcome';
  const offer=b.offer||'your offer';
  const location=b.location||'your target market';
- state.strategy={objective:b.objective||'Lead Generation',audience:audience+(b.ageRange?' · '+b.ageRange:'')+(location?' · '+location:''),corePain:'The audience is likely to hesitate or delay action because '+problem.toLowerCase().replace(/[.!?]+$/)+'.',desiredOutcome:'Help the audience move toward '+outcome.toLowerCase().replace(/[.!?]+$/)+'.',positioning:product+' is positioned as a practical way for '+audience+' to address the problem and move toward the desired outcome.',keyMessage:'You do not need to remain stuck with the problem. '+product+' gives you a clear next step toward '+outcome.toLowerCase().replace(/[.!?]+$/)+'.',funnelAngle:'Problem awareness → useful insight → offer → simple CTA.',testing:['Problem-led hook vs outcome-led hook','Short primary text vs story-led primary text','Direct CTA vs curiosity CTA']};
- state.copy=[{name:'Ad 1 · Problem-led',hook:'Still struggling with '+problem.toLowerCase().replace(/[.!?]+$/)+'?',primaryText:'If you are '+audience.toLowerCase()+', you may recognise this: '+problem+'\\n\\n'+product+' is designed to help you move toward '+outcome.toLowerCase().replace(/[.!?]+$/)+'.\\n\\n'+offer+'. Take the next step and see whether it is right for you.',headline:'A practical next step for '+audience,description:offer,cta:'Learn More'},{name:'Ad 2 · Outcome-led',hook:'What would change if '+outcome.toLowerCase().replace(/[.!?]+$/)+'?',primaryText:'Imagine being able to '+outcome.toLowerCase().replace(/[.!?]+$/)+' without constantly feeling held back by the same challenge.\\n\\n'+product+' helps '+audience.toLowerCase()+' work toward that outcome with a practical, focused approach.\\n\\n'+offer+'.',headline:'Move toward '+outcome,description:'See how it works',cta:'Learn More'},{name:'Ad 3 · Conversational',hook:'Can I ask you a quick question?',primaryText:'When '+problem.toLowerCase().replace(/[.!?]+$/)+', what do you usually do?\\n\\n'+product+' was created for '+audience.toLowerCase()+' who want a clearer way forward. The goal is simple: '+outcome.toLowerCase().replace(/[.!?]+$/)+'.\\n\\n'+offer+'. Explore the details and decide if it fits your needs.',headline:'Could this be your next step?',description:'Explore the offer',cta:'Learn More'}];
- state.creative=[{format:'Single Image Ad',concept:'Primary visual: a relatable moment showing the customer before the solution. On-image text: “'+shortText(problem,58)+'”\\nSupporting line: “Move toward '+shortText(outcome,55)+'.”\\nCTA: '+(offer||'Learn More')},{format:'Carousel',concept:'Card 1: The problem. Card 2: Why it keeps happening. Card 3: The practical shift. Card 4: What '+product+' provides. Card 5: Offer + CTA.'},{format:'Instagram Story',concept:'Frame 1: question-led hook. Frame 2: audience pain point. Frame 3: one useful insight. Frame 4: introduce '+product+'. Frame 5: '+offer+' + CTA.'},{format:'Instagram Reel',concept:'15–30 seconds. Open with the problem in the first 2 seconds, show a relatable example, introduce the solution, show the desired outcome, then finish with a clear CTA.'}];
- state.reels=[{title:'Reel 1 · Problem to solution',hook:'If '+problem.toLowerCase().replace(/[.!?]+$/)+', try this.',scenes:['0–2s — Hook: say the problem directly.','2–7s — Relatable example: show what the audience experiences.','7–15s — Insight: explain one practical shift.','15–23s — Solution: introduce '+product+'.','23–30s — CTA: invite viewers to explore the offer.']},{title:'Reel 2 · Desired outcome',hook:'Imagine '+outcome.toLowerCase().replace(/[.!?]+$/)+'.',scenes:['0–2s — Hook with the desired outcome.','2–8s — Contrast it with the current frustration.','8–18s — Explain how '+product+' helps.','18–25s — Show the next step.','25–30s — CTA: '+offer+'.']},{title:'Reel 3 · Question format',hook:'Quick question for '+audience.toLowerCase()+':',scenes:['0–3s — Ask a direct question.','3–9s — Name the common challenge.','9–17s — Give one useful insight.','17–25s — Present '+product+' as the offer.','25–30s — CTA: learn more and decide if it fits.']}];
- state.selectedCopy=state.copy[0].name;renderResults();
-}
+ const tone=b.tone||'Professional + Friendly';
+ const clean=s=>String(s).trim().replace(/[.!?]+$/,'');
+ const p=clean(problem),o=clean(outcome);
+ const aud=audience.toLowerCase(),prod=product.toLowerCase();
+ const objective=b.objective||'Lead Generation';
+ const cta=objective==='Sales'?'Shop Now':objective==='WhatsApp Leads'?'Send Message':objective==='Website Traffic'?'Learn More':'Learn More';
 
+ state.strategy={
+  objective,
+  audience:(audience+(b.ageRange?' · '+b.ageRange:'')+(location?' · '+location:'')),
+  corePain:'The audience is dealing with '+p+'. The campaign should make them feel understood before introducing the offer.',
+  desiredOutcome:'Move the audience toward '+o+' through a practical, credible next step.',
+  positioning:product+' is positioned as a focused solution for '+aud+' rather than a generic answer to every problem.',
+  keyMessage:'You may already have the intent or ability to '+shortText(o,110)+'. The barrier is turning that intention into action. '+product+' provides a practical next step.',
+  funnelAngle:'Problem recognition → relatable insight → desired outcome → offer → clear CTA.',
+  testing:[
+   'Problem-led: mirror the customer’s own words and situation.',
+   'Outcome-led: show what becomes easier or better after taking action.',
+   'Question-led: make the audience recognise themselves in the first sentence.',
+   'Offer-led: introduce the practical details only after relevance is established.'
+  ],
+  tone
+ };
+
+ state.copy=[
+  {
+   name:'Ad 1 · Problem-led',
+   hook:'Still '+p.toLowerCase()+'?',
+   primaryText:'You may already know what you want. The difficult part is '+p.toLowerCase()+'.\\n\\nIf you are '+aud+', this is exactly the kind of situation '+product+' is designed to address.\\n\\nThe focus is practical: '+o+'.\\n\\n'+(offer?offer+' · ':'')+'Explore the details and see if it is right for you.',
+   headline:'A practical next step for '+audience,
+   description:shortText(product+' for people who want '+o,90),
+   cta
+  },
+  {
+   name:'Ad 2 · Outcome-led',
+   hook:'What would change if you could '+o.toLowerCase()+'?',
+   primaryText:'Imagine '+o.toLowerCase()+'.\\n\\nFor '+aud+', the first step is often not doing more — it is having a clearer, more practical way to move forward.\\n\\n'+product+' helps you work toward that outcome with a focused approach.\\n\\n'+(offer?offer+'. ':'')+'See how it works and decide whether it fits your needs.',
+   headline:'Move toward '+shortText(o,55),
+   description:'Practical help for '+aud,
+   cta
+  },
+  {
+   name:'Ad 3 · Question-led',
+   hook:'Quick question for '+aud+' — does this sound familiar?',
+   primaryText:'You want to '+o.toLowerCase()+', but '+p.toLowerCase()+'.\\n\\nThat gap is frustrating — especially when you know you are capable of more.\\n\\n'+product+' gives '+aud+' a structured next step toward '+o.toLowerCase()+'.\\n\\n'+(offer?offer+'. ':'')+'Take a look and decide if it is useful for you.',
+   headline:'Have the goal? Take the next step.',
+   description:'A focused approach to '+o,
+   cta
+  }
+ ];
+
+ state.creative=[
+  {format:'Single Image Ad',concept:'Show the customer in the exact moment represented by the problem. Headline: “'+shortText(problem,62)+'” Supporting line: “Move toward '+shortText(outcome,58)+'.” Keep the visual simple, mobile-readable and focused on one idea.'},
+  {format:'Carousel',concept:'Card 1: recognise the problem. Card 2: describe the real-life situation. Card 3: give one useful insight. Card 4: introduce '+product+'. Card 5: show '+(offer||'the offer')+' and a clear CTA.'},
+  {format:'Instagram Story',concept:'Frame 1: a direct question about the problem. Frame 2: mirror the customer situation. Frame 3: give one practical insight. Frame 4: introduce '+product+'. Frame 5: show '+(offer||'the offer')+' and '+cta+'.'},
+  {format:'Instagram Reel',concept:'20–30 seconds: open with the problem in the first 2 seconds; show a recognisable real-life moment; give one useful insight; introduce '+product+'; show the desired outcome; finish with '+cta+'.'}
+ ];
+
+ state.reels=[
+  {title:'Reel 1 · Problem to solution',hook:'Ever '+p.toLowerCase()+'?',scenes:[
+   '0–3s — On-screen hook: “'+shortText(problem,70)+'”',
+   '3–8s — Show a realistic situation where the customer experiences the problem.',
+   '8–15s — Voiceover: explain why the situation feels difficult without blaming the customer.',
+   '15–23s — Introduce '+product+' as a practical next step toward '+o+'.',
+   '23–30s — Show '+(offer||'the offer')+' and CTA: '+cta+'.'
+  ]},
+  {title:'Reel 2 · Outcome-led',hook:'Imagine being able to '+o.toLowerCase()+'.',scenes:[
+   '0–3s — Show the desired outcome immediately.',
+   '3–8s — Contrast it with the current frustration: '+shortText(problem,80)+'.',
+   '8–16s — Give one useful tip or insight relevant to '+aud+'.',
+   '16–24s — Introduce '+product+' and explain its practical role.',
+   '24–30s — Show '+(offer||'the offer')+' and CTA: '+cta+'.'
+  ]},
+  {title:'Reel 3 · Question format',hook:'Do you '+p.toLowerCase()+'?',scenes:[
+   '0–3s — Put the question on screen and pause for recognition.',
+   '3–9s — Show a relatable example from the customer’s daily life.',
+   '9–17s — Give one practical shift the viewer can try.',
+   '17–25s — Present '+product+' as the next step for '+aud+'.',
+   '25–30s — End with '+(offer||'the offer')+' and CTA: '+cta+'.'
+  ]}
+ ];
+ state.selectedCopy=state.copy[0].name;
+ renderResults();
+}
 function shortText(value,max){const s=String(value).trim();return s.length>max?s.slice(0,max-1).trim()+'…':s;}
 
 function renderResults(){
