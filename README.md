@@ -14,7 +14,7 @@ AI-assisted Facebook + Instagram campaign creator built with plain HTML, CSS and
 - Creative concepts, with inline (non-blocking) editing, and optional manually-triggered AI image generation per concept
 - **Creative Matrix** (within Creative Ideas): an editable Angle × Format planning table (Angle/Format/Hook/Visual/CTA), selecting from 15 reusable angles (Problem, Outcome, Question, Story, Objection, Myth, Education, Proof, Testimonial, Comparison, Before/After, Demonstration, FAQ, Urgency, Offer), generated locally at ₹0 and additive to the existing format cards
 - **AI Image Factory** (within Creative Ideas): select which creative concepts to generate images for, generate a structured, editable prompt per concept at ₹0 (Subject, Setting, Emotion, Composition, Lighting, Brand context, Text-overlay guidance, Aspect ratio, Negative guidance), review/edit every field with a live prompt preview, and only then trigger AI image generation from the reviewed prompts — see below
-- Reel script concepts
+- **Reel scripts**: each reel has a Title, Hook, Angle (Problem-led / Outcome-led / Question / Story / Educational / Objection / Testimonial), Duration (15/30/45/60s), timed Scenes, Voiceover, On-Screen Text, Camera Direction, B-Roll, CTA and a ready-to-post Caption — all editable, with a one-click Copy Script per reel
 - **Reel Factory** (within Reel Scripts): select one or more reel scripts → generate a ₹0, fully-local, beat-by-beat shot list (Hook / Problem / Turn / Solution / CTA), each beat with editable Time, Visual Direction, Voiceover/Caption, On-Screen Text and Sound/Music fields, plus a Copy Shot List action per reel
 - **Landing Page** tab: analyses the campaign's destination URL at ₹0 — server-side fetch (avoids browser CORS), heuristic checks (Headline/Subheadline/Offer/CTA/Proof/Benefits/Objections/Trust/Form/Mobile usability) drawn only from signals actually found on the page, a Message Match comparison against the selected Ad Copy, and a manual paste-the-text fallback when a page can't be fetched — see below
 - Save, duplicate, load and delete campaigns in browser localStorage (including AI settings and usage)
@@ -56,9 +56,13 @@ Generating an image is a deliberate, four-step, always-reviewable flow — nothi
 
 Per the roadmap's own guidance: **do not rely on generated images for readable text** — the default Text-overlay guidance field tells the model not to render text, and final text overlays belong in the app / ad creative tool, not baked into the image.
 
+### Reel Scripts (Reel Scripts tab)
+
+Each reel carries: Title, Hook, Angle, Duration, timed Scenes, Voiceover, On-Screen Text, Camera Direction, B-Roll, CTA and Caption — all editable inline, with a per-reel Copy Script that includes every field. Reel Scripts AI (when on) also produces this full shape; older saved reels with only `{title, hook, scenes}` are normalised with sensible defaults (Problem-led angle, 30s duration, empty text fields) rather than breaking.
+
 ### Reel Factory (Reel Scripts tab)
 
-Turns a reel script (title + hook + free-text scenes) into a production-ready shot list — always ₹0, entirely local, no AI involved:
+An additive, always-₹0 tool on top of the reel scripts above — turns a reel into a production-ready shot list, entirely local, no AI involved:
 
 1. **Select reels** — check which reel script(s) to build a shot list for.
 2. **Generate Shot List — ₹0** — derives a standard 5-beat structure (Hook / Problem / Turn / Solution / CTA) from the reel's hook and the campaign brief, each beat with a suggested Time range, Visual Direction, Voiceover/Caption, On-Screen Text and Sound/Music cue.

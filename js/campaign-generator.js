@@ -68,27 +68,27 @@ function buildCampaign(b){
  ];
 
  const reels=[
-  {title:'Reel 1 · Problem to solution',hook:'Ever '+p.toLowerCase()+'?',scenes:[
+  {title:'Reel 1 · Problem to solution',hook:'Ever '+p.toLowerCase()+'?',angle:'Problem-led',duration:'30',scenes:[
    '0–3s — On-screen hook: “'+shortText(problem,70)+'”',
    '3–8s — Show a realistic situation where the customer experiences the problem.',
    '8–15s — Voiceover: explain why the situation feels difficult without blaming the customer.',
    '15–23s — Introduce '+product+' as a practical next step toward '+o+'.',
    '23–30s — Show '+(offer||'the offer')+' and CTA: '+cta+'.'
-  ]},
-  {title:'Reel 2 · Outcome-led',hook:'Imagine being able to '+o.toLowerCase()+'.',scenes:[
+  ],voiceover:'Ever '+p.toLowerCase()+'? You are not alone — and it does not have to stay that way. '+product+' gives '+aud+' a practical next step toward '+o.toLowerCase()+'. '+(offer?offer+'. ':'')+cta+'.',onScreenText:shortText(problem,70),cameraDirection:'Static or handheld phone-style shot for the opening scene; cut to a simple product/offer end card for the CTA.',bRoll:'Real-life clips of the problem moment (e.g. hesitation, searching for words, a missed opportunity).',cta,caption:'Still '+p.toLowerCase()+' 👀 '+product+' — '+(offer||'')+' '+cta+'.'},
+  {title:'Reel 2 · Outcome-led',hook:'Imagine being able to '+o.toLowerCase()+'.',angle:'Outcome-led',duration:'30',scenes:[
    '0–3s — Show the desired outcome immediately.',
    '3–8s — Contrast it with the current frustration: '+shortText(problem,80)+'.',
    '8–16s — Give one useful tip or insight relevant to '+aud+'.',
    '16–24s — Introduce '+product+' and explain its practical role.',
    '24–30s — Show '+(offer||'the offer')+' and CTA: '+cta+'.'
-  ]},
-  {title:'Reel 3 · Question format',hook:'Do you '+p.toLowerCase()+'?',scenes:[
+  ],voiceover:'Imagine being able to '+o.toLowerCase()+'. For '+aud+', the gap is usually not effort — it is a clear next step. '+product+' helps you work toward that outcome. '+(offer?offer+'. ':'')+cta+'.',onScreenText:shortText(outcome,70),cameraDirection:'Open on the outcome (confident, resolved moment), then cut back to the contrast/problem, then to a clean end card.',bRoll:'Before/after style clips contrasting the frustration with the desired outcome.',cta,caption:'Imagine '+o.toLowerCase()+' 🙌 '+product+' — '+(offer||'')+' '+cta+'.'},
+  {title:'Reel 3 · Question format',hook:'Do you '+p.toLowerCase()+'?',angle:'Question',duration:'30',scenes:[
    '0–3s — Put the question on screen and pause for recognition.',
    '3–9s — Show a relatable example from the customer’s daily life.',
    '9–17s — Give one practical shift the viewer can try.',
    '17–25s — Present '+product+' as the next step for '+aud+'.',
    '25–30s — End with '+(offer||'the offer')+' and CTA: '+cta+'.'
-  ]}
+  ],voiceover:'Quick question — do you '+p.toLowerCase()+'? If that sounds familiar, '+product+' was built for '+aud+'. It is a focused next step toward '+o.toLowerCase()+'. '+(offer?offer+'. ':'')+cta+'.',onScreenText:'Do you '+p.toLowerCase()+'?',cameraDirection:'Direct-to-camera delivery for the question, then a quick relatable cutaway scene, ending on a simple end card.',bRoll:'A short relatable daily-life clip that mirrors the audience’s situation.',cta,caption:'Quick question for '+aud+' 👇 '+product+' — '+(offer||'')+' '+cta+'.'}
  ];
 
  return {strategy,copy,creative,reels};
