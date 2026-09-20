@@ -17,6 +17,7 @@ AI-assisted Facebook + Instagram campaign creator built with plain HTML, CSS and
 - **Reel scripts**: each reel has a Title, Hook, Angle (Problem-led / Outcome-led / Question / Story / Educational / Objection / Testimonial), Duration (15/30/45/60s), timed Scenes, Voiceover, On-Screen Text, Camera Direction, B-Roll, CTA and a ready-to-post Caption — all editable, with a one-click Copy Script per reel
 - **Reel Factory** (within Reel Scripts): select one or more reel scripts → generate a ₹0, fully-local, beat-by-beat shot list (Hook / Problem / Turn / Solution / CTA), each beat with editable Time, Visual Direction, Voiceover/Caption, On-Screen Text and Sound/Music fields, plus a Copy Shot List action per reel
 - **Landing Page** tab: analyses the campaign's destination URL at ₹0 — server-side fetch (avoids browser CORS), heuristic checks (Headline/Subheadline/Offer/CTA/Proof/Benefits/Objections/Trust/Form/Mobile usability) drawn only from signals actually found on the page, a Message Match comparison against the selected Ad Copy, and a manual paste-the-text fallback when a page can't be fetched — see below
+- **Launch Checklist** tab: an editable, ₹0 checklist across four sections (Pre-launch, Campaign, Ads, Final — 31 items total, matching Meta's real pre-flight steps), each with a per-section completion count, saved with the campaign — nothing here is auto-verified, it's a manual sign-off
 - Save, duplicate, load and delete campaigns in browser localStorage (including AI settings and usage)
 - New Campaign / Clear workflow with an inline confirmation (no blocking browser dialogs)
 - JSON and text export (including AI configuration and usage, never secrets)
@@ -78,6 +79,17 @@ Always ₹0 — this never calls an AI provider, only (optionally) fetches the p
 3. **If the fetch fails** (network error, timeout, non-HTML response, CORS-restricted target, etc.) the UI clearly says so and reveals a **paste the page text** fallback; the same heuristic checks then run against the pasted text, except Form and Mobile usability, which require the live page's markup and are explicitly marked *not checked* rather than guessed.
 4. **Message Match** — compares the selected Ad Copy's hook, product/offer name and CTA against the landing page's headline/text using simple keyword overlap, and reports each as a testable observation ("this may be a mismatch — verify manually"), never a definitive claim.
 
+### Launch Checklist (Launch Checklist tab)
+
+Four sections, matching Meta's actual pre-flight steps, each rendered as a plain checkbox list with a live "N / total complete" count:
+
+- **Pre-launch** (11 items) — Business Manager, ad account, payment method, Facebook Page, Instagram, tracking, domain, conversion event, landing page tested, mobile page tested, UTM parameters.
+- **Campaign** (7 items) — objective, budget, campaign name, ad set structure, audience, placements, optimisation.
+- **Ads** (7 items) — primary text, headline, description, CTA, image/video, destination URL, tracking.
+- **Final** (6 items) — preview, links tested, mobile preview, policy-sensitive wording checked, tracking checked, ready to publish.
+
+Checking an item only records that *you* confirmed it — nothing is verified automatically, and the checklist state is saved and loaded with the rest of the campaign (including in Save/Load/Duplicate and JSON/text export).
+
 ## Tests
 
 The template logic used by Demo Mode lives in `js/campaign-generator.js` (a plain, dependency-free module usable from both the browser and Node). Run the test suite with:
@@ -90,11 +102,10 @@ npm test
 
 Following the Meta Ads Campaign Operating System roadmap:
 
-1. Launch Checklist (Phase 9)
-2. Performance Analyzer (Phase 10)
-3. Campaign Doctor + Optimisation (Phase 11)
-4. Prompt Library (Phase 12)
-5. 90-Day Plan (Phase 13)
+1. Performance Analyzer (Phase 10)
+2. Campaign Doctor + Optimisation (Phase 11)
+3. Prompt Library (Phase 12)
+4. 90-Day Plan (Phase 13)
 6. Direct Meta Ads API integration (explicitly out of scope for this roadmap; left as an architectural option for later)
 
 ## Deployment
