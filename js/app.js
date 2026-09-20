@@ -173,7 +173,11 @@ async function loadReferenceExample(){
       state.selectedCopy=state.copy[0].name;
       renderCopy();
     }
-    $('status').textContent='Reference campaign loaded — sample ad copies populated; review before use';
+    if(Array.isArray(referenceBrief.reelScripts)&&referenceBrief.reelScripts.length){
+      state.reels=referenceBrief.reelScripts;
+      renderReels();
+    }
+    $('status').textContent='Reference campaign loaded — Ad Copy and Reel Scripts populated; review before use';
     showTab('brief');
   }catch(err){
     $('status').textContent='Reference loading error — '+err.message;
