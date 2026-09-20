@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
+<defs>
+<linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#f7f4ef"/><stop offset="1" stop-color="#eaf0f7"/></linearGradient>
+<linearGradient id="pink" x1="0" x2="1"><stop stop-color="#ef6a87"/><stop offset="1" stop-color="#f39bb0"/></linearGradient>
+<filter id="shadow"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-opacity=".15"/></filter>
+</defs>
+<rect width="1200" height="900" fill="#f3f5f8"/>
+<text x="50" y="58" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#14294a">Coach Sapna Narayan — Sample Creative Set</text>
+<text x="50" y="90" font-family="Arial,sans-serif" font-size="16" fill="#64748b">Speak in Meetings Workshop · Reference campaign</text>
+
+<g filter="url(#shadow)">
+<rect x="45" y="125" width="530" height="330" rx="20" fill="url(#bg)"/>
+<rect x="70" y="150" width="250" height="275" rx="16" fill="#dbe5ef"/>
+<circle cx="195" cy="235" r="58" fill="#c8a98a"/>
+<path d="M120 365 Q195 285 270 365 L270 425 L120 425Z" fill="#182c48"/>
+<text x="345" y="190" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#14294a">Speak with</text>
+<text x="345" y="225" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#14294a">Confidence</text>
+<text x="345" y="260" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#14294a">in Meetings</text>
+<text x="345" y="302" font-family="Arial,sans-serif" font-size="16" fill="#334155">Turn your ideas into</text>
+<text x="345" y="325" font-family="Arial,sans-serif" font-size="16" fill="#334155">clear, confident conversations.</text>
+<rect x="345" y="360" width="190" height="44" rx="22" fill="url(#pink)"/>
+<text x="440" y="388" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="white">Learn More</text>
+</g>
+
+<g filter="url(#shadow)">
+<rect x="600" y="125" width="555" height="330" rx="20" fill="white"/>
+<text x="630" y="170" font-family="Arial,sans-serif" font-size="25" font-weight="700" fill="#14294a">CAROUSEL · 4 CARDS</text>
+<g transform="translate(630,195)">
+<rect width="115" height="220" rx="12" fill="#e8eef5"/><text x="15" y="38" font-family="Arial" font-size="14" font-weight="700" fill="#14294a">1</text><text x="15" y="75" font-family="Arial" font-size="18" font-weight="700" fill="#14294a">Stuck or</text><text x="15" y="98" font-family="Arial" font-size="18" font-weight="700" fill="#14294a">silent?</text><text x="15" y="140" font-family="Arial" font-size="12" fill="#334155">You have</text><text x="15" y="157" font-family="Arial" font-size="12" fill="#334155">good ideas.</text>
+<rect x="130" width="115" height="220" rx="12" fill="#f8eee9"/><text x="145" y="38" font-family="Arial" font-size="14" font-weight="700" fill="#14294a">2</text><text x="145" y="75" font-family="Arial" font-size="16" font-weight="700" fill="#14294a">Learn</text><text x="145" y="96" font-family="Arial" font-size="16" font-weight="700" fill="#14294a">practical</text><text x="145" y="117" font-family="Arial" font-size="16" font-weight="700" fill="#14294a">skills.</text>
+<rect x="260" width="115" height="220" rx="12" fill="#e8f1f3"/><text x="275" y="38" font-family="Arial" font-size="14" font-weight="700" fill="#14294a">3</text><text x="275" y="75" font-family="Arial" font-size="16" font-weight="700" fill="#14294a">Speak up.</text><text x="275" y="97" font-family="Arial" font-size="16" font-weight="700" fill="#14294a">Be clear.</text><text x="275" y="119" font-family="Arial" font-size="16" font-weight="700" fill="#14294a">Be heard.</text>
+<rect x="390" width="115" height="220" rx="12" fill="#e5ebf2"/><text x="405" y="38" font-family="Arial" font-size="14" font-weight="700" fill="#14294a">4</text><text x="405" y="75" font-family="Arial" font-size="16" font-weight="700" fill="#14294a">4-Day</text><text x="405" y="97" font-family="Arial" font-size="16" font-weight="700" fill="#14294a">Workshop</text><text x="405" y="135" font-family="Arial" font-size="13" fill="#334155">₹997</text><rect x="405" y="160" width="82" height="30" rx="15" fill="url(#pink)"/><text x="446" y="180" text-anchor="middle" font-family="Arial" font-size="10" font-weight="700" fill="white">LEARN MORE</text>
+</g></g>
+
+<g filter="url(#shadow)">
+<rect x="45" y="490" width="345" height="355" rx="20" fill="#f9e9ed"/>
+<text x="75" y="535" font-family="Arial" font-size="25" font-weight="700" fill="#14294a">INSTAGRAM STORY</text>
+<text x="75" y="590" font-family="Arial" font-size="28" font-weight="700" fill="#14294a">Your voice</text>
+<text x="75" y="625" font-family="Arial" font-size="28" font-weight="700" fill="#ef5f7d">matters.</text>
+<text x="75" y="665" font-family="Arial" font-size="15" fill="#334155">Gain confidence to speak up</text><text x="75" y="687" font-family="Arial" font-size="15" fill="#334155">in meetings and make an impact.</text>
+<rect x="75" y="735" width="190" height="45" rx="23" fill="url(#pink)"/><text x="170" y="764" text-anchor="middle" font-family="Arial" font-size="15" font-weight="700" fill="white">Learn More</text>
+</g>
+
+<g filter="url(#shadow)">
+<rect x="420" y="490" width="350" height="355" rx="20" fill="#172b47"/>
+<text x="450" y="535" font-family="Arial" font-size="25" font-weight="700" fill="white">REEL COVER</text>
+<circle cx="595" cy="650" r="85" fill="#c8a98a"/>
+<path d="M490 805 Q595 680 700 805Z" fill="#0f1d32"/>
+<text x="450" y="585" font-family="Arial" font-size="30" font-weight="700" fill="white">From Silent</text><text x="450" y="622" font-family="Arial" font-size="30" font-weight="700" fill="#ff8fa8">to Confident</text>
+<text x="450" y="750" font-family="Arial" font-size="17" fill="white">Speak in Meetings</text><text x="450" y="774" font-family="Arial" font-size="17" fill="white">with Confidence</text>
+</g>
+
+<g filter="url(#shadow)">
+<rect x="800" y="490" width="355" height="355" rx="20" fill="white"/>
+<text x="830" y="535" font-family="Arial" font-size="25" font-weight="700" fill="#14294a">REEL FRAMES</text>
+<rect x="830" y="570" width="95" height="225" rx="10" fill="#e9eef4"/><text x="845" y="605" font-family="Arial" font-size="14" font-weight="700" fill="#14294a">0–5 sec</text><text x="845" y="690" font-family="Arial" font-size="15" font-weight="700" fill="#14294a">Good ideas?</text><text x="845" y="710" font-family="Arial" font-size="15" font-weight="700" fill="#14294a">Still silent?</text>
+<rect x="940" y="570" width="95" height="225" rx="10" fill="#f8eee9"/><text x="955" y="605" font-family="Arial" font-size="14" font-weight="700" fill="#14294a">6–15 sec</text><text x="955" y="690" font-family="Arial" font-size="15" font-weight="700" fill="#14294a">Learn simple</text><text x="955" y="710" font-family="Arial" font-size="15" font-weight="700" fill="#14294a">techniques.</text>
+<rect x="1050" y="570" width="75" height="225" rx="10" fill="#e8f1f3"/><text x="1060" y="605" font-family="Arial" font-size="12" font-weight="700" fill="#14294a">16–30 sec</text><text x="1060" y="690" font-family="Arial" font-size="14" font-weight="700" fill="#14294a">Speak with</text><text x="1060" y="710" font-family="Arial" font-size="14" font-weight="700" fill="#14294a">confidence.</text>
+</g>
+</svg>
