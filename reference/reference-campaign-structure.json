@@ -1,0 +1,57 @@
+{
+  "campaign": "Speak in Meetings Workshop",
+  "structure": {
+    "name": "SM_LeadGen_IN_25-45_Sept26",
+    "objective": "Lead Generation",
+    "budget": "₹500/day",
+    "location": "India",
+    "destination": "https://coachsapnanarayan.com/speak-in-meetings",
+    "adSets": [
+      {
+        "id": "adset-0",
+        "name": "AS_Broad_IN_25-45",
+        "audience": "Broad",
+        "age": "25–45",
+        "location": "India",
+        "placements": "Advantage+ Placements",
+        "optimisationEvent": "Lead",
+        "budget": "₹200/day",
+        "ads": [
+          { "id": "ad-0-0", "name": "AD_Problem_Hook01", "copy": "Ad Version 1 · Problem-led", "creative": "Single Image Ad", "headline": "Speak with more confidence in meetings", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_broad&utm_content=problem_hook01" },
+          { "id": "ad-0-1", "name": "AD_Outcome_Hook02", "copy": "Ad Version 2 · Outcome-led", "creative": "Carousel", "headline": "Express your ideas with confidence", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_broad&utm_content=outcome_hook02" },
+          { "id": "ad-0-2", "name": "AD_Conversational_Hook03", "copy": "Ad Version 3 · Conversational", "creative": "Instagram Story", "headline": "Have something to say? Say it clearly.", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_broad&utm_content=conversational_hook03" }
+        ]
+      },
+      {
+        "id": "adset-1",
+        "name": "AS_Interest_IN_25-45",
+        "audience": "Interest",
+        "age": "25–45",
+        "location": "India",
+        "placements": "Advantage+ Placements",
+        "optimisationEvent": "Lead",
+        "budget": "₹200/day",
+        "ads": [
+          { "id": "ad-1-0", "name": "AD_Problem_Hook01", "copy": "Ad Version 1 · Problem-led", "creative": "Single Image Ad", "headline": "Speak with more confidence in meetings", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_interest&utm_content=problem_hook01" },
+          { "id": "ad-1-1", "name": "AD_Outcome_Hook02", "copy": "Ad Version 2 · Outcome-led", "creative": "Carousel", "headline": "Express your ideas with confidence", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_interest&utm_content=outcome_hook02" },
+          { "id": "ad-1-2", "name": "AD_Conversational_Hook03", "copy": "Ad Version 3 · Conversational", "creative": "Instagram Story", "headline": "Have something to say? Say it clearly.", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_interest&utm_content=conversational_hook03" }
+        ]
+      },
+      {
+        "id": "adset-2",
+        "name": "AS_Retargeting_IN_25-45",
+        "audience": "Retargeting",
+        "age": "25–45",
+        "location": "India",
+        "placements": "Advantage+ Placements",
+        "optimisationEvent": "Lead",
+        "budget": "₹100/day",
+        "ads": [
+          { "id": "ad-2-0", "name": "AD_Problem_Hook01", "copy": "Ad Version 1 · Problem-led", "creative": "Single Image Ad", "headline": "Speak with more confidence in meetings", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_retargeting&utm_content=problem_hook01" },
+          { "id": "ad-2-1", "name": "AD_Outcome_Hook02", "copy": "Ad Version 2 · Outcome-led", "creative": "Carousel", "headline": "Express your ideas with confidence", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_retargeting&utm_content=outcome_hook02" },
+          { "id": "ad-2-2", "name": "AD_Conversational_Hook03", "copy": "Ad Version 3 · Conversational", "creative": "Instagram Story", "headline": "Have something to say? Say it clearly.", "cta": "Learn More", "destination": "https://coachsapnanarayan.com/speak-in-meetings", "tracking": "utm_source=facebook&utm_medium=paid&utm_campaign=leadgen_retargeting&utm_content=conversational_hook03" }
+        ]
+      }
+    ]
+  }
+}

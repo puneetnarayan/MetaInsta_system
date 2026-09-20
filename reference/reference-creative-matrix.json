@@ -1,0 +1,10 @@
+{
+  "campaign": "Speak in Meetings Workshop",
+  "creativeMatrix": [
+    { "angle": "Problem", "format": "Single Image Ad", "hook": "Still knowing what you want to say — but hesitating when it's your turn to speak?", "visual": "A professional sitting in a meeting, hesitating to raise their hand or enter the conversation", "cta": "Learn More" },
+    { "angle": "Outcome", "format": "Instagram Reel", "hook": "Imagine expressing your idea clearly when the meeting turns to you.", "visual": "A confident professional speaking naturally in a meeting, contrasted with the earlier hesitation", "cta": "Learn More" },
+    { "angle": "Question", "format": "Instagram Story", "hook": "Quick question: do you stay quiet in meetings even when you have something useful to say?", "visual": "The question on screen, followed by a relatable meeting scene", "cta": "Learn More" },
+    { "angle": "Proof", "format": "Carousel", "hook": "What actually changes after 4 days of practice?", "visual": "A before/after contrast across the carousel cards — hesitant participation versus confident participation", "cta": "Learn More" },
+    { "angle": "Objection", "format": "Instagram Reel", "hook": "\"My English isn't the problem — I just freeze up.\"", "visual": "A professional voicing the common hesitation directly, then a reassuring reframe toward practice over vocabulary", "cta": "Learn More" }
+  ]
+}

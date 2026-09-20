@@ -12,6 +12,7 @@ AI-assisted Facebook + Instagram campaign creator built with plain HTML, CSS and
 - **Campaign tab**: a ₹0 local Campaign → Ad Set → Ad structure builder with an editable naming convention (`SM_<Objective>_<Country>_<Age>_<MonYY>`, `AS_<Strategy>_<Country>_<Age>`, `AD_<Angle>_Hook##`), generated from the Audience strategies and existing Ad Copy — a planning layer only, it never creates anything in Meta Ads Manager
 - Ad copy variations with live Meta character-count guidance (primary text / headline / description)
 - Creative concepts, with inline (non-blocking) editing, and optional manually-triggered AI image generation per concept
+- **Creative Matrix** (within Creative Ideas): an editable Angle × Format planning table (Angle/Format/Hook/Visual/CTA), selecting from 15 reusable angles (Problem, Outcome, Question, Story, Objection, Myth, Education, Proof, Testimonial, Comparison, Before/After, Demonstration, FAQ, Urgency, Offer), generated locally at ₹0 and additive to the existing format cards
 - Reel script concepts
 - Save, duplicate, load and delete campaigns in browser localStorage (including AI settings and usage)
 - New Campaign / Clear workflow with an inline confirmation (no blocking browser dialogs)
@@ -74,8 +75,12 @@ The complete reference input, strategy, ad copy, creative concepts and reel scri
 - `reference/reference-copy-variations.json` — the 3 reference Ad Copy variations
 - `reference/reference-creative.json` — the 4 reference Creative Ideas (one per format)
 - `reference/reference-reel-scripts.json` — the 3 reference Reel Scripts
+- `reference/reference-audience.json` — the reference Audience tab (inputs, plan and testing matrix)
+- `reference/reference-offer.json` — the reference Offer tab (inputs, analysis and 3 variants)
+- `reference/reference-campaign-structure.json` — the reference Campaign Structure tab (1 campaign, 3 ad sets, 9 ads)
+- `reference/reference-creative-matrix.json` — the reference Creative Matrix (5 angle/format rows)
 - `reference/images/*.svg`, `reference/creative-board.svg` — the sample creative visuals
 
-Clicking **Use Reference Example** on the Campaign Brief tab loads all of the above into every tab (Strategy, Ad Copy, Creative Ideas, Reel Scripts) — this is what a fully generated campaign is expected to look like end to end, at ₹0, with no API calls. If any reference JSON file can't be fetched (e.g. running the HTML file directly instead of through a server), the app falls back to an equivalent copy of the same content built into `js/app.js`.
+Clicking **Use Reference Example** on the Campaign Brief tab loads all of the above into every tab (Strategy, Audience, Offer, Campaign, Ad Copy, Creative Ideas + Creative Matrix, Reel Scripts) — this is what a fully generated campaign is expected to look like end to end, at ₹0, with no API calls. If any reference JSON file can't be fetched (e.g. running the HTML file directly instead of through a server), the app falls back to an equivalent copy of the same content built into `js/app.js`.
 
 The application's own generator (`js/campaign-generator.js`) should not hard-code these campaign outputs — they exist only as the reference/example data set.
