@@ -166,33 +166,42 @@ function regenerate(type){
 async function loadReferenceExample(){
   const btn=$('useReference');
   btn.disabled=true;
-  $('status').textContent='Loading reference example…';
+  $('status').textContent='Loading complete reference campaign…';
   try{
-    const response=await fetch('/reference/reference-input.json?v='+Date.now(),{cache:'no-store'});
-    if(!response.ok)throw new Error('Reference file could not be loaded ('+response.status+')');
-    const referenceBrief=await response.json();
+    const base='/reference/';
+    const [briefResponse,adResponse,reelResponse]=await Promise.all([
+      fetch(base+'reference-input.json?v='+Date.now(),{cache:'no-store'}),
+      fetch(base+'reference-ad-copies.json?v='+Date.now(),{cache:'no-store'}),
+      fetch(base+'reference-reel-scripts.json?v='+Date.now(),{cache:'no-store'})
+    ]);
+    if(!briefResponse.ok)throw new Error('Reference brief could not be loaded ('+briefResponse.status+')');
+    if(!adResponse.ok)throw new Error('Reference ad copies could not be loaded ('+adResponse.status+')');
+    if(!reelResponse.ok)throw new Error('Reference reel scripts could not be loaded ('+reelResponse.status+')');
+
+    const referenceBrief=await briefResponse.json();
+    const adData=await adResponse.json();
+    const reelData=await reelResponse.json();
+
     const missing=ids.filter(id=>referenceBrief[id]===undefined);
     fillBrief(referenceBrief);
     const stillBlank=ids.filter(id=>referenceBrief[id]!==undefined&&$(id)&&$(id).value!==String(referenceBrief[id]??''));
-    if(missing.length||stillBlank.length)throw new Error('Some reference fields could not be populated: '+[...new Set([...missing,...stillBlank])].join(', '));
-    // Populate the complete campaign workflow from the reference brief.
-    // This keeps every downstream tab ready immediately after the reference is loaded.
+    if(missing.length||stillBlank.length){
+      throw new Error('Reference brief fields missing: '+[...new Set([...missing,...stillBlank])].join(', '));
+    }
+
     state.brief=brief();
     generateDemo();
 
-    // Reference outputs are authoritative for the sample campaign.
-    // Always replace the generated outputs with the repository reference data.
-    if(Array.isArray(referenceBrief.adCopies)){
-      state.copy=referenceBrief.adCopies.slice();
-      state.selectedCopy=state.copy.length?state.copy[0].name:null;
-    }
-    if(Array.isArray(referenceBrief.reelScripts)){
-      state.reels=referenceBrief.reelScripts.slice();
-    }
+    // Dedicated repository files are the authoritative sample outputs.
+    state.copy=Array.isArray(adData.ads)?adData.ads.slice():[];
+    state.reels=Array.isArray(reelData.scripts)?reelData.scripts.slice():[];
+    state.selectedCopy=state.copy.length?state.copy[0].name:null;
 
-    // Render every output again after the reference data has been applied.
+    if(!state.copy.length)throw new Error('Reference ad copy file contains no ads');
+    if(!state.reels.length)throw new Error('Reference reel script file contains no scripts');
+
     renderResults();
-    $('status').textContent='Reference campaign loaded — Ad Copy and Reel Scripts populated';
+    $('status').textContent='Reference loaded — 3 Ad Copies + 3 Reel Scripts ready';
     showTab('brief');
   }catch(err){
     $('status').textContent='Reference loading error — '+err.message;
