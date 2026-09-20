@@ -161,7 +161,12 @@ async function loadReferenceExample(){
     // This keeps every downstream tab ready immediately after the reference is loaded.
     state.brief=brief();
     generateDemo();
-    $('status').textContent='Reference campaign loaded — all tabs populated; review before use';
+    if(Array.isArray(referenceBrief.adCopies)&&referenceBrief.adCopies.length){
+      state.copy=referenceBrief.adCopies;
+      state.selectedCopy=state.copy[0].name;
+      renderCopy();
+    }
+    $('status').textContent='Reference campaign loaded — sample ad copies populated; review before use';
     showTab('brief');
   }catch(err){
     $('status').textContent='Reference loading error — '+err.message;
