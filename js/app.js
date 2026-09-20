@@ -20,6 +20,7 @@ function derivePromptFields(concept,b){
  return fields;
 }
 function defaultReelFactory(){return {selected:[],shots:[]};}
+function defaultLandingPage(){return {url:'',source:null,page:null,analysis:null,messageMatch:null};}
 const REEL_BEATS=['Hook','Problem','Turn','Solution','CTA'];
 const REEL_SHOT_FIELDS=['time','visual','voiceover','onScreenText','sound'];
 function reelShotFieldLabel(key){return {time:'Time',visual:'Visual Direction',voiceover:'Voiceover / Caption',onScreenText:'On-Screen Text',sound:'Sound / Music'}[key]||key;}
@@ -39,7 +40,7 @@ function deriveReelShots(reel,b){
 }
 const CREATIVE_ANGLES=['Problem','Outcome','Question','Story','Objection','Myth','Education','Proof','Testimonial','Comparison','Before/After','Demonstration','FAQ','Urgency','Offer'];
 const CREATIVE_FORMATS=['Single Image Ad','Carousel','Instagram Story','Instagram Reel'];
-let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory()};
+let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage()};
 
 const REFERENCE_ADS=[{"name":"Ad Version 1 · Problem-led","hook":"Still knowing what you want to say — but hesitating when it's your turn to speak?","primaryText":"You know the answer.\n\nYou have an idea.\n\nBut when the meeting turns to you, you suddenly start searching for words, translating in your head or wondering whether you are saying it correctly.\n\nIf this sounds familiar, you are not alone.\n\nThe Speak in Meetings Workshop is designed for working professionals who want to express their ideas more clearly and participate with greater confidence in workplace conversations.\n\n4-day live workshop · ₹997\n\nExplore the workshop and see if it is right for you.","headline":"Speak with more confidence in meetings","description":"4-day live workshop for working professionals.","cta":"Learn More"},{"name":"Ad Version 2 · Outcome-led","hook":"Imagine expressing your idea clearly when the meeting turns to you.","primaryText":"You don't necessarily need more words.\n\nYou need to feel more comfortable using the words you already know.\n\nThe Speak in Meetings Workshop helps working professionals practise how to express ideas, respond naturally and participate more confidently in workplace conversations.\n\nIf your goal is to speak more clearly without constantly worrying about finding the perfect words, this workshop may be a useful next step.\n\n4-day live workshop · ₹997","headline":"Express your ideas with confidence","description":"Practical workplace communication training.","cta":"Learn More"},{"name":"Ad Version 3 · Conversational","hook":"Quick question: do you stay quiet in meetings even when you have something useful to say?","primaryText":"Maybe you know exactly what you want to say.\n\nThen the moment comes.\n\nYou hesitate.\n\nYou search for the right words.\n\nSomeone else speaks.\n\nAnd the opportunity passes.\n\nThe Speak in Meetings Workshop is created for working professionals who want to become more comfortable expressing themselves in meetings and workplace conversations.\n\nLearn, practise and build confidence through a focused 4-day live workshop.\n\n₹997","headline":"Have something to say? Say it clearly.","description":"Build practical speaking confidence at work.","cta":"Learn More"}];
 const REFERENCE_REELS=[{"title":"Reel 1 · Problem to Solution","hook":"Ever had the perfect answer five minutes after the meeting ended?","scenes":["0–3s — Hook: “Ever had the perfect answer five minutes after the meeting ended?”","3–7s — Show a professional listening in a meeting but not speaking. Voiceover: “You knew exactly what you wanted to say...”","7–12s — Show hesitation. Voiceover: “...but you started searching for words and the conversation moved on.”","12–18s — Show a confident interaction. Voiceover: “With practice, you can learn to express your ideas more naturally.”","18–24s — Introduce the workshop. Voiceover: “That's what we practise in the Speak in Meetings Workshop.”","24–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More to see the details.”"]},{"title":"Reel 2 · Outcome-led","hook":"Imagine your next meeting feeling easier.","scenes":["0–3s — Show the desired outcome immediately.","3–8s — Voiceover: “You have the knowledge. You have the ideas.”","8–15s — Show the person speaking clearly. Voiceover: “The next step is expressing those ideas clearly when the moment comes.”","15–24s — Show workshop practice. Voiceover: “The Speak in Meetings Workshop gives you a focused environment to practise workplace communication.”","24–30s — End frame: “4-day live workshop · ₹997” and “Learn More.”"]},{"title":"Reel 3 · Question Format","hook":"Do you stay quiet in meetings even when you have something useful to say?","scenes":["0–3s — Put the question on screen and pause for recognition.","3–9s — Show a meeting situation. Voiceover: “Maybe you're searching for the right words.”","9–17s — Show a simple speaking exercise. Voiceover: “Maybe you're worried about making a mistake.”","17–25s — Introduce the workshop. Voiceover: “The Speak in Meetings Workshop helps you practise expressing your ideas more clearly and confidently.”","25–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More.”"]}];
@@ -91,7 +92,7 @@ function fillBrief(b){
 }
 function resetState(){
  const keepAiConfig=state.aiConfig||defaultAiConfig();
- state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:keepAiConfig,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory()};
+ state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:keepAiConfig,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage()};
 }
 function showTab(name){
  document.querySelectorAll('nav button').forEach(b=>{const active=b.dataset.tab===name;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});
@@ -129,6 +130,12 @@ function showTab(name){
  if(name==='creative'){renderCreativeMatrix();renderImageConceptSelect();fillImageFactoryGlobalInputs();renderImagePrompts();}
  if(name==='copy')renderCopy();
  if(name==='reels'){renderReels();renderReelSelect();renderReelShotList();}
+ if(name==='landing'){
+   if(!state.landingPage)state.landingPage=defaultLandingPage();
+   if(!state.landingPage.url){const currentBrief=brief();if(currentBrief.landingPage)state.landingPage.url=currentBrief.landingPage;}
+   fillLandingPageInputs();
+   renderLandingPageAnalysis();
+ }
  if(name==='saved')renderSaved();
  if(name==='export')renderPreview();
 }
@@ -514,6 +521,105 @@ function renderReelShotList(){
   $('status').textContent='Shot list copied';
  });
 }
+
+// ---- Phase 8: Landing Page Intelligence (₹0, local heuristics on real extracted signals) ----
+function fillLandingPageInputs(){
+ const l=state.landingPage||defaultLandingPage();
+ $('lpUrl').value=l.url||'';
+}
+function messageOverlap(a,b){
+ const stop=new Set(['the','a','an','and','or','of','to','for','in','on','with','your','you','is','are','this','that','it','at','be','by','as']);
+ const words=String(a||'').toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(w=>w.length>3&&!stop.has(w));
+ const target=String(b||'').toLowerCase();
+ return words.some(w=>target.includes(w));
+}
+function buildLandingPageChecks(page,technical){
+ const text=(page.text||'').toLowerCase();
+ const h1=(page.h1s&&page.h1s[0])||'';
+ const h2=(page.h2s&&page.h2s[0])||'';
+ const ctaTexts=page.ctaTexts||[];
+ const hasPrice=/[₹$€£]\s?\d|\b\d+\s?(rs|inr|usd)\b/i.test(page.text||'');
+ const hasProof=['testimonial','review','rated','trusted by','case stud','5-star','5 star','★','⭐','success stor'].some(k=>text.includes(k));
+ const hasObjectionHandling=['faq','frequently asked','money back','refund','guarantee','cancel anytime','no risk'].some(k=>text.includes(k));
+ const hasTrustSignals=['privacy policy','terms of service','terms & conditions','secure checkout','ssl'].some(k=>text.includes(k));
+ const ctaKeywords=['learn more','buy now','sign up','get started','book','register','enroll','join','contact','call','whatsapp','download','start now','claim','reserve'];
+ const matchedCta=ctaTexts.find(t=>ctaKeywords.some(k=>t.toLowerCase().includes(k)));
+ const notCheckedNote='Not checked — this signal can only be detected by fetching the live page markup; this analysis used pasted text.';
+ return [
+  {label:'Headline',ok:!!h1,note:h1?('Headline detected: "'+shortText(h1,80)+'"'):'No clear headline (an <h1> or a strong first line) was detected on the page.'},
+  {label:'Subheadline',ok:!!(h2||page.metaDescription),note:h2?('Supporting heading detected: "'+shortText(h2,80)+'"'):(page.metaDescription?('Meta description found instead: "'+shortText(page.metaDescription,80)+'"'):'No supporting subheadline or meta description was detected.')},
+  {label:'Offer',ok:hasPrice,note:hasPrice?'A price or currency amount was detected on the page.':'No price/currency amount was detected — confirm the offer is stated clearly on the page.'},
+  {label:'CTA',ok:!!matchedCta,note:matchedCta?('Button/link text matching a call-to-action pattern was found: "'+esc(matchedCta)+'".'):'No obvious call-to-action button/link text was detected.'},
+  {label:'Proof',ok:hasProof,note:hasProof?'Proof-related language (testimonials/reviews/ratings) was detected.':'No testimonial, review or ratings language was detected — consider adding social proof.'},
+  {label:'Benefits',ok:(page.listItemCount||0)>=3,note:(page.listItemCount||0)>=3?(page.listItemCount+' list items detected — likely a benefits or feature list.'):'Fewer than 3 list items were detected — benefits may not be presented as a scannable list.'},
+  {label:'Objections',ok:hasObjectionHandling,note:hasObjectionHandling?'FAQ/guarantee/refund language was detected, which typically addresses objections.':'No FAQ, guarantee or refund language was detected.'},
+  {label:'Trust',ok:hasTrustSignals,note:hasTrustSignals?'A privacy policy, terms link or secure-checkout signal was detected.':'No privacy policy, terms link or trust-badge language was detected.'},
+  {label:'Form',ok:technical?!!page.hasFormTag:null,note:technical?(page.hasFormTag?'A <form> element was detected on the page.':'No <form> element was detected — confirm how visitors actually convert (form, WhatsApp link, phone number).'):notCheckedNote},
+  {label:'Mobile usability',ok:technical?!!page.hasViewportMeta:null,note:technical?(page.hasViewportMeta?'A responsive viewport meta tag was detected.':'No viewport meta tag was detected — the page may not be optimised for mobile.'):notCheckedNote}
+ ];
+}
+function buildMessageMatch(page,ctx){
+ const selected=Array.isArray(ctx.copy)&&ctx.copy.find(c=>c.name===ctx.selectedCopy);
+ const hook=selected?selected.hook:'';
+ const offerText=(ctx.offer&&ctx.offer.product)||(ctx.brief&&ctx.brief.productName)||'';
+ const ctaText=(selected&&selected.cta)||(ctx.offer&&ctx.offer.cta)||'';
+ const pageHeadline=(page.h1s&&page.h1s[0])||page.title||'';
+ const pageText=page.text||'';
+ return [
+  {step:'Ad Hook → Landing Page Headline',ok:!hook?null:(messageOverlap(hook,pageHeadline)||messageOverlap(hook,pageText)),note:hook?('Ad hook: "'+shortText(hook,60)+'" vs. page headline: "'+shortText(pageHeadline,60)+'"'):'No ad hook selected yet — generate or select Ad Copy first to compare.'},
+  {step:'Offer / Product Match',ok:!offerText?null:messageOverlap(offerText,pageText),note:offerText?('Product/offer "'+shortText(offerText,60)+'" '+(messageOverlap(offerText,pageText)?'appears to be mentioned on the page.':'was not found in the page text — a testable mismatch worth checking manually.')):'No product/offer name available to compare yet.'},
+  {step:'CTA Match',ok:!ctaText?null:messageOverlap(ctaText,pageText),note:ctaText?('Ad CTA "'+shortText(ctaText,40)+'" '+(messageOverlap(ctaText,pageText)?'has similar wording on the page.':'was not found in similar wording on the page — a testable mismatch, not a certainty.')):'No CTA available to compare yet.'}
+ ];
+}
+function applyLandingPageAnalysis(page,source){
+ if(!state.landingPage)state.landingPage=defaultLandingPage();
+ state.landingPage.page=page;
+ state.landingPage.source=source;
+ state.landingPage.analysis=buildLandingPageChecks(page,source==='fetched');
+ state.landingPage.messageMatch=buildMessageMatch(page,{brief:state.brief||{},offer:state.offer,copy:state.copy,selectedCopy:state.selectedCopy});
+ renderLandingPageAnalysis();
+}
+function renderLandingPageAnalysis(){
+ const lp=state.landingPage||defaultLandingPage();
+ const checks=lp.analysis;
+ const resultEl=$('lpAnalysisResult'),matchEl=$('lpMessageMatchResult');
+ if(!resultEl)return;
+ if(!checks){resultEl.innerHTML='<div class="placeholder">Enter a URL and click Analyse Landing Page.</div>';matchEl.innerHTML='';return;}
+ const rowHtml=c=>'<div class="offer-check-row '+(c.ok===null?'':c.ok?'ok':'warn')+'"><span class="offer-check-icon">'+(c.ok===null?'•':c.ok?'✓':'⚠')+'</span><div><strong>'+esc(c.label||c.step)+'</strong><p>'+esc(c.note)+'</p></div></div>';
+ resultEl.innerHTML='<div class="offer-checklist">'+checks.map(rowHtml).join('')+'</div><small class="demo-badge">₹0 MODE — heuristic checks from '+(lp.source==='manual'?'pasted text':'the fetched page')+'; not a guarantee of results</small>';
+ const mm=lp.messageMatch||[];
+ matchEl.innerHTML=mm.length?'<h3 class="variants-head">Message Match</h3><div class="offer-checklist">'+mm.map(rowHtml).join('')+'</div><small class="demo-badge">Testable observations, not certainties — verify manually.</small>':'';
+}
+async function analyzeLandingPage(){
+ if(!state.landingPage)state.landingPage=defaultLandingPage();
+ const url=$('lpUrl').value.trim();
+ if(!url){$('status').textContent='Enter a landing page URL first.';return;}
+ state.landingPage.url=url;
+ const btn=$('analyzeLandingPage');
+ btn.disabled=true;const orig=btn.textContent;btn.textContent='Fetching…';
+ $('lpManualWrap').hidden=true;
+ $('status').textContent='Fetching landing page…';
+ try{
+  const res=await fetch('/api/fetch-landing-page',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
+  const data=await res.json();
+  if(!res.ok||!data.ok)throw new Error(data.error||'Could not fetch that page.');
+  applyLandingPageAnalysis(data,'fetched');
+  $('status').textContent='Landing page analysed — ₹0';
+ }catch(err){
+  $('lpManualWrap').hidden=false;
+  $('status').textContent='Could not fetch automatically ('+err.message+') — paste the page text below instead.';
+ }finally{
+  btn.disabled=false;btn.textContent=orig;
+ }
+}
+function analyzeLandingPageManual(){
+ if(!state.landingPage)state.landingPage=defaultLandingPage();
+ const text=$('lpManualText').value.trim();
+ if(!text){$('status').textContent='Paste the page text first.';return;}
+ const page={title:'',metaDescription:'',h1s:[],h2s:[],ctaTexts:[],listItemCount:(text.match(/\n\s*[-*•]\s/g)||[]).length,hasFormTag:false,hasViewportMeta:false,text};
+ applyLandingPageAnalysis(page,'manual');
+ $('status').textContent='Pasted text analysed — ₹0 (Form/Mobile usability need the live page and are marked not checked)';
+}
 async function regenerate(type){
  if(!state.brief.productName){$('status').textContent='Generate a campaign first.';showTab('brief');return;}
  if(stageIsAi(type)){
@@ -897,6 +1003,7 @@ async function loadReferenceExample(){
     state.creative=Array.isArray(creativeData.creative)?creativeData.creative.slice():REFERENCE_CREATIVE.slice();
     state.reels=Array.isArray(reelData.scripts)?reelData.scripts.slice():REFERENCE_REELS.slice();
     state.selectedCopy=state.copy.length?state.copy[0].name:null;
+    state.landingPage=Object.assign(defaultLandingPage(),{url:referenceBrief.landingPage||''});
 
     if(!state.strategy||!state.copy.length||!state.creative.length||!state.reels.length)throw new Error('Reference outputs are empty');
 
@@ -919,6 +1026,8 @@ async function loadReferenceExample(){
     renderImagePrompts();
     renderReelSelect();
     renderReelShotList();
+    fillLandingPageInputs();
+    renderLandingPageAnalysis();
     $('status').textContent='Reference loaded — Strategy, Audience, Offer, Campaign Structure, 3 Ad Copies, Creative Matrix + 4 Creative Ideas, 3 Reel Scripts ready';
     showTab('brief');
   }catch(err){
@@ -929,7 +1038,7 @@ async function loadReferenceExample(){
 }
 $('useReference').onclick=loadReferenceExample;
 $('generate').onclick=()=>{state.brief=brief();generateAI();};
-$('regenStrategy').onclick=()=>regenerate('strategy');$('regenCopy').onclick=()=>regenerate('copy');$('regenCreative').onclick=()=>regenerate('creative');$('regenReels').onclick=()=>regenerate('reels');$('nextAudience').onclick=()=>showTab('audience');$('nextOffer').onclick=()=>showTab('offer');$('nextStructure').onclick=()=>showTab('structure');$('nextCopyFromStructure').onclick=()=>showTab('copy');$('nextCreative').onclick=()=>showTab('creative');$('nextReels').onclick=()=>showTab('reels');$('nextSaved').onclick=()=>showTab('saved');
+$('regenStrategy').onclick=()=>regenerate('strategy');$('regenCopy').onclick=()=>regenerate('copy');$('regenCreative').onclick=()=>regenerate('creative');$('regenReels').onclick=()=>regenerate('reels');$('nextAudience').onclick=()=>showTab('audience');$('nextOffer').onclick=()=>showTab('offer');$('nextStructure').onclick=()=>showTab('structure');$('nextCopyFromStructure').onclick=()=>showTab('copy');$('nextCreative').onclick=()=>showTab('creative');$('nextReels').onclick=()=>showTab('reels');$('nextLanding').onclick=()=>showTab('landing');$('nextSaved').onclick=()=>showTab('saved');
 $('genAudiencePlan').onclick=generateAudiencePlan;
 $('addMatrixRow').onclick=()=>{if(!state.audience)state.audience=defaultAudience();if(!Array.isArray(state.audience.matrix))state.audience.matrix=[];state.audience.matrix.push({audience:'',angle:'',creative:'',purpose:''});renderAudienceMatrix();};
 $('analyzeOffer').onclick=analyzeOffer;
@@ -956,6 +1065,8 @@ $('aiImagesOnlyBtn').onclick=()=>{
 };
 $('genImagePrompts').onclick=generateImagePrompts;
 $('genReelShotList').onclick=generateReelShotList;
+$('analyzeLandingPage').onclick=analyzeLandingPage;
+$('analyzeLpManual').onclick=analyzeLandingPageManual;
 $('generateImagesBtn').onclick=async()=>{
  if(!stageIsAi('images'))return;
  if(!Array.isArray(state.creative)||!state.creative.length){$('status').textContent='Generate creative concepts first.';return;}
@@ -991,7 +1102,7 @@ $('generateImagesBtn').onclick=async()=>{
 };
 
 $('save').onclick=()=>{const b=brief();if(!b.productName){$('status').textContent='Enter a product/service first.';return;}const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:b,state});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));$('status').textContent='Campaign saved';};
-function startNewCampaign(){ids.forEach(id=>$(id).value='');resetState();$('strategyResult').innerHTML='<div class="placeholder">Complete the brief and generate a strategy.</div>';$('copyResult').innerHTML='<div class="placeholder">Generate a campaign to create ad copy.</div>';$('creativeResult').innerHTML='<article><h3>Image Ad</h3><p>Visual concept and text hierarchy.</p></article><article><h3>Carousel</h3><p>Problem → solution → proof → CTA.</p></article><article><h3>Story</h3><p>Vertical 9:16 concept.</p></article><article><h3>Reel</h3><p>Scene-by-scene creative concept.</p></article>';$('reelsResult').innerHTML='<div class="placeholder">Generate a campaign to create reel scripts.</div>';fillAudienceInputs(state.audience);renderAudiencePlan();renderAudienceMatrix();fillOfferInputs(state.offer);renderOfferAnalysis();$('campaignName').value='';$('campaignObjective').value='';$('campaignBudget').value='';$('campaignLocation').value='';$('campaignDestination').value='';renderCampaignStructure();renderCreativeMatrix();fillImageFactoryGlobalInputs();renderImageConceptSelect();renderImagePrompts();renderReelSelect();renderReelShotList();$('status').textContent='New campaign ready';renderAiControlSummary();showTab('brief');}
+function startNewCampaign(){ids.forEach(id=>$(id).value='');resetState();$('strategyResult').innerHTML='<div class="placeholder">Complete the brief and generate a strategy.</div>';$('copyResult').innerHTML='<div class="placeholder">Generate a campaign to create ad copy.</div>';$('creativeResult').innerHTML='<article><h3>Image Ad</h3><p>Visual concept and text hierarchy.</p></article><article><h3>Carousel</h3><p>Problem → solution → proof → CTA.</p></article><article><h3>Story</h3><p>Vertical 9:16 concept.</p></article><article><h3>Reel</h3><p>Scene-by-scene creative concept.</p></article>';$('reelsResult').innerHTML='<div class="placeholder">Generate a campaign to create reel scripts.</div>';fillAudienceInputs(state.audience);renderAudiencePlan();renderAudienceMatrix();fillOfferInputs(state.offer);renderOfferAnalysis();$('campaignName').value='';$('campaignObjective').value='';$('campaignBudget').value='';$('campaignLocation').value='';$('campaignDestination').value='';renderCampaignStructure();renderCreativeMatrix();fillImageFactoryGlobalInputs();renderImageConceptSelect();renderImagePrompts();renderReelSelect();renderReelShotList();fillLandingPageInputs();renderLandingPageAnalysis();$('status').textContent='New campaign ready';renderAiControlSummary();showTab('brief');}
 $('newCampaign').onclick=()=>{$('newCampaignConfirm').hidden=false;};
 $('confirmNewCampaign').onclick=()=>{$('newCampaignConfirm').hidden=true;startNewCampaign();};
 $('cancelNewCampaign').onclick=()=>{$('newCampaignConfirm').hidden=true;};
@@ -1005,13 +1116,13 @@ $('exportText').onclick=()=>{
  download('ai-ads-campaign.txt',briefText+aiText,'text/plain');
 };
 function renderSaved(){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');$('savedList').innerHTML=items.length?items.map(x=>'<div class="saved-card"><div class="saved-meta"><strong>'+esc(x.brief.productName||'Untitled campaign')+'</strong><small>'+esc(x.brief.brandName||'')+' · '+new Date(x.savedAt).toLocaleString()+'</small></div><div class="saved-actions"><button class="secondary loadBtn" data-id="'+x.id+'">Load</button><button class="secondary duplicateBtn" data-id="'+x.id+'">Duplicate</button><button class="secondary danger deleteBtn" data-id="'+x.id+'">Delete</button></div></div>').join(''):'<div class="placeholder">No saved campaigns yet.</div>';document.querySelectorAll('.loadBtn').forEach(btn=>btn.onclick=()=>loadCampaign(Number(btn.dataset.id)));document.querySelectorAll('.duplicateBtn').forEach(btn=>btn.onclick=()=>duplicateCampaign(Number(btn.dataset.id)));document.querySelectorAll('.deleteBtn').forEach(btn=>btn.onclick=()=>deleteCampaign(Number(btn.dataset.id)));}
-function duplicateCampaign(id){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');const item=items.find(x=>x.id===id);if(!item)return;const copyBrief={...item.brief,productName:(item.brief.productName||'Untitled campaign')+' (Copy)'};const copyState=item.state?{...item.state,brief:copyBrief}:{brief:copyBrief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:item.state&&item.state.aiConfig||defaultAiConfig(),aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory()};items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:copyBrief,state:copyState});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));renderSaved();$('status').textContent='Campaign duplicated';}
+function duplicateCampaign(id){const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');const item=items.find(x=>x.id===id);if(!item)return;const copyBrief={...item.brief,productName:(item.brief.productName||'Untitled campaign')+' (Copy)'};const copyState=item.state?{...item.state,brief:copyBrief}:{brief:copyBrief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:item.state&&item.state.aiConfig||defaultAiConfig(),aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage()};items.unshift({id:Date.now(),savedAt:new Date().toISOString(),brief:copyBrief,state:copyState});localStorage.setItem('aiAdsCampaigns',JSON.stringify(items.slice(0,50)));renderSaved();$('status').textContent='Campaign duplicated';}
 function loadCampaign(id){
  const items=JSON.parse(localStorage.getItem('aiAdsCampaigns')||'[]');
  const item=items.find(x=>x.id===id);
  if(!item)return;
  fillBrief(item.brief);
- state=item.state||{brief:item.brief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory()};
+ state=item.state||{brief:item.brief,strategy:null,copy:null,creative:null,reels:null,selectedCopy:null,aiMode:false,aiConfig:null,aiUsage:emptyAiUsage(),aiImages:null,audience:defaultAudience(),offer:defaultOffer(),campaign:defaultCampaignStructure(),creativeMatrix:[],imageFactory:defaultImageFactory(),reelFactory:defaultReelFactory(),landingPage:defaultLandingPage()};
  state.aiConfig=state.aiConfig||defaultAiConfig();
  state.aiUsage=state.aiUsage||emptyAiUsage();
  if(state.aiImages===undefined)state.aiImages=null;
@@ -1026,6 +1137,7 @@ function loadCampaign(id){
  state.reelFactory=Object.assign(defaultReelFactory(),state.reelFactory||{});
  if(!Array.isArray(state.reelFactory.selected))state.reelFactory.selected=[];
  if(!Array.isArray(state.reelFactory.shots))state.reelFactory.shots=[];
+ state.landingPage=Object.assign(defaultLandingPage(),state.landingPage||{});
  applyAiConfigToUI();
  fillAudienceInputs(state.audience);
  renderAudiencePlan();
@@ -1044,6 +1156,8 @@ function loadCampaign(id){
  renderImagePrompts();
  renderReelSelect();
  renderReelShotList();
+ fillLandingPageInputs();
+ renderLandingPageAnalysis();
  if(!state.copy)generateDemo();else{renderResults();}
  state.brief=item.brief;
  $('status').textContent='Saved campaign loaded';

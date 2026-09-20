@@ -16,6 +16,7 @@ AI-assisted Facebook + Instagram campaign creator built with plain HTML, CSS and
 - **AI Image Factory** (within Creative Ideas): select which creative concepts to generate images for, generate a structured, editable prompt per concept at ₹0 (Subject, Setting, Emotion, Composition, Lighting, Brand context, Text-overlay guidance, Aspect ratio, Negative guidance), review/edit every field with a live prompt preview, and only then trigger AI image generation from the reviewed prompts — see below
 - Reel script concepts
 - **Reel Factory** (within Reel Scripts): select one or more reel scripts → generate a ₹0, fully-local, beat-by-beat shot list (Hook / Problem / Turn / Solution / CTA), each beat with editable Time, Visual Direction, Voiceover/Caption, On-Screen Text and Sound/Music fields, plus a Copy Shot List action per reel
+- **Landing Page** tab: analyses the campaign's destination URL at ₹0 — server-side fetch (avoids browser CORS), heuristic checks (Headline/Subheadline/Offer/CTA/Proof/Benefits/Objections/Trust/Form/Mobile usability) drawn only from signals actually found on the page, a Message Match comparison against the selected Ad Copy, and a manual paste-the-text fallback when a page can't be fetched — see below
 - Save, duplicate, load and delete campaigns in browser localStorage (including AI settings and usage)
 - New Campaign / Clear workflow with an inline confirmation (no blocking browser dialogs)
 - JSON and text export (including AI configuration and usage, never secrets)
@@ -64,6 +65,15 @@ Turns a reel script (title + hook + free-text scenes) into a production-ready sh
 3. **Review / edit** — every field on every beat is a plain editable textarea; edits are kept in `state.reelFactory` and included in Save/Export.
 4. **Copy Shot List** — copies the full beat-by-beat breakdown for one reel to the clipboard, ready to hand to an editor or use as a filming brief.
 
+### Landing Page Intelligence (Landing Page tab)
+
+Always ₹0 — this never calls an AI provider, only (optionally) fetches the page itself:
+
+1. **Analyse Landing Page** — `api/fetch-landing-page.js` fetches the URL server-side (dependency-free regex extraction, no HTML parser library), capped at an 8-second timeout and ~600KB of response body, and returns only what it can actually find: `<title>`, meta description, `<h1>`/`<h2>` text, button/link text, list-item count, and whether a `<form>` tag and a responsive viewport `<meta>` tag are present.
+2. **Heuristic checks** — Headline, Subheadline, Offer, CTA, Proof, Benefits, Objections, Trust, Form and Mobile usability are each marked ✓ or ⚠ from those real signals (e.g. a price/currency pattern for Offer, testimonial/review language for Proof, FAQ/guarantee language for Objections). Nothing about the page is invented — a check that can't be determined is shown as *not checked* rather than a false ⚠.
+3. **If the fetch fails** (network error, timeout, non-HTML response, CORS-restricted target, etc.) the UI clearly says so and reveals a **paste the page text** fallback; the same heuristic checks then run against the pasted text, except Form and Mobile usability, which require the live page's markup and are explicitly marked *not checked* rather than guessed.
+4. **Message Match** — compares the selected Ad Copy's hook, product/offer name and CTA against the landing page's headline/text using simple keyword overlap, and reports each as a testable observation ("this may be a mismatch — verify manually"), never a definitive claim.
+
 ## Tests
 
 The template logic used by Demo Mode lives in `js/campaign-generator.js` (a plain, dependency-free module usable from both the browser and Node). Run the test suite with:
@@ -74,10 +84,14 @@ npm test
 
 ## Planned next stages
 
-1. Structured prompt system refinements for strategy, copy, creatives and reels
-2. Campaign editing and regeneration history
-3. Meta Ads API integration
-4. Campaign performance analysis
+Following the Meta Ads Campaign Operating System roadmap:
+
+1. Launch Checklist (Phase 9)
+2. Performance Analyzer (Phase 10)
+3. Campaign Doctor + Optimisation (Phase 11)
+4. Prompt Library (Phase 12)
+5. 90-Day Plan (Phase 13)
+6. Direct Meta Ads API integration (explicitly out of scope for this roadmap; left as an architectural option for later)
 
 ## Deployment
 
