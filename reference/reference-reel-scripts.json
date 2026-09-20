@@ -1,0 +1,39 @@
+{
+  "campaign": "Speak in Meetings Workshop",
+  "scripts": [
+    {
+      "title": "Reel 1 · Problem to Solution",
+      "hook": "Ever had the perfect answer five minutes after the meeting ended?",
+      "scenes": [
+        "0–3s — Hook: “Ever had the perfect answer five minutes after the meeting ended?”",
+        "3–7s — Show a professional listening in a meeting but not speaking. Voiceover: “You knew exactly what you wanted to say...”",
+        "7–12s — Show hesitation. Voiceover: “...but you started searching for words and the conversation moved on.”",
+        "12–18s — Show a confident interaction. Voiceover: “With practice, you can learn to express your ideas more naturally.”",
+        "18–24s — Introduce the workshop. Voiceover: “That's what we practise in the Speak in Meetings Workshop.”",
+        "24–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More to see the details.”"
+      ]
+    },
+    {
+      "title": "Reel 2 · Outcome-led",
+      "hook": "Imagine your next meeting feeling easier.",
+      "scenes": [
+        "0–3s — Show the desired outcome immediately.",
+        "3–8s — Voiceover: “You have the knowledge. You have the ideas.”",
+        "8–15s — Show the person speaking clearly. Voiceover: “The next step is expressing those ideas clearly when the moment comes.”",
+        "15–24s — Show workshop practice. Voiceover: “The Speak in Meetings Workshop gives you a focused environment to practise workplace communication.”",
+        "24–30s — End frame: “4-day live workshop · ₹997” and “Learn More.”"
+      ]
+    },
+    {
+      "title": "Reel 3 · Question Format",
+      "hook": "Do you stay quiet in meetings even when you have something useful to say?",
+      "scenes": [
+        "0–3s — Put the question on screen and pause for recognition.",
+        "3–9s — Show a meeting situation. Voiceover: “Maybe you're searching for the right words.”",
+        "9–17s — Show a simple speaking exercise. Voiceover: “Maybe you're worried about making a mistake.”",
+        "17–25s — Introduce the workshop. Voiceover: “The Speak in Meetings Workshop helps you practise expressing your ideas more clearly and confidently.”",
+        "25–30s — End frame: “4-day live workshop · ₹997” and “Tap Learn More.”"
+      ]
+    }
+  ]
+}
