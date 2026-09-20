@@ -20,6 +20,7 @@ AI-assisted Facebook + Instagram campaign creator built with plain HTML, CSS and
 - **Launch Checklist** tab: an editable, ₹0 checklist across four sections (Pre-launch, Campaign, Ads, Final — 31 items total, matching Meta's real pre-flight steps), each with a per-section completion count, saved with the campaign — nothing here is auto-verified, it's a manual sign-off
 - **Performance** tab: import real ad performance data (CSV upload, paste a table, or manual entry) with column mapping, ₹0 dashboard cards and a lightweight spend-by-campaign bar chart, and per-row ratios (CTR/CPC/CPL/Conversion Rate/Frequency/ROAS/Cost per Conversion) clearly tagged Reported, Calculated or Unavailable — nothing is ever invented, see below
 - **Optimisation** tab: Campaign Doctor checks 10 areas of the campaign (Brief, Offer, Audience, Strategy, Copy, Creative, Landing Page, Campaign Structure, Tracking, Performance) as Complete / Needs attention / Missing with no overall score, factual Performance Observations pulled straight from imported data, and editable Optimisation Ideas (Hypothesis / Possible Explanation / Suggested Test, grounded in your actual Creative Matrix angles/formats and Audience strategies) plus a Generate New Creative Set button to close the loop — see below
+- **Prompt Library** tab: an original, ₹0 internal library of 18 prompt/framework templates spanning all 9 roadmap categories (Strategy, Audience, Offer, Copy, Creative, Reels, Landing Page, Analysis, Optimisation) and all 9 frameworks (Problem-led, Outcome-led, PAS, AIDA, Story, Question, Objection, Education, Proof), with Search, Category/Framework filters, Copy, inline Edit and your own custom Add/Remove prompts — all saved with the campaign, see below
 - Save, duplicate, load and delete campaigns in browser localStorage (including AI settings and usage)
 - New Campaign / Clear workflow with an inline confirmation (no blocking browser dialogs)
 - JSON and text export (including AI configuration and usage, never secrets)
@@ -113,6 +114,17 @@ Always ₹0, entirely local — computed live from the rest of the campaign, not
 3. **Optimisation Ideas** — **Generate Optimisation Ideas** produces four editable hypothesis cards (Hook, Creative, Audience, Landing Page), each with a Hypothesis, a Possible Explanation and a Suggested Test, personalised using your actual Creative Matrix angles/formats and Audience strategies rather than generic text. Each can be marked "Tested" and every field is editable — none of this claims a change will definitely improve results, only that it's worth testing.
 4. **Generate New Creative Set** — re-runs the ₹0 Creative Matrix generator (the same one on the Creative Ideas tab) and jumps you there, closing the loop from optimisation back into production.
 
+### Prompt Library (Prompt Library tab)
+
+Always ₹0, entirely original content written for this app — never copied from any paid course or third-party material:
+
+- **18 built-in prompts**, at least two per category, covering every category × framework the roadmap specifies. Each is a short, reusable template (e.g. an AIDA ad structure, a PAS offer stack, a five-beat reel story arc) with `{{placeholder}}` fields like `{{product}}`, `{{audience}}` or `{{problem}}` for you to fill in.
+- **Search** — filters by title, description and prompt text together.
+- **Category / Framework filters** — narrow the list to one of the 9 categories and/or one of the 9 frameworks.
+- **Copy** — copies the prompt text to the clipboard as-is.
+- **Edit** — every field (title, category, framework, description, prompt text) is directly editable; edits to a built-in prompt are kept as a per-campaign override rather than changing the shared library, so they travel with this campaign's save/export.
+- **+ Add Custom Prompt / Save** — add your own prompt, which behaves exactly like a built-in one (searchable, filterable, copyable, editable) and can be removed again; custom prompts are saved with the campaign the same way everything else is.
+
 ## Tests
 
 The template logic used by Demo Mode lives in `js/campaign-generator.js` (a plain, dependency-free module usable from both the browser and Node). Run the test suite with:
@@ -125,9 +137,8 @@ npm test
 
 Following the Meta Ads Campaign Operating System roadmap:
 
-1. Prompt Library (Phase 12)
-2. 90-Day Plan (Phase 13)
-3. Direct Meta Ads API integration (explicitly out of scope for this roadmap; left as an architectural option for later)
+1. 90-Day Plan (Phase 13)
+2. Direct Meta Ads API integration (explicitly out of scope for this roadmap; left as an architectural option for later)
 
 ## Deployment
 
