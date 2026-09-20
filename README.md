@@ -21,6 +21,7 @@ AI-assisted Facebook + Instagram campaign creator built with plain HTML, CSS and
 - **Performance** tab: import real ad performance data (CSV upload, paste a table, or manual entry) with column mapping, ₹0 dashboard cards and a lightweight spend-by-campaign bar chart, and per-row ratios (CTR/CPC/CPL/Conversion Rate/Frequency/ROAS/Cost per Conversion) clearly tagged Reported, Calculated or Unavailable — nothing is ever invented, see below
 - **Optimisation** tab: Campaign Doctor checks 10 areas of the campaign (Brief, Offer, Audience, Strategy, Copy, Creative, Landing Page, Campaign Structure, Tracking, Performance) as Complete / Needs attention / Missing with no overall score, factual Performance Observations pulled straight from imported data, and editable Optimisation Ideas (Hypothesis / Possible Explanation / Suggested Test, grounded in your actual Creative Matrix angles/formats and Audience strategies) plus a Generate New Creative Set button to close the loop — see below
 - **Prompt Library** tab: an original, ₹0 internal library of 18 prompt/framework templates spanning all 9 roadmap categories (Strategy, Audience, Offer, Copy, Creative, Reels, Landing Page, Analysis, Optimisation) and all 9 frameworks (Problem-led, Outcome-led, PAS, AIDA, Story, Question, Objection, Education, Proof), with Search, Category/Framework filters, Copy, inline Edit and your own custom Add/Remove prompts — all saved with the campaign, see below
+- **90-Day Plan** tab: a ₹0, fully editable 3-month / 12-week planning structure (Foundation → Optimisation → Consolidation, matching the roadmap's example) with concrete seed tasks tied back into this app's own tabs, per-task done checkboxes, per-month completion counts, and add/remove/edit on every task and label — explicitly framed as a customisable structure, not a guarantee of results, see below
 - Save, duplicate, load and delete campaigns in browser localStorage (including AI settings and usage)
 - New Campaign / Clear workflow with an inline confirmation (no blocking browser dialogs)
 - JSON and text export (including AI configuration and usage, never secrets)
@@ -125,6 +126,16 @@ Always ₹0, entirely original content written for this app — never copied fro
 - **Edit** — every field (title, category, framework, description, prompt text) is directly editable; edits to a built-in prompt are kept as a per-campaign override rather than changing the shared library, so they travel with this campaign's save/export.
 - **+ Add Custom Prompt / Save** — add your own prompt, which behaves exactly like a built-in one (searchable, filterable, copyable, editable) and can be removed again; custom prompts are saved with the campaign the same way everything else is.
 
+### 90-Day Plan (90-Day Plan tab)
+
+Always ₹0, entirely local, saved with the campaign:
+
+- **Structure** — 3 months (Foundation, Optimisation, Consolidation) × 4 weeks each, matching the roadmap's own example exactly (Week 1 — Offer + Audience, Week 2 — Landing Page, … through Week 12 — Consolidate Learnings).
+- **Seed tasks** — each week ships with 2-3 concrete starting tasks that point back into this app's own tabs (e.g. Week 1 includes "Analyse the offer on the Offer tab"), so the plan is immediately actionable rather than a blank template.
+- **Fully editable** — month titles, week focus labels and every task's text are plain editable inputs; tasks can be checked off, added or removed per week.
+- **Completion counts** — a live "N / total complete" count per month, from real checkbox state, never estimated.
+- The tab explicitly states this is a customisable planning structure, **not a guarantee of results**, per the roadmap's own constraint.
+
 ## Tests
 
 The template logic used by Demo Mode lives in `js/campaign-generator.js` (a plain, dependency-free module usable from both the browser and Node). Run the test suite with:
@@ -133,12 +144,11 @@ The template logic used by Demo Mode lives in `js/campaign-generator.js` (a plai
 npm test
 ```
 
-## Planned next stages
+## Roadmap status
 
-Following the Meta Ads Campaign Operating System roadmap:
+All 13 phases of the Meta Ads Campaign Operating System roadmap are complete (AI Foundation through 90-Day Plan). The one remaining item is explicitly out of scope for this roadmap and left as an architectural option for later:
 
-1. 90-Day Plan (Phase 13)
-2. Direct Meta Ads API integration (explicitly out of scope for this roadmap; left as an architectural option for later)
+- Direct Meta Ads API integration (Meta OAuth → Ad Account → Campaign/Ad Set/Ad creation → Insights API) — this app stays a planning, creation and analysis layer; it never creates anything directly in Meta Ads Manager.
 
 ## Deployment
 
