@@ -2,7 +2,16 @@ const ids=['brandName','productName','productDescription','objective','location'
 let state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null};
 
 function brief(){return Object.fromEntries(ids.map(id=>[id,$(id).value.trim()]));}
-function fillBrief(b){ids.forEach(id=>{if($(id)&&b[id]!==undefined)$(id).value=b[id]||'';});}
+function fillBrief(b){
+ ids.forEach(id=>{
+  const el=$(id);
+  if(!el||b[id]===undefined)return;
+  const value=String(b[id]??'');
+  el.value=value;
+  el.dispatchEvent(new Event('input',{bubbles:true}));
+  el.dispatchEvent(new Event('change',{bubbles:true}));
+ });
+}
 function resetState(){state={brief:{},strategy:null,copy:null,creative:null,reels:null,selectedCopy:null};}
 function showTab(name){document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===name));if(name==='saved')renderSaved();if(name==='export')renderPreview();}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
@@ -141,14 +150,17 @@ async function loadReferenceExample(){
   btn.disabled=true;
   $('status').textContent='Loading reference example…';
   try{
-    const response=await fetch('/reference/reference-input.json?'+Date.now(),{cache:'no-store'});
-    if(!response.ok) throw new Error('Reference file could not be loaded');
+    const response=await fetch('/reference/reference-input.json?v='+Date.now(),{cache:'no-store'});
+    if(!response.ok)throw new Error('Reference file could not be loaded ('+response.status+')');
     const referenceBrief=await response.json();
+    const missing=ids.filter(id=>referenceBrief[id]===undefined);
     fillBrief(referenceBrief);
-    $('status').textContent='Reference example loaded — review and confirm each field';
+    const stillBlank=ids.filter(id=>referenceBrief[id]!==undefined&&$(id)&&$(id).value!==String(referenceBrief[id]??''));
+    if(missing.length||stillBlank.length)throw new Error('Some reference fields could not be populated: '+[...new Set([...missing,...stillBlank])].join(', '));
+    $('status').textContent='All reference fields loaded — review and confirm each field';
     showTab('brief');
   }catch(err){
-    $('status').textContent='Could not load reference example — '+err.message;
+    $('status').textContent='Reference loading error — '+err.message;
   }finally{
     btn.disabled=false;
   }
